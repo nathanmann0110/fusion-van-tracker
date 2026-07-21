@@ -97,6 +97,15 @@ h1,h2,h3{font-weight:700;letter-spacing:.025em}
 .bird .worm{animation:wiggle .5s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:left center}
 @keyframes wiggle{from{transform:rotate(-8deg)}to{transform:rotate(10deg)}}
 .van.early .vanTag{background:var(--f-gold);color:#414042}
+/* the ONE early bird — carried across the sky */
+.flyer{position:absolute;top:44px;left:-460px;z-index:6;animation:flyAcross 24s linear infinite;pointer-events:none}
+.flyer .inner{display:flex;flex-direction:column;align-items:center;animation:flyBob 3.2s ease-in-out infinite}
+.flyer .bigbird svg{width:220px;height:145px;overflow:visible;display:block}
+.flyer .bigbird .bwing{transform-box:fill-box;transform-origin:100% 100%;animation:flap .5s ease-in-out infinite alternate}
+.flyer .cargo{display:flex;flex-direction:column;align-items:center;margin-top:-10px;animation:swing 2.6s ease-in-out infinite;transform-origin:top center}
+@keyframes swing{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+@keyframes flyAcross{from{left:-460px}to{left:105%}}
+@keyframes flyBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
 .earlychip{font-size:20px;font-weight:800;color:#7a5c00;background:#ffe9a8;border:1px solid var(--f-gold);border-radius:12px;padding:0 10px;margin-top:3px;white-space:nowrap}
 /* cop */
 .cop{position:relative;display:inline-flex;flex-direction:column;align-items:center;width:174px;animation:bob .45s ease-in-out infinite}
@@ -297,7 +306,7 @@ table.board tr:hover{background:#fafbfc}
   <span><span class="stripchip" style="background:var(--f-light)"></span> gray stripe = checkpoint hasn't happened yet</span>
   <span><span class="stripchip" style="background:#fff;border:1px solid var(--f-light)"></span> white stripe = never left Fusion after 7:45 / overnight</span>
   <span>🚔 = today's speeding leader — pulled over, officer walks up &amp; hands them a ticket</span>
-  <span>🐦 = early bird — at Fusion by 6:45a, or rolling to a job before 6:30a (bird + gold tag, never late)</span>
+  <span>🐦 = THE early bird — first van at Fusion this morning, carried across the sky</span>
   <span>Sales vans (Bill Bacon, Michael Santana) show location only — no morning timing</span>
 </div>
 
@@ -682,6 +691,23 @@ function birdSVG(){
   </svg>`;
 }
 
+/* the early bird flight — winner's van carried across the sky */
+function startFlyer(row, stripColor){
+  const scene = document.getElementById("scene");
+  const type = vehTypeFor(row.name, row.tag);
+  const f = document.createElement("div");
+  f.className = "flyer";
+  f.title = row.name + " — first at Fusion this morning" + (row.ebTime ? " ("+fmtET(row.ebTime)+")" : "") + "!";
+  f.innerHTML = `<div class="inner">
+    <span class="bigbird">${birdSVG()}</span>
+    <div class="cargo">
+      <svg width="160" height="26"><line x1="45" y1="0" x2="65" y2="26" stroke="#6e7073" stroke-width="3"/><line x1="115" y1="0" x2="95" y2="26" stroke="#6e7073" stroke-width="3"/></svg>
+      <div class="van early">${vehSVG(type, stripColor)}<span class="vanTag">${esc(row.tag)}</span><span class="earlychip">🐦 EARLY BIRD${row.ebTime?" · "+fmtET(row.ebTime):""}</span></div>
+    </div>
+  </div>`;
+  scene.appendChild(f);
+}
+
 /* ================= CLOCK ================= */
 function tickClock(){
   const now = new Date();
@@ -738,7 +764,7 @@ function startPursuit(row, stripColor){
   officer.innerHTML = officerSVG();
   const bubble = document.createElement("div");
   bubble.className = "tbubble";
-  bubble.textContent = "🎫 SPEEDING TICKET";
+  bubble.textContent = "🎫 TICKET";
   layer.appendChild(runner); layer.appendChild(chaser); layer.appendChild(officer); layer.appendChild(bubble);
 
   const vanEl = runner.querySelector(".van");
@@ -931,6 +957,18 @@ async function main(){
   const lbSorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
   const leaderDriver = lbSorted.length ? lbSorted[0][0] : null;
 
+  /* --- THE early bird: first van to arrive at Fusion this morning (real drive-in, before 9:30) --- */
+  let ebWinner = null, ebTime = null;
+  for (const v of fleet){
+    const nm = v.vehicle;
+    if (SALES.some(rx=>rx.test(nm))) continue;
+    const arrivals = (tripsBy[nm]||[]).filter(t=>t.stop>=dayStart && t.stop<=T930 && t.lat!=null && atFusion(t.lat,t.lon) && (t.distanceKm||0)>=0.5);
+    if (arrivals.length){
+      const first = arrivals.reduce((a,b)=>a.stop<b.stop?a:b).stop;
+      if (!ebTime || first < ebTime){ ebTime = first; ebWinner = nm; }
+    }
+  }
+
   /* --- evaluate each van --- */
   const rows = [];
   for (const v of fleet){
@@ -940,7 +978,7 @@ async function main(){
     async function fusionCheck(T){
       if (now < T) return {state:"pend"};
       /* early birds are never late — at Fusion by 6:45 or off to a job before 6:30 */
-      if (row.earlyBird) return {state:"ok", sub:"early bird"};
+      if (row.earlyCredit) return {state:"ok", sub:"early start"};
       const p = await posAt(nm, T);
       if (p && !p.driving && atFusion(p.lat,p.lon)) return {state:"ok"};
       /* not at Fusion at T — still on time if they came in earlier and already left */
@@ -961,13 +999,14 @@ async function main(){
     }
 
     row.sales = SALES.some(rx=>rx.test(nm));
+    row.earlyBird = !row.sales && nm === ebWinner; /* the ONE early bird — first at Fusion */
+    row.ebTime = row.earlyBird ? ebTime : null;
     if (row.sales){
       /* Sales vans aren't timed */
-      row.earlyBird = false;
       const sc = {state:"na", sub:"sales"};
       row.checks = {c700:sc, c715:sc, c730:sc, c745:sc};
     } else {
-      row.earlyBird = await isEarlyBird(nm);
+      row.earlyCredit = await isEarlyBird(nm);
       row.checks.c700 = await fusionCheck(T700);
       row.checks.c715 = await fusionCheck(T715);
       row.checks.c730 = routeCheck(T730);
@@ -1042,12 +1081,17 @@ async function main(){
       startPursuit(r, stripColor);
       continue;
     }
+    if (r.earlyBird){
+      /* the early bird is out of the lots — airlifted across the sky */
+      startFlyer(r, stripColor);
+      continue;
+    }
     const type = vehTypeFor(r.name, r.tag);
     if (r.zone === "road"){ roadVans.push({r, type, stripColor}); continue; }
     const el=document.createElement("div");
-    el.className="van"+(type==="small"?" small":"")+(r.earlyBird?" early":"");
-    el.innerHTML = (r.earlyBird?`<span class="bird">${birdSVG()}</span>`:"") + vehSVG(type, stripColor) + `<span class="vanTag">${esc(r.tag)}</span>` + (r.earlyBird?'<span class="earlychip">🐦 EARLY BIRD</span>':"");
-    el.title = r.name + (r.driver?(" — "+r.driver):"") + (r.place?(" — "+r.place):"") + (r.earlyBird?" — early bird!":"") + (r.sales?" — Sales (not timed)":"");
+    el.className="van"+(type==="small"?" small":"");
+    el.innerHTML = vehSVG(type, stripColor) + `<span class="vanTag">${esc(r.tag)}</span>`;
+    el.title = r.name + (r.driver?(" — "+r.driver):"") + (r.place?(" — "+r.place):"") + (r.sales?" — Sales (not timed)":"");
     lots[r.zone].appendChild(el);
   }
   /* en-route vans: rear view, staggered up the road toward the horizon */
@@ -1057,7 +1101,7 @@ async function main(){
     wrap.className = "rv" + (v.type==="small" ? " small" : "");
     wrap.style.setProperty("--lx", (i%2===0 ? -90 : 90) + "px");   /* alternate lanes */
     wrap.style.animationDelay = "-" + (i * (RDUR / Math.max(roadVans.length,1))).toFixed(2) + "s";
-    wrap.innerHTML = `<div class="van${v.r.earlyBird?" early":""}">${v.r.earlyBird?`<span class="bird">${birdSVG()}</span>`:""}${rearSVG(v.type, v.stripColor)}<span class="vanTag">${esc(v.r.tag)}</span><span class="speedchip">${kmh2mph(v.r.live.speed)} mph</span></div>`;
+    wrap.innerHTML = `<div class="van">${rearSVG(v.type, v.stripColor)}<span class="vanTag">${esc(v.r.tag)}</span><span class="speedchip">${kmh2mph(v.r.live.speed)} mph</span></div>`;
     wrap.title = v.r.name + (v.r.driver?(" — "+v.r.driver):"") + (v.r.place?(" — "+v.r.place):"") + (v.r.sales?" — Sales (not timed)":"");
     lots.road.appendChild(wrap);
   });
