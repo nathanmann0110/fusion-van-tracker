@@ -306,7 +306,7 @@ table.board tr:hover{background:#fafbfc}
   <span><span class="stripchip" style="background:var(--f-light)"></span> gray stripe = checkpoint hasn't happened yet</span>
   <span><span class="stripchip" style="background:#fff;border:1px solid var(--f-light)"></span> white stripe = never left Fusion after 7:45 / overnight</span>
   <span>🚔 = speeding leader — full-screen pursuit with spins &amp; tire smoke</span>
-  <span>🐦 = early bird — arrived at Fusion by 6:45a (bird + gold tag)</span>
+  <span>🐦 = early bird — at Fusion by 6:45a, or rolling to a job before 6:30a (bird + gold tag, never late)</span>
 </div>
 
 <div id="loading" style="display:none"><span class="spin"></span>Pulling live Geotab data — vans, trips, and violations…</div>
@@ -336,7 +336,7 @@ table.board tr:hover{background:#fafbfc}
     <div class="panel">
       <h2>Daily Schedule · Mon–Thu</h2>
       <div class="sched">
-        <div class="sched-item"><div class="sched-time">7:00a</div><div class="sched-txt"><b>All vans at Fusion.</b> Came in early and already left? Still on time. Late vans get a red stripe.</div></div>
+        <div class="sched-item"><div class="sched-time">7:00a</div><div class="sched-txt"><b>All vans at Fusion.</b> Came in early and left, or headed straight to a job before 6:30? Still on time. Late vans get a red stripe.</div></div>
         <div class="sched-item"><div class="sched-time">7:15a</div><div class="sched-txt"><b>Follow-up check.</b> Did the stragglers make it in?</div></div>
         <div class="sched-item"><div class="sched-time">7:30a</div><div class="sched-txt"><b>All vans en route to job sites.</b> Still parked at Fusion = red stripe.</div></div>
         <div class="sched-item"><div class="sched-time">7:45a</div><div class="sched-txt"><b>Follow-up check.</b> Everyone rolling?</div></div>
@@ -740,7 +740,7 @@ async function main(){
   document.getElementById("boardDate").textContent = new Intl.DateTimeFormat("en-US",{timeZone:ET,weekday:"long",month:"short",day:"numeric"}).format(new Date());
 
   const now = new Date();
-  const T645=etToday(6,45), T700=etToday(7,0), T715=etToday(7,15), T730=etToday(7,30), T745=etToday(7,45), T930=etToday(9,30);
+  const T630=etToday(6,30), T645=etToday(6,45), T700=etToday(7,0), T715=etToday(7,15), T730=etToday(7,30), T745=etToday(7,45), T930=etToday(9,30);
   if (parseInt(o.hour,10) >= 15) document.getElementById("scene").classList.add("sunset");
   const dayStart=etToday(3,0);
   const prev = prevWorkDayRange();
@@ -829,9 +829,12 @@ async function main(){
     const pts = await earlyPoints(vname);
     return pts.some(p=>p.t<=T && p.lat!=null && atFusion(p.lat,p.lon));
   }
-  /* early bird = ARRIVED at Fusion by 6:45a today (drove in — overnight parkers don't count) */
+  /* early bird = ARRIVED at Fusion by 6:45a today (drove in — overnight parkers don't count),
+     OR was rolling before 6:30a headed somewhere other than Fusion (straight to the job) */
   async function isEarlyBird(vname){
     if ((tripsBy[vname]||[]).some(t=>t.stop>=dayStart && t.stop<=T645 && t.lat!=null && atFusion(t.lat,t.lon))) return true;
+    /* real trip (not a driveway shuffle) started by 6:30a, ending away from Fusion */
+    if ((tripsBy[vname]||[]).some(t=>t.start>=dayStart && t.start<=T630 && t.lat!=null && !atFusion(t.lat,t.lon) && (t.distanceKm||0)>=0.5)) return true;
     const pts = await earlyPoints(vname);
     let wasAway = false;
     for (const p of pts){
@@ -871,6 +874,8 @@ async function main(){
 
     async function fusionCheck(T){
       if (now < T) return {state:"pend"};
+      /* early birds are never late — at Fusion by 6:45 or off to a job before 6:30 */
+      if (row.earlyBird) return {state:"ok", sub:"early bird"};
       const p = await posAt(nm, T);
       if (p && !p.driving && atFusion(p.lat,p.lon)) return {state:"ok"};
       /* not at Fusion at T — still on time if they came in earlier and already left */
@@ -890,11 +895,11 @@ async function main(){
       return {state:"late", sub: ls&&ls.lat!=null&&atFusion(ls.lat,ls.lon) ? "at Fusion" : "not moving"};
     }
 
+    row.earlyBird = await isEarlyBird(nm);
     row.checks.c700 = await fusionCheck(T700);
     row.checks.c715 = await fusionCheck(T715);
     row.checks.c730 = routeCheck(T730);
     row.checks.c745 = routeCheck(T745);
-    row.earlyBird = await isEarlyBird(nm);
 
     /* live zone for the scene */
     row.zone = v.isDriving ? "road" : (atFusion(v.latitude, v.longitude) ? "fusion" : "job");
@@ -963,7 +968,7 @@ async function main(){
     const el=document.createElement("div");
     el.className="van"+(type==="small"?" small":"")+(r.earlyBird?" early":"");
     el.innerHTML = (r.earlyBird?`<span class="bird">${birdSVG()}</span>`:"") + vehSVG(type, stripColor) + `<span class="vanTag">${esc(r.tag)}</span>` + (r.earlyBird?'<span class="earlychip">🐦 EARLY BIRD</span>':"");
-    el.title = r.name + (r.driver?(" — "+r.driver):"") + (r.earlyBird?" — early bird! At Fusion by 6:45":"");
+    el.title = r.name + (r.driver?(" — "+r.driver):"") + (r.earlyBird?" — early bird!":"");
     lots[r.zone].appendChild(el);
   }
   /* en-route vans: rear view, staggered up the road toward the horizon */
