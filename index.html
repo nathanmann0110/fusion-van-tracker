@@ -29,7 +29,7 @@ h1,h2,h3{font-weight:700;letter-spacing:.025em}
 .banner{background:#fff6e5;border:1px solid var(--f-gold);border-radius:8px;padding:8px 12px;font-size:12px;margin-bottom:10px;display:none}
 .errbanner{background:#fdecea;border:1px solid var(--bad);border-radius:8px;padding:8px 12px;font-size:12px;margin-bottom:10px;display:none;color:#7a1712}
 /* ---------------- SCENE ---------------- */
-.scene{position:relative;height:800px;border-radius:14px;overflow:hidden;border:1px solid var(--f-light);
+.scene{position:relative;height:600px;border-radius:14px;overflow:hidden;border:1px solid var(--f-light);
   background:linear-gradient(#8ec9ee 0%, #bfe0f5 42%, #ffe9c2 58%, #e8e2d2 60%, #cfd4cd 100%);box-shadow:0 2px 8px rgba(0,0,0,.08)}
 .sun{position:absolute;left:50%;top:86px;width:74px;height:74px;margin-left:-37px;border-radius:50%;
   background:radial-gradient(circle,#fff6d8 0%,#ffd766 55%,#ffb833 100%);box-shadow:0 0 46px 18px rgba(255,200,80,.65);animation:sunpulse 5s ease-in-out infinite}
@@ -51,7 +51,7 @@ h1,h2,h3{font-weight:700;letter-spacing:.025em}
 .scene.sunset .ground{background:linear-gradient(#96a189,#7f8d78)}
 .scene.sunset .mtns polygon{opacity:.85}
 /* road */
-.road{position:absolute;left:50%;bottom:0;width:620px;height:42%;margin-left:-310px;
+.road{position:absolute;left:50%;bottom:0;width:480px;height:42%;margin-left:-240px;
   background:#5a5d61;clip-path:polygon(0 100%,100% 100%,58% 0,42% 0)}
 .dash{position:absolute;left:50%;width:6px;margin-left:-3px;background:#ffe27a;border-radius:2px;animation:dashmove 1.1s linear infinite;opacity:0}
 @keyframes dashmove{0%{opacity:0}10%{opacity:1}90%{opacity:1}100%{opacity:0}}
@@ -65,29 +65,29 @@ h1,h2,h3{font-weight:700;letter-spacing:.025em}
 #zoneJob{right:0;width:31%}
 /* en-route vans: rear view, driving up the road toward the horizon */
 #roadLane{position:absolute;inset:0;padding:0}
-.rv{position:absolute;bottom:2px;left:50%;margin-left:-66px;animation:toHorizon 9s linear infinite;will-change:transform,opacity;opacity:0}
+.rv{position:absolute;bottom:2px;left:50%;margin-left:-33px;animation:toHorizon 9s linear infinite;will-change:transform,opacity;opacity:0}
 .rv .van{width:auto;animation:none}
-.rv .van svg{width:132px;height:138px}
-.rv.small .van svg{width:102px;height:108px}
+.rv .van svg{width:66px;height:69px}
+.rv.small .van svg{width:51px;height:54px}
 @keyframes toHorizon{
   0%  {transform:translateX(var(--lx,0px)) translateY(0)      scale(1);   opacity:0}
   8%  {opacity:1}
   84% {opacity:1}
-  100%{transform:translateX(calc(var(--lx,0px)/3)) translateY(-300px) scale(.22); opacity:0}
+  100%{transform:translateX(calc(var(--lx,0px)/3)) translateY(-200px) scale(.22); opacity:0}
 }
 /* structures */
 .structure{position:absolute;pointer-events:none}
 /* vehicles */
-.van{position:relative;display:inline-flex;flex-direction:column;align-items:center;width:192px}
-.van svg{width:180px;height:102px;display:block}
-.van.small svg{width:132px;height:75px}
-.van.small{width:150px}
-.vanTag{font-size:22px;font-weight:700;color:#fff;background:var(--f-dark);border-radius:12px;padding:2px 12px;margin-top:3px;white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis}
+.van{position:relative;display:inline-flex;flex-direction:column;align-items:center;width:96px}
+.van svg{width:90px;height:51px;display:block}
+.van.small svg{width:66px;height:38px}
+.van.small{width:75px}
+.vanTag{font-size:11px;font-weight:700;color:#fff;background:var(--f-dark);border-radius:6px;padding:1px 6px;margin-top:2px;white-space:nowrap;max-width:110px;overflow:hidden;text-overflow:ellipsis}
 .van.driving{animation:bob .5s ease-in-out infinite}
-@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 .van.driving .wheel{transform-box:fill-box;transform-origin:center;animation:spin .5s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.speedchip{font-size:20px;font-weight:700;color:var(--f-navy);background:#fff;border:1px solid var(--f-light);border-radius:12px;padding:0 10px;margin-top:3px}
+.speedchip{font-size:10px;font-weight:700;color:var(--f-navy);background:#fff;border:1px solid var(--f-light);border-radius:6px;padding:0 5px;margin-top:2px}
 /* early bird — hovers over vans that reached Fusion by 6:45a */
 .bird{position:absolute;top:-52px;left:50%;width:72px;height:48px;transform:translateX(-50%);animation:birdBob 2.4s ease-in-out infinite;pointer-events:none;z-index:4}
 .bird svg{width:100%;height:100%;overflow:visible;display:block}
@@ -98,30 +98,32 @@ h1,h2,h3{font-weight:700;letter-spacing:.025em}
 @keyframes wiggle{from{transform:rotate(-8deg)}to{transform:rotate(10deg)}}
 .van.early .vanTag{background:var(--f-gold);color:#414042}
 /* the ONE early bird — carried across the sky */
-.flyer{position:absolute;top:44px;left:-460px;z-index:6;animation:flyAcross 24s linear infinite;pointer-events:none}
+.flyer{position:absolute;top:44px;left:-260px;z-index:6;animation:flyAcross 24s linear infinite;pointer-events:none}
 .flyer .inner{display:flex;flex-direction:column;align-items:center;animation:flyBob 3.2s ease-in-out infinite}
-.flyer .bigbird svg{width:220px;height:145px;overflow:visible;display:block}
+.flyer .bigbird svg{width:120px;height:80px;overflow:visible;display:block}
 .flyer .bigbird .bwing{transform-box:fill-box;transform-origin:100% 100%;animation:flap .5s ease-in-out infinite alternate}
 .flyer .cargo{display:flex;flex-direction:column;align-items:center;margin-top:-10px;animation:swing 2.6s ease-in-out infinite;transform-origin:top center}
 @keyframes swing{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
-@keyframes flyAcross{from{left:-460px}to{left:105%}}
-@keyframes flyBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
-.earlychip{font-size:20px;font-weight:800;color:#7a5c00;background:#ffe9a8;border:1px solid var(--f-gold);border-radius:12px;padding:0 10px;margin-top:3px;white-space:nowrap}
+@keyframes flyAcross{from{left:-260px}to{left:105%}}
+@keyframes flyBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.earlychip{font-size:10px;font-weight:800;color:#7a5c00;background:#ffe9a8;border:1px solid var(--f-gold);border-radius:6px;padding:0 5px;margin-top:2px;white-space:nowrap}
 /* cop */
-.cop{position:relative;display:inline-flex;flex-direction:column;align-items:center;width:174px;animation:bob .45s ease-in-out infinite}
-.cop svg{width:162px;height:90px}
+.cop{position:relative;display:inline-flex;flex-direction:column;align-items:center;width:87px;animation:bob .45s ease-in-out infinite}
+.cop svg{width:81px;height:45px}
 .cop .lightR{animation:sirenR .4s steps(1) infinite}
 .cop .lightB{animation:sirenB .4s steps(1) infinite}
 @keyframes sirenR{0%,49%{opacity:1}50%,100%{opacity:.15}}
 @keyframes sirenB{0%,49%{opacity:.15}50%,100%{opacity:1}}
-.copTag{font-size:20px;font-weight:800;color:#fff;background:var(--bad);border-radius:12px;padding:2px 12px;margin-top:3px;animation:blinkTag 1s infinite}
+.copTag{font-size:10px;font-weight:800;color:#fff;background:var(--bad);border-radius:6px;padding:1px 6px;margin-top:2px;animation:blinkTag 1s infinite}
 @keyframes blinkTag{50%{opacity:.4}}
 /* ---------------- TRAFFIC STOP (chase → pull over → ticket) ---------------- */
-.pursuit{position:absolute;left:0;right:0;bottom:0;height:210px;z-index:7;pointer-events:none}
-.runner{position:absolute;bottom:4px;left:-300px;will-change:left}
-.chaser{position:absolute;bottom:4px;left:-520px;will-change:left}
-.officer{position:absolute;bottom:8px;width:48px;height:84px;z-index:8;opacity:0;will-change:left}
-.officer svg{width:48px;height:81px;display:block;overflow:visible}
+.pursuit{position:absolute;left:0;right:0;bottom:0;height:130px;z-index:7;pointer-events:none}
+.runner{position:absolute;bottom:4px;left:-150px;will-change:left}
+.chaser{position:absolute;bottom:4px;left:-260px;will-change:left}
+.officer{position:absolute;bottom:8px;width:24px;height:44px;z-index:8;opacity:0;will-change:left}
+.officer svg{width:24px;height:41px;display:block;overflow:visible}
+.officer.running .legL{animation:stepA .22s ease-in-out infinite alternate}
+.officer.running .legR{animation:stepB .22s ease-in-out infinite alternate}
 .officer .legL,.officer .legR{transform-box:fill-box;transform-origin:top center}
 .officer.walking .legL{animation:stepA .4s ease-in-out infinite alternate}
 .officer.walking .legR{animation:stepB .4s ease-in-out infinite alternate}
@@ -240,7 +242,7 @@ table.board tr:hover{background:#fafbfc}
   <div class="kpi"><div class="n" id="kFleet">–</div><div class="l">Vans Tracked</div></div>
   <div class="kpi"><div class="n" id="k700" style="color:var(--ok)">–</div><div class="l">On Time @ 7:00</div></div>
   <div class="kpi"><div class="n" id="kLate" style="color:var(--bad)">–</div><div class="l">Late @ 7:00</div></div>
-  <div class="kpi"><div class="n" id="k730" style="color:var(--f-navy)">–</div><div class="l">En Route @ 7:30</div></div>
+  <div class="kpi"><div class="n" id="k730" style="color:var(--f-navy)">–</div><div class="l">En Route @ 7:45</div></div>
   <div class="kpi"><div class="n" id="kArr" style="color:var(--f-green)">–</div><div class="l">At Job Sites</div></div>
   <div class="kpi"><div class="n" id="kSpeed" style="color:var(--f-red)">–</div><div class="l" id="kSpeedLbl">Speeding Today</div></div>
 </div>
@@ -262,7 +264,7 @@ table.board tr:hover{background:#fafbfc}
   <div class="road" id="road"></div>
 
   <!-- Fusion HQ building -->
-  <svg class="structure" style="left:2.5%;bottom:38%;width:420px;height:273px" viewBox="0 0 200 130">
+  <svg class="structure" style="left:2.5%;bottom:38%;width:300px;height:195px" viewBox="0 0 200 130">
     <rect x="10" y="30" width="140" height="100" rx="3" fill="#a9abae"/>
     <rect x="10" y="30" width="140" height="100" rx="3" fill="url(#bgrad)" opacity=".25"/>
     <defs><linearGradient id="bgrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#414042"/></linearGradient></defs>
@@ -280,7 +282,7 @@ table.board tr:hover{background:#fafbfc}
   </svg>
 
   <!-- Job site house -->
-  <svg class="structure" style="right:3%;bottom:38%;width:400px;height:253px" viewBox="0 0 190 120">
+  <svg class="structure" style="right:3%;bottom:38%;width:280px;height:177px" viewBox="0 0 190 120">
     <polygon points="10,55 85,8 160,55" fill="#8d4a3a"/>
     <rect x="22" y="55" width="126" height="65" fill="#e8dcc8"/>
     <rect x="118" y="14" width="12" height="28" fill="#75777a"/>
@@ -305,7 +307,7 @@ table.board tr:hover{background:#fafbfc}
   <span><span class="stripchip" style="background:var(--bad)"></span> red stripe = late / not where they should be</span>
   <span><span class="stripchip" style="background:var(--f-light)"></span> gray stripe = checkpoint hasn't happened yet</span>
   <span><span class="stripchip" style="background:#fff;border:1px solid var(--f-light)"></span> white stripe = never left Fusion after 7:45 / overnight</span>
-  <span>🚔 = today's speeding leader — pulled over, officer walks up &amp; hands them a ticket</span>
+  <span>🚔 = today's speeding leader — pulled over, foot chase, car swap, chaos on repeat</span>
   <span>🐦 = THE early bird — first van at Fusion this morning, carried across the sky</span>
   <span>Sales vans (Bill Bacon, Michael Santana) show location only — no morning timing</span>
 </div>
@@ -319,9 +321,7 @@ table.board tr:hover{background:#fafbfc}
       <thead><tr>
         <th>Van / Driver</th>
         <th>7:00 AM<br>At Fusion</th>
-        <th>7:15 AM<br>Follow-up</th>
-        <th>7:30 AM<br>En Route</th>
-        <th>7:45 AM<br>Follow-up</th>
+        <th>7:45 AM<br>En Route</th>
         <th>Job Site Arrival<br>(locks at 9:30)</th>
         <th>Now</th>
       </tr></thead>
@@ -338,9 +338,7 @@ table.board tr:hover{background:#fafbfc}
       <h2>Daily Schedule · Mon–Thu</h2>
       <div class="sched">
         <div class="sched-item"><div class="sched-time">7:00a</div><div class="sched-txt"><b>All vans at Fusion.</b> Came in early and left, or headed straight to a job before 6:30? Still on time. Late vans get a red stripe.</div></div>
-        <div class="sched-item"><div class="sched-time">7:15a</div><div class="sched-txt"><b>Follow-up check.</b> Did the stragglers make it in?</div></div>
-        <div class="sched-item"><div class="sched-time">7:30a</div><div class="sched-txt"><b>All vans en route to job sites.</b> Still parked at Fusion = red stripe.</div></div>
-        <div class="sched-item"><div class="sched-time">7:45a</div><div class="sched-txt"><b>Follow-up check.</b> Everyone rolling?</div></div>
+        <div class="sched-item"><div class="sched-time">7:45a</div><div class="sched-txt"><b>All vans en route to job sites.</b> Still parked at Fusion = red stripe.</div></div>
         <div class="sched-item"><div class="sched-time">9:30a</div><div class="sched-txt"><b>Job site arrival.</b> Each van's arrival time at its current location is logged — locked for the rest of the day.</div></div>
       </div>
     </div>
@@ -677,6 +675,16 @@ function officerSVG(){
     <rect x="4" y="3.9" width="8.4" height="1.1" rx=".55" fill="#12203a"/>
   </svg>`;
 }
+function driverSVG(){
+  return `<svg viewBox="0 0 22 27">
+    <rect class="legL" x="5.2" y="17" width="2.6" height="9" rx="1.2" fill="#414042"/>
+    <rect class="legR" x="8.6" y="17" width="2.6" height="9" rx="1.2" fill="#414042"/>
+    <rect x="4.5" y="8" width="7.5" height="9.5" rx="2" fill="#939598"/>
+    <rect x="4.5" y="8" width="7.5" height="1.6" fill="#C1272D"/>
+    <circle cx="8.2" cy="4.8" r="3" fill="#e8b98f"/>
+    <path d="M5.2 3.6 Q8.2 1 11.2 3.6 L11.2 4.8 Q8.2 3 5.2 4.8 Z" fill="#5b4632"/>
+  </svg>`;
+}
 
 function birdSVG(){
   return `<svg viewBox="0 0 26 17">
@@ -701,7 +709,7 @@ function startFlyer(row, stripColor){
   f.innerHTML = `<div class="inner">
     <span class="bigbird">${birdSVG()}</span>
     <div class="cargo">
-      <svg width="160" height="26"><line x1="45" y1="0" x2="65" y2="26" stroke="#6e7073" stroke-width="3"/><line x1="115" y1="0" x2="95" y2="26" stroke="#6e7073" stroke-width="3"/></svg>
+      <svg width="90" height="16"><line x1="25" y1="0" x2="36" y2="16" stroke="#6e7073" stroke-width="2"/><line x1="64" y1="0" x2="53" y2="16" stroke="#6e7073" stroke-width="2"/></svg>
       <div class="van early">${vehSVG(type, stripColor)}<span class="vanTag">${esc(row.tag)}</span><span class="earlychip">🐦 EARLY BIRD${row.ebTime?" · "+fmtET(row.ebTime):""}</span></div>
     </div>
   </div>`;
@@ -722,7 +730,7 @@ setInterval(tickClock,1000); tickClock();
   for(let i=0;i<6;i++){
     const d=document.createElement("div"); d.className="dash";
     const t=i/6;
-    d.style.top=(t*100)+"%"; d.style.height=(12+t*42)+"px"; d.style.width=(6+t*15)+"px"; d.style.marginLeft=-(3+t*7.5)+"px";
+    d.style.top=(t*100)+"%"; d.style.height=(8+t*26)+"px"; d.style.width=(4+t*9)+"px"; d.style.marginLeft=-(2+t*4.5)+"px";
     d.style.animationDelay=(t*1.1)+"s";
     road.appendChild(d);
   }
@@ -748,75 +756,90 @@ function saveSettings(){
   location.reload();
 }
 
-/* ================= TRAFFIC STOP ================= */
+/* ================= THE GREAT FOOT-CHASE CAR-SWAP ================= */
 function startPursuit(row, stripColor){
   const layer = document.getElementById("pursuit");
   const type = vehTypeFor(row.name, row.tag);
-  const runner = document.createElement("div");
-  runner.className = "runner";
-  runner.innerHTML = `<div class="van driving ${type==="small"?"small":""}">${vehSVG(type, stripColor)}<span class="vanTag">🚨 ${esc(row.tag)}</span></div>`;
-  runner.title = row.name + " — today's speeding leader, getting pulled over!";
-  const chaser = document.createElement("div");
-  chaser.className = "chaser";
-  chaser.innerHTML = `<div class="cop">${copSVG()}<span class="copTag">PURSUIT</span></div>`;
-  const officer = document.createElement("div");
-  officer.className = "officer";
-  officer.innerHTML = officerSVG();
-  const bubble = document.createElement("div");
-  bubble.className = "tbubble";
-  bubble.textContent = "🎫 TICKET";
-  layer.appendChild(runner); layer.appendChild(chaser); layer.appendChild(officer); layer.appendChild(bubble);
+  const van = document.createElement("div");
+  van.className = "runner";
+  van.innerHTML = `<div class="van driving ${type==="small"?"small":""}">${vehSVG(type, stripColor)}<span class="vanTag">🚨 ${esc(row.tag)}</span></div>`;
+  van.title = row.name + " — today's speeding leader";
+  const cop = document.createElement("div");
+  cop.className = "chaser";
+  cop.innerHTML = `<div class="cop">${copSVG()}<span class="copTag">PURSUIT</span></div>`;
+  const copman = document.createElement("div");
+  copman.className = "officer"; copman.innerHTML = officerSVG(); copman.style.opacity="0";
+  const drv = document.createElement("div");
+  drv.className = "officer"; drv.innerHTML = driverSVG(); drv.style.opacity="0";
+  layer.appendChild(van); layer.appendChild(cop); layer.appendChild(copman); layer.appendChild(drv);
 
-  const vanEl = runner.querySelector(".van");
-  const tagEl = chaser.querySelector(".copTag");
+  const vanBody = van.querySelector(".van");
+  const copTag = cop.querySelector(".copTag");
   const sleep = ms => new Promise(r=>setTimeout(r,ms));
-  const setPos = (el,x,dur,ease)=>{ el.style.transition = dur ? `left ${dur}ms ${ease||"linear"}` : "none"; el.style.left = x+"px"; };
+  const move = (el,x,dur,ease)=>{ el.style.transition = dur ? `left ${dur}ms ${ease||"linear"}` : "none"; el.style.left = x+"px"; };
+  const show = (el,x,faceLeft)=>{ el.style.transition="none"; el.style.left=x+"px"; el.style.opacity="1"; el.classList.toggle("back", !!faceLeft); };
+  const hide = el => { el.style.opacity="0"; el.classList.remove("running","back"); };
+  const W = () => layer.clientWidth;
 
   (async function loop(){
     while (true){
-      /* reset */
-      officer.style.transition="none"; officer.style.opacity="0"; officer.classList.remove("walking","back","handing");
-      bubble.classList.remove("show");
-      vanEl.classList.add("driving");
-      tagEl.textContent = "PURSUIT";
-      setPos(runner,-300,0); setPos(chaser,-520,0);
+      /* ACT 1 — cop chases van, van pulls over */
+      hide(copman); hide(drv);
+      vanBody.classList.add("driving");
+      copTag.textContent = "PURSUIT";
+      move(van,-150,0); move(cop,-260,0);
       await sleep(300);
-      const stopX = Math.max(480, Math.round(layer.clientWidth*0.6));
-      /* the chase */
-      setPos(runner, stopX-140, 5000); setPos(chaser, stopX-430, 5000);
-      await sleep(5100);
-      /* lights win — pull over */
-      setPos(runner, stopX, 1400, "ease-out"); setPos(chaser, stopX-215, 1500, "ease-out");
-      await sleep(1650);
-      vanEl.classList.remove("driving");
-      tagEl.textContent = "STOPPED";
-      /* officer steps out and walks up */
-      officer.style.left = (stopX-165)+"px"; officer.style.opacity="1";
-      officer.classList.add("walking");
-      await sleep(60);
-      officer.style.transition = "left 2400ms linear"; officer.style.left = (stopX+112)+"px";
-      await sleep(2500);
-      officer.classList.remove("walking");
-      /* hands over the ticket */
-      officer.classList.add("handing");
+      const stopX = Math.max(320, Math.round(W()*0.6));
+      move(van, stopX-60, 4500); move(cop, stopX-190, 4500);
+      await sleep(4600);
+      move(van, stopX, 1200, "ease-out"); move(cop, stopX-110, 1300, "ease-out");
+      await sleep(1450);
+      vanBody.classList.remove("driving");
+      copTag.textContent = "STOPPED";
+      /* ACT 2 — both bail out, driver bolts, cop gives chase on foot */
+      show(copman, stopX-70, false); show(drv, stopX+55, false);
+      await sleep(450);
+      drv.classList.add("running"); copman.classList.add("running");
+      move(drv, W()+40, 2100);
+      await sleep(250);
+      move(copman, W()+10, 2200);
+      await sleep(2300);
+      hide(drv); hide(copman);
+      await sleep(600);
+      /* ACT 3 — they run back on... and jump into the WRONG cars */
+      show(drv, W()+20, true); show(copman, W()+60, true);
+      drv.classList.add("running"); copman.classList.add("running");
+      move(drv, stopX-95, 2100);     /* driver → cop car */
+      move(copman, stopX+40, 2300);  /* cop → the van */
+      await sleep(2400);
+      /* the jump-in */
+      hide(drv); hide(copman);
+      copTag.textContent = "FLEEING";
       await sleep(500);
-      bubble.style.left = (stopX+90)+"px"; bubble.classList.add("show");
-      await sleep(2000);
-      officer.classList.remove("handing");
-      /* walks back to the cruiser */
-      officer.classList.add("walking","back");
-      officer.style.transition = "left 2400ms linear"; officer.style.left = (stopX-165)+"px";
-      await sleep(2500);
-      officer.classList.remove("walking","back");
-      officer.style.opacity="0";
+      /* ACT 4 — role reversal: cop car flees, VAN gives pursuit */
+      vanBody.classList.add("driving");
+      move(cop, W()+140, 1900, "ease-in");
+      await sleep(450);
+      move(van, W()+280, 1900, "ease-in");
+      await sleep(2100);
+      /* loop around: van chases cop car across the screen */
+      move(cop, -260, 0); move(van, -420, 0);
       await sleep(400);
-      /* everyone rolls on */
-      vanEl.classList.add("driving");
-      setPos(runner, layer.clientWidth+350, 2400, "ease-in");
-      await sleep(800);
-      setPos(chaser, layer.clientWidth+150, 2400, "ease-in");
-      await sleep(2700);
-      bubble.classList.remove("show");
+      move(cop, stopX+45, 4500); move(van, stopX-140, 4500);
+      await sleep(4600);
+      /* the van pulls the cop car over */
+      move(cop, stopX+95, 1200, "ease-out"); move(van, stopX-60, 1300, "ease-out");
+      await sleep(1450);
+      vanBody.classList.remove("driving");
+      copTag.textContent = "BUSTED";
+      await sleep(500);
+      /* ACT 5 — both jump out and run off screen together */
+      show(copman, stopX-20, false); show(drv, stopX+140, false);
+      await sleep(400);
+      copman.classList.add("running"); drv.classList.add("running");
+      move(drv, W()+40, 2000); move(copman, W()+10, 2200);
+      await sleep(2400);
+      hide(drv); hide(copman);
       await sleep(900);
     }
   })();
@@ -1004,12 +1027,10 @@ async function main(){
     if (row.sales){
       /* Sales vans aren't timed */
       const sc = {state:"na", sub:"sales"};
-      row.checks = {c700:sc, c715:sc, c730:sc, c745:sc};
+      row.checks = {c700:sc, c745:sc};
     } else {
       row.earlyCredit = await isEarlyBird(nm);
       row.checks.c700 = await fusionCheck(T700);
-      row.checks.c715 = await fusionCheck(T715);
-      row.checks.c730 = routeCheck(T730);
       row.checks.c745 = routeCheck(T745);
     }
 
@@ -1051,7 +1072,7 @@ async function main(){
   document.getElementById("kFleet").textContent = rows.length;
   document.getElementById("k700").textContent = now>=T700 ? tracked.filter(r=>r.checks.c700.state==="ok").length : "–";
   document.getElementById("kLate").textContent = now>=T700 ? tracked.filter(r=>r.checks.c700.state==="late").length : "–";
-  document.getElementById("k730").textContent = now>=T730 ? tracked.filter(r=>r.checks.c730.state==="ok").length : "–";
+  document.getElementById("k730").textContent = now>=T745 ? tracked.filter(r=>r.checks.c745.state==="ok").length : "–";
   document.getElementById("kArr").textContent = tracked.filter(r=>r.arrival&&r.arrival.kind==="ok").length;
   document.getElementById("kSpeed").textContent = totalViol;
 
@@ -1060,7 +1081,7 @@ async function main(){
     if (r.sales) return STRIP.none; /* sales vans aren't timed */
     /* white stripe: stayed overnight / never left Fusion after 7:45 */
     if (now >= T745 && r.neverLeft) return "#ffffff";
-    const seq=[["c700",T700],["c715",T715],["c730",T730],["c745",T745]];
+    const seq=[["c700",T700],["c745",T745]];
     let st="";
     for(const [k,T] of seq){ if(now>=T && done(r.checks[k].state)) st = r.checks[k].state; }
     if (now>=T745){
@@ -1099,7 +1120,7 @@ async function main(){
   roadVans.forEach((v, i) => {
     const wrap = document.createElement("div");
     wrap.className = "rv" + (v.type==="small" ? " small" : "");
-    wrap.style.setProperty("--lx", (i%2===0 ? -90 : 90) + "px");   /* alternate lanes */
+    wrap.style.setProperty("--lx", (i%2===0 ? -45 : 45) + "px");   /* alternate lanes */
     wrap.style.animationDelay = "-" + (i * (RDUR / Math.max(roadVans.length,1))).toFixed(2) + "s";
     wrap.innerHTML = `<div class="van">${rearSVG(v.type, v.stripColor)}<span class="vanTag">${esc(v.r.tag)}</span><span class="speedchip">${kmh2mph(v.r.live.speed)} mph</span></div>`;
     wrap.title = v.r.name + (v.r.driver?(" — "+v.r.driver):"") + (v.r.place?(" — "+v.r.place):"") + (v.r.sales?" — Sales (not timed)":"");
@@ -1131,8 +1152,7 @@ async function main(){
     const earlyMark = r.earlyBird ? " 🐦" : "";
     return `<tr>
       <td>${esc(r.tag)}${leaderMark}${earlyMark}<br><span class="drivername">${esc(r.driver)}${r.sales?" · SALES":""}</span></td>
-      <td>${cell(r.checks.c700)}</td><td>${cell(r.checks.c715)}</td>
-      <td>${cell(r.checks.c730)}</td><td>${cell(r.checks.c745)}</td>
+      <td>${cell(r.checks.c700)}</td><td>${cell(r.checks.c745)}</td>
       <td>${arrCell(r.arrival)}</td>
       <td style="font-size:10.5px;white-space:nowrap">${nowTxt}</td>
     </tr>`;
@@ -1147,7 +1167,7 @@ async function main(){
       <div class="lb-n">${n}</div>
     </div>`).join("") || `<div style="font-size:12px;color:var(--f-gray)">No speeding violations yet today. 🎉</div>`;
   document.getElementById("wanted").innerHTML = leaderDriver
-    ? `🚨 <b>${esc(leaderDriver)}</b> leads the fleet with <b>${lbSorted[0][1]}</b> speeding violations today — watch the scene: <b>pulled over and handed a ticket</b>, on repeat.`
+    ? `🚨 <b>${esc(leaderDriver)}</b> leads the fleet with <b>${lbSorted[0][1]}</b> speeding violations today — watch the scene: <b>pulled over, foot chase, wrong cars, tables turned</b>, on repeat.`
     : `Fleet is clean so far today — nobody is being chased.`;
 
   document.getElementById("refreshed").textContent = "Live Geotab data · refreshed " + new Intl.DateTimeFormat("en-US",{timeZone:ET,hour:"numeric",minute:"2-digit",second:"2-digit"}).format(new Date()) + " ET · reload any time for fresh data";
