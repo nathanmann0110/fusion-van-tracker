@@ -88,6 +88,16 @@ h1,h2,h3{font-weight:700;letter-spacing:.025em}
 .van.driving .wheel{transform-box:fill-box;transform-origin:center;animation:spin .5s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .speedchip{font-size:8px;font-weight:700;color:var(--f-navy);background:#fff;border:1px solid var(--f-light);border-radius:6px;padding:0 4px;margin-top:1px}
+/* early bird — hovers over vans that reached Fusion by 6:45a */
+.bird{position:absolute;top:-16px;left:50%;width:24px;height:16px;transform:translateX(-50%);animation:birdBob 2.4s ease-in-out infinite;pointer-events:none;z-index:4}
+.bird svg{width:100%;height:100%;overflow:visible;display:block}
+.bird .bwing{transform-box:fill-box;transform-origin:100% 100%;animation:flap .3s ease-in-out infinite alternate}
+@keyframes flap{from{transform:rotate(4deg)}to{transform:rotate(-42deg)}}
+@keyframes birdBob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-5px)}}
+.bird .worm{animation:wiggle .5s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:left center}
+@keyframes wiggle{from{transform:rotate(-8deg)}to{transform:rotate(10deg)}}
+.van.early .vanTag{background:var(--f-gold);color:#414042}
+.earlychip{font-size:8px;font-weight:800;color:#7a5c00;background:#ffe9a8;border:1px solid var(--f-gold);border-radius:6px;padding:0 4px;margin-top:1px;white-space:nowrap}
 /* cop */
 .cop{position:relative;display:inline-flex;flex-direction:column;align-items:center;width:58px;animation:bob .45s ease-in-out infinite}
 .cop svg{width:54px;height:30px}
@@ -296,6 +306,7 @@ table.board tr:hover{background:#fafbfc}
   <span><span class="stripchip" style="background:var(--f-light)"></span> gray stripe = checkpoint hasn't happened yet</span>
   <span><span class="stripchip" style="background:#fff;border:1px solid var(--f-light)"></span> white stripe = never left Fusion after 7:45 / overnight</span>
   <span>🚔 = speeding leader — full-screen pursuit with spins &amp; tire smoke</span>
+  <span>🐦 = early bird — arrived at Fusion by 6:45a (bird + gold tag)</span>
 </div>
 
 <div id="loading" style="display:none"><span class="spin"></span>Pulling live Geotab data — vans, trips, and violations…</div>
@@ -325,7 +336,7 @@ table.board tr:hover{background:#fafbfc}
     <div class="panel">
       <h2>Daily Schedule · Mon–Thu</h2>
       <div class="sched">
-        <div class="sched-item"><div class="sched-time">7:00a</div><div class="sched-txt"><b>All vans at Fusion.</b> Late vans get a red stripe, on-time vans a green stripe.</div></div>
+        <div class="sched-item"><div class="sched-time">7:00a</div><div class="sched-txt"><b>All vans at Fusion.</b> Came in early and already left? Still on time. Late vans get a red stripe.</div></div>
         <div class="sched-item"><div class="sched-time">7:15a</div><div class="sched-txt"><b>Follow-up check.</b> Did the stragglers make it in?</div></div>
         <div class="sched-item"><div class="sched-time">7:30a</div><div class="sched-txt"><b>All vans en route to job sites.</b> Still parked at Fusion = red stripe.</div></div>
         <div class="sched-item"><div class="sched-time">7:45a</div><div class="sched-txt"><b>Follow-up check.</b> Everyone rolling?</div></div>
@@ -632,6 +643,19 @@ function copSVG(){
   </svg>`;
 }
 
+function birdSVG(){
+  return `<svg viewBox="0 0 26 17">
+    <path class="worm" d="M20.5 8.5 q1.5 1.2 3 .4 q1.4 -.8 2 .6" fill="none" stroke="#e07a8b" stroke-width="1.3" stroke-linecap="round"/>
+    <ellipse cx="10" cy="9" rx="6.5" ry="4.2" fill="#2A4562"/>
+    <polygon points="4,10 0,13.5 5.5,12" fill="#3a5a7d"/>
+    <circle cx="16.5" cy="6" r="3.2" fill="#2A4562"/>
+    <polygon points="19.3,5.5 23,6.8 19.3,8" fill="#C5A757"/>
+    <circle cx="17.4" cy="5.2" r=".8" fill="#fff"/>
+    <circle cx="17.6" cy="5.2" r=".4" fill="#1b1b1d"/>
+    <polygon class="bwing" points="9.5,8.5 3,1.5 13,5.5" fill="#4a6f96"/>
+  </svg>`;
+}
+
 /* ================= CLOCK ================= */
 function tickClock(){
   const now = new Date();
@@ -716,7 +740,7 @@ async function main(){
   document.getElementById("boardDate").textContent = new Intl.DateTimeFormat("en-US",{timeZone:ET,weekday:"long",month:"short",day:"numeric"}).format(new Date());
 
   const now = new Date();
-  const T700=etToday(7,0), T715=etToday(7,15), T730=etToday(7,30), T745=etToday(7,45), T930=etToday(9,30);
+  const T645=etToday(6,45), T700=etToday(7,0), T715=etToday(7,15), T730=etToday(7,30), T745=etToday(7,45), T930=etToday(9,30);
   if (parseInt(o.hour,10) >= 15) document.getElementById("scene").classList.add("sunset");
   const dayStart=etToday(3,0);
   const prev = prevWorkDayRange();
@@ -787,6 +811,38 @@ async function main(){
     return best ? {lat:best.lat, lon:best.lon} : null;
   }
 
+  /* --- early-bird credit: was the van at Fusion at ANY point earlier today before T? ---
+     Covers vans that came in before 7:00 and already left — they count as on time. */
+  const earlyCache = {};
+  async function earlyPoints(vname){
+    if (earlyCache[vname]) return earlyCache[vname];
+    try{
+      const pts = await geoLogRecords(vname, dayStart.toISOString(), new Date(T715.getTime()+2*60000).toISOString(), 400);
+      earlyCache[vname] = (pts||[]).map(p=>({t:parseGeoDate(p.dateTime), lat:p.latitude, lon:p.longitude})).filter(p=>p.t).sort((a,b)=>a.t-b.t);
+    }catch(e){ earlyCache[vname]=[]; }
+    return earlyCache[vname];
+  }
+  async function wasAtFusionBy(vname, T){
+    /* a trip today that ENDED at Fusion before T proves they were there */
+    if ((tripsBy[vname]||[]).some(t=>t.stop>=dayStart && t.stop<=T && t.lat!=null && atFusion(t.lat,t.lon))) return true;
+    /* otherwise scan GPS points from 3:00 AM up to T */
+    const pts = await earlyPoints(vname);
+    return pts.some(p=>p.t<=T && p.lat!=null && atFusion(p.lat,p.lon));
+  }
+  /* early bird = ARRIVED at Fusion by 6:45a today (drove in — overnight parkers don't count) */
+  async function isEarlyBird(vname){
+    if ((tripsBy[vname]||[]).some(t=>t.stop>=dayStart && t.stop<=T645 && t.lat!=null && atFusion(t.lat,t.lon))) return true;
+    const pts = await earlyPoints(vname);
+    let wasAway = false;
+    for (const p of pts){
+      if (p.t > T645) break;
+      if (p.lat == null) continue;
+      if (atFusion(p.lat, p.lon)) { if (wasAway) return true; }
+      else wasAway = true;
+    }
+    return false;
+  }
+
   /* --- speeding: merge overlapping events per vehicle, count per driver --- */
   const evBy = {};
   for (const ex of exceptions){
@@ -816,9 +872,12 @@ async function main(){
     async function fusionCheck(T){
       if (now < T) return {state:"pend"};
       const p = await posAt(nm, T);
+      if (p && !p.driving && atFusion(p.lat,p.lon)) return {state:"ok"};
+      /* not at Fusion at T — still on time if they came in earlier and already left */
+      if (await wasAtFusionBy(nm, T)) return {state:"ok", sub:"in early, left"};
       if (!p) return {state:"na"};
       if (p.driving) return {state:"late", sub:"driving"};
-      return atFusion(p.lat,p.lon) ? {state:"ok"} : {state:"late"};
+      return {state:"late"};
     }
     function routeCheck(T){
       if (now < T) return {state:"pend"};
@@ -835,6 +894,7 @@ async function main(){
     row.checks.c715 = await fusionCheck(T715);
     row.checks.c730 = routeCheck(T730);
     row.checks.c745 = routeCheck(T745);
+    row.earlyBird = await isEarlyBird(nm);
 
     /* live zone for the scene */
     row.zone = v.isDriving ? "road" : (atFusion(v.latitude, v.longitude) ? "fusion" : "job");
@@ -901,9 +961,9 @@ async function main(){
     const type = vehTypeFor(r.name, r.tag);
     if (r.zone === "road"){ roadVans.push({r, type, stripColor}); continue; }
     const el=document.createElement("div");
-    el.className="van"+(type==="small"?" small":"");
-    el.innerHTML = vehSVG(type, stripColor) + `<span class="vanTag">${esc(r.tag)}</span>`;
-    el.title = r.name + (r.driver?(" — "+r.driver):"");
+    el.className="van"+(type==="small"?" small":"")+(r.earlyBird?" early":"");
+    el.innerHTML = (r.earlyBird?`<span class="bird">${birdSVG()}</span>`:"") + vehSVG(type, stripColor) + `<span class="vanTag">${esc(r.tag)}</span>` + (r.earlyBird?'<span class="earlychip">🐦 EARLY BIRD</span>':"");
+    el.title = r.name + (r.driver?(" — "+r.driver):"") + (r.earlyBird?" — early bird! At Fusion by 6:45":"");
     lots[r.zone].appendChild(el);
   }
   /* en-route vans: rear view, staggered up the road toward the horizon */
@@ -913,7 +973,7 @@ async function main(){
     wrap.className = "rv" + (v.type==="small" ? " small" : "");
     wrap.style.setProperty("--lx", (i%2===0 ? -30 : 30) + "px");   /* alternate lanes */
     wrap.style.animationDelay = "-" + (i * (RDUR / Math.max(roadVans.length,1))).toFixed(2) + "s";
-    wrap.innerHTML = `<div class="van">${rearSVG(v.type, v.stripColor)}<span class="vanTag">${esc(v.r.tag)}</span><span class="speedchip">${kmh2mph(v.r.live.speed)} mph</span></div>`;
+    wrap.innerHTML = `<div class="van${v.r.earlyBird?" early":""}">${v.r.earlyBird?`<span class="bird">${birdSVG()}</span>`:""}${rearSVG(v.type, v.stripColor)}<span class="vanTag">${esc(v.r.tag)}</span><span class="speedchip">${kmh2mph(v.r.live.speed)} mph</span></div>`;
     wrap.title = v.r.name + (v.r.driver?(" — "+v.r.driver):"");
     lots.road.appendChild(wrap);
   });
@@ -939,8 +999,9 @@ async function main(){
   document.getElementById("boardBody").innerHTML = rows.map(r=>{
     const nowTxt = r.live.isDriving ? `🚐 ${kmh2mph(r.live.speed)} mph` : (r.zone==="fusion"?"🏢 Fusion":"🅿️ Parked");
     const leaderMark = leaderDriver && (r.driver===leaderDriver||r.name.includes(leaderDriver)) ? " 🚔" : "";
+    const earlyMark = r.earlyBird ? " 🐦" : "";
     return `<tr>
-      <td>${esc(r.tag)}${leaderMark}<br><span class="drivername">${esc(r.driver)}</span></td>
+      <td>${esc(r.tag)}${leaderMark}${earlyMark}<br><span class="drivername">${esc(r.driver)}</span></td>
       <td>${cell(r.checks.c700)}</td><td>${cell(r.checks.c715)}</td>
       <td>${cell(r.checks.c730)}</td><td>${cell(r.checks.c745)}</td>
       <td>${arrCell(r.arrival)}</td>
