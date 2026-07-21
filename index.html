@@ -157,6 +157,7 @@ table.board tr:hover{background:#fafbfc}
 .arr-ok{color:var(--f-green);font-weight:700}
 .arr-route{color:var(--f-navy);font-weight:700}
 .arr-fusion{color:var(--f-red);font-weight:700}
+.arr-sales{color:var(--f-gray);font-weight:700}
 /* leaderboard */
 .lb-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:12px}
 .lb-name{width:118px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -242,7 +243,7 @@ table.board tr:hover{background:#fafbfc}
   <div class="kpi"><div class="n" id="kLate" style="color:var(--bad)">–</div><div class="l">Late @ 7:00</div></div>
   <div class="kpi"><div class="n" id="k730" style="color:var(--f-navy)">–</div><div class="l">En Route @ 7:30</div></div>
   <div class="kpi"><div class="n" id="kArr" style="color:var(--f-green)">–</div><div class="l">At Job Sites</div></div>
-  <div class="kpi"><div class="n" id="kSpeed" style="color:var(--f-red)">–</div><div class="l" id="kSpeedLbl">Speeding (Prev Day)</div></div>
+  <div class="kpi"><div class="n" id="kSpeed" style="color:var(--f-red)">–</div><div class="l" id="kSpeedLbl">Speeding Today</div></div>
 </div>
 
 <div class="scene" id="scene">
@@ -307,6 +308,7 @@ table.board tr:hover{background:#fafbfc}
   <span><span class="stripchip" style="background:#fff;border:1px solid var(--f-light)"></span> white stripe = never left Fusion after 7:45 / overnight</span>
   <span>🚔 = speeding leader — full-screen pursuit with spins &amp; tire smoke</span>
   <span>🐦 = early bird — at Fusion by 6:45a, or rolling to a job before 6:30a (bird + gold tag, never late)</span>
+  <span>Sales vans (Bill Bacon, Michael Santana) show location only — no morning timing</span>
 </div>
 
 <div id="loading" style="display:none"><span class="spin"></span>Pulling live Geotab data — vans, trips, and violations…</div>
@@ -329,7 +331,7 @@ table.board tr:hover{background:#fafbfc}
   </div>
   <div>
     <div class="panel" style="margin-bottom:12px">
-      <h2>🚨 Speeding Leaderboard <span style="font-size:9px;color:var(--f-gray)" id="lbSub">(previous work day)</span></h2>
+      <h2>🚨 Speeding Leaderboard <span style="font-size:9px;color:var(--f-gray)" id="lbSub">(today)</span></h2>
       <div id="lb"></div>
       <div class="wanted" id="wanted"></div>
     </div>
@@ -381,6 +383,8 @@ try { const s = localStorage.getItem("vanTrackerCfg"); if (s) CFG = JSON.parse(s
 
 const JUNK = [/geotab to remove/i, /^GA[A-Z0-9]{8,}$/];
 const STALE_DAYS = 7;
+/* Sales vans — tracked for location only, never timed */
+const SALES = [/bill bacon/i, /michael santana/i];
 /* vehicle body types */
 function vehTypeFor(name, tag){
   if (/FV1|Michael Santana/i.test(name)) return "pickup";
@@ -567,6 +571,24 @@ function splitName(n){
   return m ? {tag:m[1].trim(), driver:m[2].trim()} : {tag:String(n).trim(), driver:""};
 }
 const kmh2mph = k => Math.round(k*0.621371);
+/* reverse geocode → "City, ST" (cached in this browser) */
+let GEONAMES = {};
+try { GEONAMES = JSON.parse(localStorage.getItem("vanTrackerGeo")||"{}"); } catch(e){}
+async function cityState(lat, lon){
+  if (lat==null || lon==null) return "";
+  const key = lat.toFixed(3)+","+lon.toFixed(3);
+  if (GEONAMES[key]) return GEONAMES[key];
+  try{
+    const r = await fetch("https://api.bigdatacloud.net/data/reverse-geocode-client?latitude="+lat+"&longitude="+lon+"&localityLanguage=en");
+    const j = await r.json();
+    const city = j.city || j.locality || "";
+    let st = (j.principalSubdivisionCode||"").split("-").pop();
+    if (!st) st = j.principalSubdivision || "";
+    const s = city ? (city+", "+st) : (j.principalSubdivision || "");
+    if (s){ GEONAMES[key]=s; try{ localStorage.setItem("vanTrackerGeo", JSON.stringify(GEONAMES)); }catch(e){} }
+    return s;
+  }catch(e){ return ""; }
+}
 
 /* ================= SVG BUILDERS =================
    All bodies Fusion Gray; the stripe carries the status color. */
@@ -743,16 +765,15 @@ async function main(){
   const T630=etToday(6,30), T645=etToday(6,45), T700=etToday(7,0), T715=etToday(7,15), T730=etToday(7,30), T745=etToday(7,45), T930=etToday(9,30);
   if (parseInt(o.hour,10) >= 15) document.getElementById("scene").classList.add("sunset");
   const dayStart=etToday(3,0);
-  const prev = prevWorkDayRange();
-  document.getElementById("lbSub").textContent = "(" + prev.label + ")";
-  document.getElementById("kSpeedLbl").textContent = "Speeding · " + prev.label;
+  document.getElementById("lbSub").textContent = "(today — updates every open)";
+  document.getElementById("kSpeedLbl").textContent = "Speeding Today";
 
   let live, trips, exceptions;
   try {
     live = await geoLive(); /* first — builds the device-name map the others need */
     [trips, exceptions] = await Promise.all([
       geoTrips(dayStart.toISOString(), now.toISOString()),
-      geoExceptions(prev.from.toISOString(), prev.to.toISOString())
+      geoExceptions(dayStart.toISOString(), now.toISOString())
     ]);
   } catch(e){
     console.error("Geotab load failed", e);
@@ -895,21 +916,33 @@ async function main(){
       return {state:"late", sub: ls&&ls.lat!=null&&atFusion(ls.lat,ls.lon) ? "at Fusion" : "not moving"};
     }
 
-    row.earlyBird = await isEarlyBird(nm);
-    row.checks.c700 = await fusionCheck(T700);
-    row.checks.c715 = await fusionCheck(T715);
-    row.checks.c730 = routeCheck(T730);
-    row.checks.c745 = routeCheck(T745);
+    row.sales = SALES.some(rx=>rx.test(nm));
+    if (row.sales){
+      /* Sales vans aren't timed */
+      row.earlyBird = false;
+      const sc = {state:"na", sub:"sales"};
+      row.checks = {c700:sc, c715:sc, c730:sc, c745:sc};
+    } else {
+      row.earlyBird = await isEarlyBird(nm);
+      row.checks.c700 = await fusionCheck(T700);
+      row.checks.c715 = await fusionCheck(T715);
+      row.checks.c730 = routeCheck(T730);
+      row.checks.c745 = routeCheck(T745);
+    }
 
     /* live zone for the scene */
     row.zone = v.isDriving ? "road" : (atFusion(v.latitude, v.longitude) ? "fusion" : "job");
+    /* city/state for any van away from Fusion */
+    if (row.zone !== "fusion") row.place = await cityState(v.latitude, v.longitude);
     /* never left Fusion today (overnight vans / non-departures) */
     row.neverLeft = !v.isDriving && atFusion(v.latitude, v.longitude) &&
       !(tripsBy[nm]||[]).some(t=>t.lat!=null && !atFusion(t.lat,t.lon));
 
     /* job-site arrival — LOCKS at 9:30 AM and never changes for the rest of the day */
     const E = now < T930 ? now : T930;
-    if (E === now && v.isDriving){
+    if (row.sales){
+      row.arrival = {kind:"sales", text:"Sales — not timed", sub:""};
+    } else if (E === now && v.isDriving){
       row.arrival = {kind:"route", text:"En route now", sub:"locks at 9:30"};
     } else if (now >= T930 && drivingAt(nm, T930)){
       row.arrival = {kind:"route", text:"En route at 9:30", sub:"driving at check"};
@@ -931,15 +964,17 @@ async function main(){
 
   /* --- KPIs --- */
   const done = s=>s==="ok"||s==="late";
+  const tracked = rows.filter(r=>!r.sales);
   document.getElementById("kFleet").textContent = rows.length;
-  document.getElementById("k700").textContent = now>=T700 ? rows.filter(r=>r.checks.c700.state==="ok").length : "–";
-  document.getElementById("kLate").textContent = now>=T700 ? rows.filter(r=>r.checks.c700.state==="late").length : "–";
-  document.getElementById("k730").textContent = now>=T730 ? rows.filter(r=>r.checks.c730.state==="ok").length : "–";
-  document.getElementById("kArr").textContent = rows.filter(r=>r.arrival&&r.arrival.kind==="ok").length;
+  document.getElementById("k700").textContent = now>=T700 ? tracked.filter(r=>r.checks.c700.state==="ok").length : "–";
+  document.getElementById("kLate").textContent = now>=T700 ? tracked.filter(r=>r.checks.c700.state==="late").length : "–";
+  document.getElementById("k730").textContent = now>=T730 ? tracked.filter(r=>r.checks.c730.state==="ok").length : "–";
+  document.getElementById("kArr").textContent = tracked.filter(r=>r.arrival&&r.arrival.kind==="ok").length;
   document.getElementById("kSpeed").textContent = totalViol;
 
   /* --- current status per van → stripe color (latest applicable checkpoint) --- */
   function stripeFor(r){
+    if (r.sales) return STRIP.none; /* sales vans aren't timed */
     /* white stripe: stayed overnight / never left Fusion after 7:45 */
     if (now >= T745 && r.neverLeft) return "#ffffff";
     const seq=[["c700",T700],["c715",T715],["c730",T730],["c745",T745]];
@@ -968,7 +1003,7 @@ async function main(){
     const el=document.createElement("div");
     el.className="van"+(type==="small"?" small":"")+(r.earlyBird?" early":"");
     el.innerHTML = (r.earlyBird?`<span class="bird">${birdSVG()}</span>`:"") + vehSVG(type, stripColor) + `<span class="vanTag">${esc(r.tag)}</span>` + (r.earlyBird?'<span class="earlychip">🐦 EARLY BIRD</span>':"");
-    el.title = r.name + (r.driver?(" — "+r.driver):"") + (r.earlyBird?" — early bird!":"");
+    el.title = r.name + (r.driver?(" — "+r.driver):"") + (r.place?(" — "+r.place):"") + (r.earlyBird?" — early bird!":"") + (r.sales?" — Sales (not timed)":"");
     lots[r.zone].appendChild(el);
   }
   /* en-route vans: rear view, staggered up the road toward the horizon */
@@ -979,7 +1014,7 @@ async function main(){
     wrap.style.setProperty("--lx", (i%2===0 ? -30 : 30) + "px");   /* alternate lanes */
     wrap.style.animationDelay = "-" + (i * (RDUR / Math.max(roadVans.length,1))).toFixed(2) + "s";
     wrap.innerHTML = `<div class="van${v.r.earlyBird?" early":""}">${v.r.earlyBird?`<span class="bird">${birdSVG()}</span>`:""}${rearSVG(v.type, v.stripColor)}<span class="vanTag">${esc(v.r.tag)}</span><span class="speedchip">${kmh2mph(v.r.live.speed)} mph</span></div>`;
-    wrap.title = v.r.name + (v.r.driver?(" — "+v.r.driver):"");
+    wrap.title = v.r.name + (v.r.driver?(" — "+v.r.driver):"") + (v.r.place?(" — "+v.r.place):"") + (v.r.sales?" — Sales (not timed)":"");
     lots.road.appendChild(wrap);
   });
   document.querySelectorAll(".zone").forEach(z=>{
@@ -998,15 +1033,16 @@ async function main(){
   };
   const arrCell = a=>{
     if(!a) return "—";
-    const cls=a.kind==="ok"?"arr-ok":(a.kind==="route"?"arr-route":"arr-fusion");
+    const cls=a.kind==="ok"?"arr-ok":(a.kind==="route"?"arr-route":(a.kind==="sales"?"arr-sales":"arr-fusion"));
     return `<span class="${cls}">${esc(a.text)}</span>`+(a.sub?`<span class="cellsub">${esc(a.sub)}</span>`:"");
   };
   document.getElementById("boardBody").innerHTML = rows.map(r=>{
-    const nowTxt = r.live.isDriving ? `🚐 ${kmh2mph(r.live.speed)} mph` : (r.zone==="fusion"?"🏢 Fusion":"🅿️ Parked");
+    const loc = r.place ? " · " + esc(r.place) : "";
+    const nowTxt = r.live.isDriving ? `🚐 ${kmh2mph(r.live.speed)} mph${loc}` : (r.zone==="fusion"?"🏢 Fusion":`🅿️ ${esc(r.place||"Parked")}`);
     const leaderMark = leaderDriver && (r.driver===leaderDriver||r.name.includes(leaderDriver)) ? " 🚔" : "";
     const earlyMark = r.earlyBird ? " 🐦" : "";
     return `<tr>
-      <td>${esc(r.tag)}${leaderMark}${earlyMark}<br><span class="drivername">${esc(r.driver)}</span></td>
+      <td>${esc(r.tag)}${leaderMark}${earlyMark}<br><span class="drivername">${esc(r.driver)}${r.sales?" · SALES":""}</span></td>
       <td>${cell(r.checks.c700)}</td><td>${cell(r.checks.c715)}</td>
       <td>${cell(r.checks.c730)}</td><td>${cell(r.checks.c745)}</td>
       <td>${arrCell(r.arrival)}</td>
@@ -1021,10 +1057,10 @@ async function main(){
       <div class="lb-name">${i===0?"🚔 ":""}${esc(d)}</div>
       <div class="lb-bar"><div class="lb-fill" style="width:${Math.round(n/maxN*100)}%"></div></div>
       <div class="lb-n">${n}</div>
-    </div>`).join("") || `<div style="font-size:12px;color:var(--f-gray)">No speeding violations on ${esc(prev.label)}. 🎉</div>`;
+    </div>`).join("") || `<div style="font-size:12px;color:var(--f-gray)">No speeding violations yet today. 🎉</div>`;
   document.getElementById("wanted").innerHTML = leaderDriver
-    ? `🚨 <b>${esc(leaderDriver)}</b> leads the fleet with <b>${lbSorted[0][1]}</b> speeding violations on ${esc(prev.label)} — currently <b>evading pursuit</b> across the scene, spins, 180s, tire smoke and all.`
-    : `Fleet was clean on ${esc(prev.label)} — nobody is being chased today.`;
+    ? `🚨 <b>${esc(leaderDriver)}</b> leads the fleet with <b>${lbSorted[0][1]}</b> speeding violations today — currently <b>evading pursuit</b> across the scene, spins, 180s, tire smoke and all.`
+    : `Fleet is clean so far today — nobody is being chased.`;
 
   document.getElementById("refreshed").textContent = "Live Geotab data · refreshed " + new Intl.DateTimeFormat("en-US",{timeZone:ET,hour:"numeric",minute:"2-digit",second:"2-digit"}).format(new Date()) + " ET · reload any time for fresh data";
   document.getElementById("loading").style.display="none";
