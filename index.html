@@ -60,9 +60,10 @@ h1,h2,h3{font-weight:700;letter-spacing:.025em}
 .zoneLabel{position:absolute;top:-30px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.85);border:1px solid var(--f-light);
   font-size:14px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--f-dark);padding:3px 14px;border-radius:14px;white-space:nowrap}
 .lot{display:flex;flex-wrap:wrap-reverse;gap:8px 12px;align-items:flex-end;justify-content:center;padding:6px 8px 10px}
-#zoneFusion{left:0;width:31%}
-#zoneRoad{left:31%;width:38%}
-#zoneJob{right:0;width:31%}
+#zoneFusion{left:0;width:26%}
+#zoneRoad{left:26%;width:32%}
+#zoneJob{left:58%;width:22%}
+#zoneHome{right:0;width:20%}
 /* en-route vans: rear view, driving up the road toward the horizon */
 #roadLane{position:absolute;inset:0;padding:0}
 .rv{position:absolute;bottom:2px;left:50%;margin-left:-33px;animation:toHorizon 9s linear infinite;will-change:transform,opacity;opacity:0}
@@ -199,6 +200,63 @@ table.board tr:hover{background:#fafbfc}
 #login button:disabled{background:var(--f-gray)}
 #loginErr{color:var(--bad);font-size:12px;margin:0 0 10px;display:none}
 #login .note{font-size:10.5px;color:var(--f-gray);margin-top:12px;line-height:1.5;font-family:Georgia,serif}
+/* ---------------- WEATHER ---------------- */
+#wxChip{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:12;background:rgba(255,255,255,.92);border:1px solid var(--f-light);border-radius:22px;padding:7px 18px;font-size:16px;font-weight:700;color:var(--f-dark);box-shadow:0 2px 8px rgba(0,0,0,.18);white-space:nowrap}
+#precip{position:absolute;inset:0;pointer-events:none;z-index:4;overflow:hidden}
+.drop{position:absolute;top:-30px;width:2px;height:22px;background:linear-gradient(rgba(180,200,230,0),#9db8d8);animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(660px)}}
+.flake{position:absolute;top:-14px;width:8px;height:8px;border-radius:50%;background:#fff;animation:snowfall linear infinite;box-shadow:0 0 3px rgba(255,255,255,.8)}
+@keyframes snowfall{0%{transform:translateY(0) translateX(0)}50%{transform:translateY(330px) translateX(24px)}100%{transform:translateY(660px) translateX(-16px)}}
+#lightning{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:6}
+#lightning.flash{animation:flash .7s ease-out}
+@keyframes flash{0%{opacity:0}8%{opacity:.9}18%{opacity:.05}28%{opacity:.55}45%{opacity:0}100%{opacity:0}}
+.cloud.xc::before{width:30px;height:30px;top:-13px;left:12px}
+.cloud.xc::after{width:22px;height:22px;top:-9px;left:40px}
+/* weather skies (defined after .sunset so they win when both are set) */
+.scene.wx-cloudy{background:linear-gradient(#9fb1c1 0%,#c3cdd6 45%,#dfe3e2 60%,#cfd4cd 100%)}
+.scene.wx-cloudy .sun{opacity:.25}
+.scene.wx-rain{background:linear-gradient(#5b6a7a 0%,#8494a3 45%,#aab4ba 60%,#9aa79b 100%)}
+.scene.wx-rain .sun{display:none}
+.scene.wx-rain .cloud{background:#8b98a5}.scene.wx-rain .cloud::before,.scene.wx-rain .cloud::after{background:#8b98a5}
+.scene.wx-rain .ground{background:linear-gradient(#93a18c,#7f8d78)}
+.scene.wx-storm{background:linear-gradient(#2e3742 0%,#4a5563 45%,#6a7581 60%,#7d8a80 100%)}
+.scene.wx-storm .sun{display:none}
+.scene.wx-storm .cloud{background:#5d6771}.scene.wx-storm .cloud::before,.scene.wx-storm .cloud::after{background:#5d6771}
+.scene.wx-storm .ground{background:linear-gradient(#7c8a76,#68755f)}
+.scene.wx-snow{background:linear-gradient(#c9d6e2 0%,#e3eaf1 45%,#f2f4f6 60%,#e9edf0 100%)}
+.scene.wx-snow .sun{opacity:.35}
+.scene.wx-snow .ground{background:linear-gradient(#eef2f6,#dbe2e9)}
+.scene.wx-snow .road{background:#6d7076}
+/* ---------------- CHASE EXTRAS ---------------- */
+.runner.flip .van>svg,.chaser.flip .cop>svg{transform:rotateY(180deg)}
+.van.spinny>svg{animation:spinny .8s linear infinite}
+@keyframes spinny{to{transform:rotate(360deg)}}
+/* ---------------- DARK MODE ---------------- */
+body.dark{background:#14161a;color:#d8dadd}
+body.dark .wordmark .f3{color:#e8e9ea}
+body.dark #clock{color:#e8e9ea}
+body.dark .kpi,body.dark .panel{background:#1c1f25;border-color:#2b2f37}
+body.dark .kpi .n{color:#e8e9ea}
+body.dark .panel h2{color:#e8e9ea}
+body.dark table.board th{border-color:#2b2f37}
+body.dark table.board td{border-color:#242830;color:#d8dadd}
+body.dark table.board tr:hover{background:#20242b}
+body.dark .lb-bar{background:#2a2e35}
+body.dark .lb-name,body.dark .lb-n{color:#d8dadd}
+body.dark .lb-row.leader .lb-name{color:#ff6b6b}
+body.dark .sched-time{background:#1c1f25}
+body.dark .sched-txt{color:#c6c9cd}
+body.dark .wanted{background:#33171a;border-color:#7a2a2f}
+body.dark .banner{background:#33301c;border-color:#7a6a2a;color:#e8dfb8}
+body.dark .errbanner{background:#33171a;color:#f2b8bd}
+body.dark .gear{color:#d8dadd;border-color:#3a3f47;background:#22262d}
+body.dark .foot{color:#9aa0a8}
+body.dark .scene{border-color:#2b2f37}
+body.dark .legend{color:#9aa0a8}
+body.dark #settings .box,body.dark #login .box{background:#1c1f25;color:#d8dadd}
+body.dark #settings input,body.dark #login input{background:#14161a;border-color:#3a3f47;color:#e8e9ea}
+body.dark #login{background:linear-gradient(#14161a,#1c1f25)}
+body.dark #loading{color:#9aa0a8}
 </style>
 </head>
 <body>
@@ -232,6 +290,7 @@ table.board tr:hover{background:#fafbfc}
     <div id="clock">--:--</div>
     <div id="dateline">Loading…</div>
     <div class="badge-day" id="daybadge">MON–THU SCHEDULE</div>
+    <div style="margin-top:6px"><button class="gear" id="darkBtn" onclick="toggleDark()">🌙 Dark mode</button></div>
   </div>
 </div>
 
@@ -282,7 +341,7 @@ table.board tr:hover{background:#fafbfc}
   </svg>
 
   <!-- Job site house -->
-  <svg class="structure" style="right:3%;bottom:38%;width:280px;height:177px" viewBox="0 0 190 120">
+  <svg class="structure" style="right:22%;bottom:38%;width:280px;height:177px" viewBox="0 0 190 120">
     <polygon points="10,55 85,8 160,55" fill="#8d4a3a"/>
     <rect x="22" y="55" width="126" height="65" fill="#e8dcc8"/>
     <rect x="118" y="14" width="12" height="28" fill="#75777a"/>
@@ -297,9 +356,28 @@ table.board tr:hover{background:#fafbfc}
     <circle cx="152" cy="68" r="14" fill="#529148"/>
   </svg>
 
+  <!-- Driver's home -->
+  <svg class="structure" style="right:1.5%;bottom:38%;width:210px;height:140px" viewBox="0 0 150 100">
+    <rect x="15" y="45" width="105" height="55" fill="#b8c4d6"/>
+    <polygon points="8,48 67,12 127,48" fill="#5d6b80"/>
+    <rect x="88" y="22" width="9" height="22" fill="#75777a"/>
+    <rect x="55" y="65" width="20" height="35" fill="#4a5568"/>
+    <circle cx="71" cy="83" r="1.8" fill="#C5A757"/>
+    <g fill="#fff3c4" stroke="#75777a" stroke-width="1.2">
+      <rect x="26" y="56" width="18" height="15"/><rect x="90" y="56" width="18" height="15"/>
+    </g>
+    <rect x="120" y="88" width="28" height="12" rx="1" fill="#9aa0a6"/>
+    <rect x="138" y="62" width="3" height="28" fill="#6b4f35"/>
+    <rect x="134" y="58" width="11" height="7" rx="1" fill="#C1272D"/>
+  </svg>
+
   <div class="zone" id="zoneFusion"><div class="zoneLabel">🏢 At Fusion HQ</div><div class="lot" id="fusionLot"></div></div>
   <div class="zone" id="zoneRoad"><div class="zoneLabel">🛣️ En Route</div><div class="lot" id="roadLane"></div></div>
   <div class="zone" id="zoneJob"><div class="zoneLabel">🏠 At Job Site</div><div class="lot" id="jobLot"></div></div>
+  <div class="zone" id="zoneHome"><div class="zoneLabel">🏡 At Home</div><div class="lot" id="homeLot"></div></div>
+  <div id="precip"></div>
+  <div id="lightning"></div>
+  <div id="wxChip">⏳ loading weather…</div>
   <div class="pursuit" id="pursuit"></div>
 </div>
 <div class="legend">
@@ -309,6 +387,7 @@ table.board tr:hover{background:#fafbfc}
   <span><span class="stripchip" style="background:#fff;border:1px solid var(--f-light)"></span> white stripe = never left Fusion after 7:45 / overnight</span>
   <span>🚔 = today's speeding leader — pulled over, foot chase, car swap, chaos on repeat</span>
   <span>🐦 = THE early bird — first van at Fusion this morning, carried across the sky</span>
+  <span>🏡 Home = parked where the van started its day · 🏠 Job Site = parked anywhere else</span>
   <span>Sales vans (Bill Bacon, Michael Santana) show location only — no morning timing</span>
 </div>
 
@@ -377,6 +456,19 @@ const DEFAULTS = {
 };
 let CFG = DEFAULTS;
 try { const s = localStorage.getItem("vanTrackerCfg"); if (s) CFG = JSON.parse(s); } catch(e){}
+
+/* ================= DARK MODE ================= */
+function toggleDark(){
+  const on = document.body.classList.toggle("dark");
+  try{ localStorage.setItem("vanTrackerDark", on ? "1" : "0"); }catch(e){}
+  document.getElementById("darkBtn").textContent = on ? "☀️ Light mode" : "🌙 Dark mode";
+}
+try{
+  if (localStorage.getItem("vanTrackerDark")==="1"){
+    document.body.classList.add("dark");
+    setTimeout(()=>{ const b=document.getElementById("darkBtn"); if(b) b.textContent="☀️ Light mode"; },0);
+  }
+}catch(e){}
 
 const JUNK = [/geotab to remove/i, /^GA[A-Z0-9]{8,}$/];
 const STALE_DAYS = 7;
@@ -587,6 +679,70 @@ async function cityState(lat, lon){
   }catch(e){ return ""; }
 }
 
+/* ================= LIVE WEATHER (Open-Meteo, no key needed) ================= */
+async function applyWeather(){
+  try{
+    const c = CFG.centers[0];
+    const r = await fetch("https://api.open-meteo.com/v1/forecast?latitude="+c.lat+"&longitude="+c.lon+"&current=temperature_2m,weather_code,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph");
+    const j = await r.json();
+    const code = j.current.weather_code, temp = Math.round(j.current.temperature_2m);
+    let cat="sunny", label="Sunny", icon="☀️";
+    if (code===1||code===2){ cat="sunny"; label="Partly Cloudy"; icon="🌤️"; }
+    else if (code===3||code===45||code===48){ cat="cloudy"; label="Cloudy"; icon="☁️"; }
+    else if ((code>=51&&code<=67)||(code>=80&&code<=82)){ cat="rain"; label="Rain"; icon="🌧️"; }
+    else if (code>=95){ cat="storm"; label="Thunderstorm"; icon="⛈️"; }
+    else if ((code>=71&&code<=77)||code===85||code===86){ cat="snow"; label="Snow"; icon="❄️"; }
+    setWeatherScene(cat, icon, label, temp);
+  }catch(e){
+    console.warn("weather failed", e);
+    setWeatherScene("sunny","☀️","Weather unavailable",null);
+  }
+}
+function setWeatherScene(cat, icon, label, temp){
+  const scene = document.getElementById("scene");
+  scene.classList.remove("wx-sunny","wx-cloudy","wx-rain","wx-storm","wx-snow");
+  scene.classList.add("wx-"+cat);
+  if (cat!=="sunny") scene.classList.remove("sunset");
+  document.getElementById("wxChip").innerHTML = icon+" <b>"+(temp!=null?temp+"°F":"")+"</b> "+esc(label)+" · Greenville";
+  const precip = document.getElementById("precip");
+  precip.innerHTML = "";
+  if (cat==="rain"||cat==="storm"){
+    const n = cat==="storm" ? 130 : 90;
+    for (let i=0;i<n;i++){
+      const d=document.createElement("div"); d.className="drop";
+      d.style.left=(Math.random()*100)+"%";
+      d.style.animationDelay=(Math.random()*1.2)+"s";
+      d.style.animationDuration=(0.5+Math.random()*0.5)+"s";
+      precip.appendChild(d);
+    }
+  } else if (cat==="snow"){
+    for (let i=0;i<75;i++){
+      const f=document.createElement("div"); f.className="flake";
+      f.style.left=(Math.random()*100)+"%";
+      f.style.animationDelay=(Math.random()*6)+"s";
+      f.style.animationDuration=(5+Math.random()*5)+"s";
+      f.style.opacity=(.5+Math.random()*.5);
+      const s=(5+Math.random()*6); f.style.width=s+"px"; f.style.height=s+"px";
+      precip.appendChild(f);
+    }
+  } else if (cat==="cloudy"){
+    for (let i=0;i<4;i++){
+      const cd=document.createElement("div"); cd.className="cloud xc";
+      cd.style.top=(20+Math.random()*110)+"px";
+      cd.style.width=(70+Math.random()*60)+"px"; cd.style.height="22px";
+      cd.style.animationDuration=(60+Math.random()*50)+"s";
+      cd.style.animationDelay=(-Math.random()*60)+"s";
+      precip.appendChild(cd);
+    }
+  }
+  if (cat==="storm"){
+    if (!window.__boltTimer) window.__boltTimer = setInterval(function(){
+      const L=document.getElementById("lightning");
+      L.classList.remove("flash"); void L.offsetWidth; L.classList.add("flash");
+    }, 4000+Math.random()*4000);
+  } else if (window.__boltTimer){ clearInterval(window.__boltTimer); window.__boltTimer=null; }
+}
+
 /* ================= SVG BUILDERS =================
    All bodies Fusion Gray; the stripe carries the status color. */
 const STRIP = {ok:"#2e9e46", late:"#d32f2f", none:"#D1D3D4"};
@@ -771,75 +927,140 @@ function startPursuit(row, stripColor){
   copman.className = "officer"; copman.innerHTML = officerSVG(); copman.style.opacity="0";
   const drv = document.createElement("div");
   drv.className = "officer"; drv.innerHTML = driverSVG(); drv.style.opacity="0";
-  layer.appendChild(van); layer.appendChild(cop); layer.appendChild(copman); layer.appendChild(drv);
+  const bubble = document.createElement("div");
+  bubble.className = "tbubble"; bubble.textContent = "🎫 TICKET";
+  layer.appendChild(van); layer.appendChild(cop); layer.appendChild(copman); layer.appendChild(drv); layer.appendChild(bubble);
 
   const vanBody = van.querySelector(".van");
   const copTag = cop.querySelector(".copTag");
   const sleep = ms => new Promise(r=>setTimeout(r,ms));
   const move = (el,x,dur,ease)=>{ el.style.transition = dur ? `left ${dur}ms ${ease||"linear"}` : "none"; el.style.left = x+"px"; };
   const show = (el,x,faceLeft)=>{ el.style.transition="none"; el.style.left=x+"px"; el.style.opacity="1"; el.classList.toggle("back", !!faceLeft); };
-  const hide = el => { el.style.opacity="0"; el.classList.remove("running","back"); };
+  const hide = el => { el.style.opacity="0"; el.classList.remove("running","walking","back","handing"); };
   const W = () => layer.clientWidth;
 
+  function reset(){
+    hide(copman); hide(drv);
+    bubble.classList.remove("show");
+    van.classList.remove("flip"); cop.classList.remove("flip");
+    vanBody.classList.remove("spinny");
+    vanBody.classList.add("driving");
+    copTag.textContent = "PURSUIT";
+    move(van,-150,0); move(cop,-260,0);
+  }
+  async function pullOver(){
+    const stopX = Math.max(320, Math.round(W()*0.6));
+    move(van, stopX-60, 4500); move(cop, stopX-190, 4500);
+    await sleep(4600);
+    move(van, stopX, 1200, "ease-out"); move(cop, stopX-110, 1300, "ease-out");
+    await sleep(1450);
+    vanBody.classList.remove("driving");
+    copTag.textContent = "STOPPED";
+    return stopX;
+  }
+  async function driveOffBoth(){
+    vanBody.classList.add("driving");
+    move(van, W()+280, 2200, "ease-in");
+    await sleep(600);
+    move(cop, W()+140, 2200, "ease-in");
+    await sleep(2400);
+  }
+
+  /* SCENE 1 — classic: pulled over, officer walks up, hands over a ticket */
+  async function sceneTicket(){
+    reset(); await sleep(300);
+    const stopX = await pullOver();
+    show(copman, stopX-85, false);
+    copman.classList.add("walking");
+    await sleep(60);
+    copman.style.transition = "left 2200ms linear"; copman.style.left = (stopX+50)+"px";
+    await sleep(2300);
+    copman.classList.remove("walking");
+    copman.classList.add("handing");
+    await sleep(400);
+    bubble.style.left = (stopX+38)+"px"; bubble.classList.add("show");
+    await sleep(1800);
+    copman.classList.remove("handing");
+    copman.classList.add("walking","back");
+    copman.style.transition = "left 2200ms linear"; copman.style.left = (stopX-85)+"px";
+    await sleep(2300);
+    hide(copman);
+    bubble.classList.remove("show");
+    await sleep(300);
+    await driveOffBoth();
+  }
+
+  /* SCENE 2 — the foot chase & car swap saga */
+  async function sceneSwap(){
+    reset(); await sleep(300);
+    const stopX = await pullOver();
+    show(copman, stopX-70, false); show(drv, stopX+55, false);
+    await sleep(450);
+    drv.classList.add("running"); copman.classList.add("running");
+    move(drv, W()+40, 2100);
+    await sleep(250);
+    move(copman, W()+10, 2200);
+    await sleep(2300);
+    hide(drv); hide(copman);
+    await sleep(600);
+    /* back on — into the WRONG cars */
+    show(drv, W()+20, true); show(copman, W()+60, true);
+    drv.classList.add("running"); copman.classList.add("running");
+    move(drv, stopX-95, 2100);
+    move(copman, stopX+40, 2300);
+    await sleep(2400);
+    hide(drv); hide(copman);
+    copTag.textContent = "FLEEING";
+    await sleep(500);
+    vanBody.classList.add("driving");
+    move(cop, W()+140, 1900, "ease-in");
+    await sleep(450);
+    move(van, W()+280, 1900, "ease-in");
+    await sleep(2100);
+    move(cop, -260, 0); move(van, -420, 0);
+    await sleep(400);
+    move(cop, stopX+45, 4500); move(van, stopX-140, 4500);
+    await sleep(4600);
+    move(cop, stopX+95, 1200, "ease-out"); move(van, stopX-60, 1300, "ease-out");
+    await sleep(1450);
+    vanBody.classList.remove("driving");
+    copTag.textContent = "BUSTED";
+    await sleep(500);
+    show(copman, stopX-20, false); show(drv, stopX+140, false);
+    await sleep(400);
+    copman.classList.add("running"); drv.classList.add("running");
+    move(drv, W()+40, 2000); move(copman, W()+10, 2200);
+    await sleep(2400);
+    hide(drv); hide(copman);
+  }
+
+  /* SCENE 3 — wild pursuit: high-speed passes with 360 spins, back and forth */
+  async function sceneWild(){
+    reset(); await sleep(300);
+    move(van, W()+240, 3200); move(cop, W()+120, 3600);
+    await sleep(1100);
+    vanBody.classList.add("spinny");
+    await sleep(1000);
+    vanBody.classList.remove("spinny");
+    await sleep(1700);
+    /* re-enter from the right, blasting left */
+    van.classList.add("flip"); cop.classList.add("flip");
+    move(van, W()+240, 0); move(cop, W()+380, 0);
+    await sleep(400);
+    move(van, -200, 3200); move(cop, -340, 3600);
+    await sleep(1300);
+    vanBody.classList.add("spinny");
+    await sleep(1000);
+    vanBody.classList.remove("spinny");
+    await sleep(1700);
+    van.classList.remove("flip"); cop.classList.remove("flip");
+  }
+
   (async function loop(){
+    const scenes = [sceneTicket, sceneSwap, sceneWild];
     while (true){
-      /* ACT 1 — cop chases van, van pulls over */
-      hide(copman); hide(drv);
-      vanBody.classList.add("driving");
-      copTag.textContent = "PURSUIT";
-      move(van,-150,0); move(cop,-260,0);
-      await sleep(300);
-      const stopX = Math.max(320, Math.round(W()*0.6));
-      move(van, stopX-60, 4500); move(cop, stopX-190, 4500);
-      await sleep(4600);
-      move(van, stopX, 1200, "ease-out"); move(cop, stopX-110, 1300, "ease-out");
-      await sleep(1450);
-      vanBody.classList.remove("driving");
-      copTag.textContent = "STOPPED";
-      /* ACT 2 — both bail out, driver bolts, cop gives chase on foot */
-      show(copman, stopX-70, false); show(drv, stopX+55, false);
-      await sleep(450);
-      drv.classList.add("running"); copman.classList.add("running");
-      move(drv, W()+40, 2100);
-      await sleep(250);
-      move(copman, W()+10, 2200);
-      await sleep(2300);
-      hide(drv); hide(copman);
-      await sleep(600);
-      /* ACT 3 — they run back on... and jump into the WRONG cars */
-      show(drv, W()+20, true); show(copman, W()+60, true);
-      drv.classList.add("running"); copman.classList.add("running");
-      move(drv, stopX-95, 2100);     /* driver → cop car */
-      move(copman, stopX+40, 2300);  /* cop → the van */
-      await sleep(2400);
-      /* the jump-in */
-      hide(drv); hide(copman);
-      copTag.textContent = "FLEEING";
-      await sleep(500);
-      /* ACT 4 — role reversal: cop car flees, VAN gives pursuit */
-      vanBody.classList.add("driving");
-      move(cop, W()+140, 1900, "ease-in");
-      await sleep(450);
-      move(van, W()+280, 1900, "ease-in");
-      await sleep(2100);
-      /* loop around: van chases cop car across the screen */
-      move(cop, -260, 0); move(van, -420, 0);
-      await sleep(400);
-      move(cop, stopX+45, 4500); move(van, stopX-140, 4500);
-      await sleep(4600);
-      /* the van pulls the cop car over */
-      move(cop, stopX+95, 1200, "ease-out"); move(van, stopX-60, 1300, "ease-out");
-      await sleep(1450);
-      vanBody.classList.remove("driving");
-      copTag.textContent = "BUSTED";
-      await sleep(500);
-      /* ACT 5 — both jump out and run off screen together */
-      show(copman, stopX-20, false); show(drv, stopX+140, false);
-      await sleep(400);
-      copman.classList.add("running"); drv.classList.add("running");
-      move(drv, W()+40, 2000); move(copman, W()+10, 2200);
-      await sleep(2400);
-      hide(drv); hide(copman);
+      const pick = scenes[Math.floor(Math.random()*scenes.length)];
+      await pick();
       await sleep(900);
     }
   })();
@@ -853,6 +1074,7 @@ async function main(){
   const isSchedDay = ["Mon","Tue","Wed","Thu"].includes(o.weekday);
   if(!isSchedDay) document.getElementById("weekendBanner").style.display="block";
   document.getElementById("boardDate").textContent = new Intl.DateTimeFormat("en-US",{timeZone:ET,weekday:"long",month:"short",day:"numeric"}).format(new Date());
+  applyWeather(); /* live weather + scenery, non-blocking */
 
   const now = new Date();
   const T630=etToday(6,30), T645=etToday(6,45), T700=etToday(7,0), T715=etToday(7,15), T730=etToday(7,30), T745=etToday(7,45), T930=etToday(9,30);
@@ -1036,6 +1258,18 @@ async function main(){
 
     /* live zone for the scene */
     row.zone = v.isDriving ? "road" : (atFusion(v.latitude, v.longitude) ? "fusion" : "job");
+    /* HOME detection: parked where the van started its day (and not at Fusion) */
+    if (row.zone === "job"){
+      if (!(tripsBy[nm]||[]).length){
+        row.zone = "home"; /* hasn't moved all day */
+      } else {
+        try{
+          const first = await geoLogRecords(nm, dayStart.toISOString(), now.toISOString(), 2);
+          if (first.length && first[0].latitude!=null &&
+              havM(v.latitude, v.longitude, first[0].latitude, first[0].longitude) <= 400) row.zone = "home";
+        }catch(e){}
+      }
+    }
     /* city/state for any van away from Fusion */
     if (row.zone !== "fusion") row.place = await cityState(v.latitude, v.longitude);
     /* never left Fusion today (overnight vans / non-departures) */
@@ -1092,7 +1326,7 @@ async function main(){
   }
 
   /* --- scene --- */
-  const lots={fusion:document.getElementById("fusionLot"), road:document.getElementById("roadLane"), job:document.getElementById("jobLot")};
+  const lots={fusion:document.getElementById("fusionLot"), road:document.getElementById("roadLane"), job:document.getElementById("jobLot"), home:document.getElementById("homeLot")};
   const roadVans = [];
   for (const r of rows){
     const stripColor = stripeFor(r);
@@ -1147,7 +1381,9 @@ async function main(){
   };
   document.getElementById("boardBody").innerHTML = rows.map(r=>{
     const loc = r.place ? " · " + esc(r.place) : "";
-    const nowTxt = r.live.isDriving ? `🚐 ${kmh2mph(r.live.speed)} mph${loc}` : (r.zone==="fusion"?"🏢 Fusion":`🅿️ ${esc(r.place||"Parked")}`);
+    const nowTxt = r.live.isDriving ? `🚐 ${kmh2mph(r.live.speed)} mph${loc}`
+      : (r.zone==="fusion" ? "🏢 Fusion"
+      : (r.zone==="home" ? `🏡 Home${loc}` : `🅿️ ${esc(r.place||"Parked")}`));
     const leaderMark = leaderDriver && (r.driver===leaderDriver||r.name.includes(leaderDriver)) ? " 🚔" : "";
     const earlyMark = r.earlyBird ? " 🐦" : "";
     return `<tr>
