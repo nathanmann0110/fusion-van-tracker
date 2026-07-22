@@ -88,25 +88,40 @@ h1,h2,h3{font-weight:700;letter-spacing:.025em}
 /* front/rear-view vans parked in lots */
 .van.fr svg{width:66px;height:69px}
 .van.small.fr svg{width:51px;height:54px}
-/* bear climbing the mountains */
-.bear{position:absolute;left:11%;top:56%;width:52px;height:34px;z-index:3;pointer-events:none;animation:bearClimb 30s linear infinite;opacity:0}
-.bear svg{width:100%;height:100%;transform:rotate(-32deg);overflow:visible}
+/* bear wandering the whole scene */
+.bear{position:absolute;left:2%;top:60%;width:52px;height:34px;z-index:3;pointer-events:none;animation:bearWander 95s linear infinite}
+.bear svg{width:100%;height:100%;overflow:visible}
 .bear .bl1,.bear .bl3{transform-box:fill-box;transform-origin:top center;animation:stepA .5s ease-in-out infinite alternate}
 .bear .bl2,.bear .bl4{transform-box:fill-box;transform-origin:top center;animation:stepB .5s ease-in-out infinite alternate}
-@keyframes bearClimb{
-  0%{left:11%;top:56%;opacity:0;transform:rotate(0)}
-  4%{opacity:1}
-  44%{left:24%;top:10%;opacity:1;transform:rotate(0)}
-  48%{left:26%;top:9%;transform:rotate(60deg)}
-  68%{left:37%;top:54%;opacity:1;transform:rotate(900deg)}
-  72%{left:38.5%;top:56%;opacity:1;transform:rotate(940deg)}
-  76%{opacity:0;transform:rotate(940deg)}
-  100%{left:11%;top:56%;opacity:0;transform:rotate(940deg)}
+@keyframes bearWander{
+  0%  {left:2%;  top:60%; transform:scaleX(1)}
+  10% {left:16%; top:66%; transform:scaleX(1)}
+  14% {left:17%; top:66%; transform:scaleX(-1)}
+  24% {left:5%;  top:76%; transform:scaleX(-1)}
+  28% {left:6%;  top:77%; transform:scaleX(1)}
+  42% {left:38%; top:82%; transform:scaleX(1)}
+  52% {left:56%; top:72%; transform:scaleX(1)}
+  60% {left:70%; top:60%; transform:scaleX(1)}
+  67% {left:79%; top:38%; transform:scaleX(1) rotate(-24deg)}
+  72% {left:85%; top:26%; transform:scaleX(1) rotate(-24deg)}
+  75% {left:84%; top:28%; transform:scaleX(-1) rotate(22deg)}
+  84% {left:64%; top:62%; transform:scaleX(-1) rotate(0deg)}
+  92% {left:28%; top:70%; transform:scaleX(-1)}
+  97% {left:6%;  top:62%; transform:scaleX(-1)}
+  99% {left:3%;  top:60%; transform:scaleX(1)}
+  100%{left:2%;  top:60%; transform:scaleX(1)}
 }
 /* Waldo */
 .waldo{position:absolute;width:20px;height:34px;z-index:5;pointer-events:auto}
 .waldo svg{width:100%;height:100%;overflow:visible;display:block}
 .waldo.mini{width:15px;height:25px}
+/* half of Waldo tucked behind whatever he's hiding at */
+.waldo.peekL,.waldo.peekR{width:10px;overflow:hidden}
+.waldo.peekL svg,.waldo.peekR svg{width:20px;max-width:none}
+.waldo.peekR svg{margin-left:-10px}
+.waldo.mini.peekL,.waldo.mini.peekR{width:8px}
+.waldo.mini.peekL svg,.waldo.mini.peekR svg{width:15px}
+.waldo.mini.peekR svg{margin-left:-7px}
 .waldo .wlL,.waldo .wlR{transform-box:fill-box;transform-origin:top center}
 .waldo.running .wlL{animation:stepA .4s ease-in-out infinite alternate}
 .waldo.running .wlR{animation:stepB .4s ease-in-out infinite alternate}
@@ -1048,14 +1063,12 @@ function placeWaldo(){
   w.title = "You found Waldo! 🎉";
   const spots = [];
   const vans = Array.prototype.slice.call(document.querySelectorAll(".lot .van"));
-  if (vans.length) spots.push(function(){ w.classList.add("mini"); w.style.top="-16px"; w.style.left="32%"; vans[Math.floor(Math.random()*vans.length)].appendChild(w); });
-  spots.push(function(){ w.style.left="10.5%"; w.style.bottom="40%"; scene.appendChild(w); });   /* by the Fusion door */
-  spots.push(function(){ w.style.right="23%"; w.style.bottom="38.5%"; scene.appendChild(w); });  /* at the job site */
-  spots.push(function(){ w.style.right="6%"; w.style.bottom="38.5%"; scene.appendChild(w); });   /* at home */
-  const cloud = document.querySelector(".cloud.c1");
-  if (cloud) spots.push(function(){ w.classList.add("mini"); w.style.top="-20px"; w.style.left="34px"; cloud.appendChild(w); }); /* in a cloud */
-  spots.push(function(){ w.style.right="35.3%"; w.style.bottom="39.2%"; w.style.zIndex="0"; scene.appendChild(w); }); /* behind a tree */
-  spots.push(function(){ w.style.left="63.5%"; w.style.top="15%"; scene.appendChild(w); });      /* on a mountain */
+  if (vans.length) spots.push(function(){ w.classList.add("mini","peekR"); w.style.top="26%"; w.style.left="-7px"; vans[Math.floor(Math.random()*vans.length)].appendChild(w); }); /* half-out from behind a van */
+  spots.push(function(){ w.classList.add("peekR"); w.style.left="10.9%"; w.style.bottom="40%"; scene.appendChild(w); });    /* half-out of the Fusion doorway */
+  spots.push(function(){ w.classList.add("peekR"); w.style.right="34.8%"; w.style.bottom="38.5%"; scene.appendChild(w); }); /* half-behind the job-site house corner */
+  spots.push(function(){ w.classList.add("peekL"); w.style.right="15%"; w.style.bottom="38.5%"; scene.appendChild(w); });   /* half-behind the home's edge */
+  spots.push(function(){ w.classList.add("peekL"); w.style.right="32.6%"; w.style.bottom="39.2%"; scene.appendChild(w); }); /* half-behind a tree trunk */
+  spots.push(function(){ w.classList.add("peekR"); w.style.left="63.5%"; w.style.top="16%"; scene.appendChild(w); });       /* half-behind a mountain peak */
   const bear = document.querySelector(".bear");
   if (bear){
     spots.push(function(){ w.classList.add("mini","running"); w.style.left="-15px"; w.style.top="2px"; bear.appendChild(w); }); /* running from the bear! */
@@ -1653,7 +1666,17 @@ async function main(){
     const cls=a.kind==="ok"?"arr-ok":(a.kind==="route"?"arr-route":(a.kind==="sales"?"arr-sales":"arr-fusion"));
     return `<span class="${cls}">${esc(a.text)}</span>`+(a.sub?`<span class="cellsub">${esc(a.sub)}</span>`:"");
   };
-  document.getElementById("boardBody").innerHTML = rows.map(r=>{
+  /* board order: furthest from Fusion first → Fusion parking lot last; Sales vans (FV1, Tundra) at the very bottom */
+  const distFromFusion = r=>{
+    let d = Infinity;
+    CFG.centers.forEach(c=>{ const x = havM(r.live.latitude, r.live.longitude, c.lat, c.lon); if (x<d) d=x; });
+    return d;
+  };
+  const boardRows = rows.slice().sort((a,b)=>{
+    if (a.sales !== b.sales) return a.sales ? 1 : -1;
+    return distFromFusion(b) - distFromFusion(a);
+  });
+  document.getElementById("boardBody").innerHTML = boardRows.map(r=>{
     const loc = r.place ? " · " + esc(r.place) : "";
     const nowTxt = r.live.isDriving ? `🚐 ${kmh2mph(r.live.speed)} mph${loc}`
       : (r.zone==="fusion" ? "🏢 Fusion"
