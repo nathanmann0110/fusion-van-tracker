@@ -61,12 +61,13 @@ h1,h2,h3{font-weight:700;letter-spacing:.025em}
   font-size:14px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--f-dark);padding:3px 14px;border-radius:14px;white-space:nowrap}
 .lot{display:flex;flex-wrap:wrap-reverse;gap:8px 12px;align-items:flex-end;justify-content:center;padding:6px 8px 10px}
 #zoneFusion{left:0;width:26%}
-#zoneRoad{left:26%;width:32%}
-#zoneJob{left:58%;width:22%}
-#zoneHome{right:0;width:20%}
+#zoneRoad{left:30%;width:40%}
+#zoneJob{left:70%;width:16%}
+#zoneHome{right:0;width:14%}
+.zone{z-index:2}
 /* en-route vans: rear view, driving up the road toward the horizon */
 #roadLane{position:absolute;inset:0;padding:0}
-.rv{position:absolute;bottom:2px;left:75%;margin-left:-33px;animation:toHorizon 9s linear infinite;will-change:transform,opacity;opacity:0}
+.rv{position:absolute;bottom:2px;left:50%;margin-left:-33px;animation:toHorizon 18s linear infinite;will-change:transform,opacity;opacity:0}
 .rv .van{width:auto;animation:none}
 .rv .van svg{width:66px;height:69px}
 .rv.small .van svg{width:51px;height:54px}
@@ -87,6 +88,14 @@ h1,h2,h3{font-weight:700;letter-spacing:.025em}
 /* front/rear-view vans parked in lots */
 .van.fr svg{width:66px;height:69px}
 .van.small.fr svg{width:51px;height:54px}
+/* bear climbing the mountains */
+.bear{position:absolute;left:11%;top:56%;width:52px;height:34px;z-index:3;pointer-events:none;animation:bearClimb 30s linear infinite;opacity:0}
+.bear svg{width:100%;height:100%;transform:rotate(-32deg);overflow:visible}
+.bear .bl1,.bear .bl3{transform-box:fill-box;transform-origin:top center;animation:stepA .5s ease-in-out infinite alternate}
+.bear .bl2,.bear .bl4{transform-box:fill-box;transform-origin:top center;animation:stepB .5s ease-in-out infinite alternate}
+@keyframes bearClimb{0%{left:11%;top:56%;opacity:0}4%{opacity:1}44%{left:24%;top:10%;opacity:1}48%{opacity:0}100%{left:11%;top:56%;opacity:0}}
+/* street lights */
+.lamp .glow{filter:drop-shadow(0 0 6px #ffd766)}
 /* structures */
 .structure{position:absolute;pointer-events:none}
 /* vehicles */
@@ -351,8 +360,66 @@ body.dark #loading{color:#9aa0a8}
     <text x="80" y="12" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="7" fill="#C1272D" letter-spacing="2">AUDIO+VIDEO</text>
   </svg>
 
+  <!-- bear climbing the mountain -->
+  <div class="bear"><svg viewBox="0 0 46 30">
+    <ellipse cx="20" cy="17" rx="13" ry="8" fill="#6b4a2f"/>
+    <circle cx="34" cy="12" r="6" fill="#6b4a2f"/>
+    <circle cx="37.5" cy="7.5" r="2" fill="#59391f"/>
+    <circle cx="35.8" cy="11.5" r=".9" fill="#1b1b1d"/>
+    <ellipse cx="38.8" cy="13.8" rx="1.7" ry="1.2" fill="#4a331f"/>
+    <circle cx="7" cy="14" r="2.6" fill="#59391f"/>
+    <rect class="bl1" x="12" y="21" width="3.4" height="9" rx="1.6" fill="#59391f"/>
+    <rect class="bl2" x="18" y="21" width="3.4" height="9" rx="1.6" fill="#59391f"/>
+    <rect class="bl3" x="24" y="21" width="3.4" height="9" rx="1.6" fill="#59391f"/>
+    <rect class="bl4" x="29" y="21" width="3.4" height="9" rx="1.6" fill="#59391f"/>
+  </svg></div>
+
+  <!-- Fusion parking lot with stall lines -->
+  <svg class="structure" style="left:.5%;bottom:1%;width:25%;height:135px;z-index:1" viewBox="0 0 400 135" preserveAspectRatio="none">
+    <rect x="0" y="18" width="400" height="117" rx="6" fill="#63666b"/>
+    <g stroke="#e8e9ea" stroke-width="3" opacity=".6">
+      <line x1="45" y1="26" x2="45" y2="66"/><line x1="105" y1="26" x2="105" y2="66"/><line x1="165" y1="26" x2="165" y2="66"/><line x1="225" y1="26" x2="225" y2="66"/><line x1="285" y1="26" x2="285" y2="66"/><line x1="345" y1="26" x2="345" y2="66"/>
+      <line x1="45" y1="88" x2="45" y2="128"/><line x1="105" y1="88" x2="105" y2="128"/><line x1="165" y1="88" x2="165" y2="128"/><line x1="225" y1="88" x2="225" y2="128"/><line x1="285" y1="88" x2="285" y2="128"/><line x1="345" y1="88" x2="345" y2="128"/>
+    </g>
+  </svg>
+  <!-- parking lot lights + trees -->
+  <svg class="structure lamp" style="left:1%;bottom:17%;width:22px;height:95px;z-index:1" viewBox="0 0 26 110">
+    <rect x="11" y="10" width="4" height="100" fill="#4a4d52"/>
+    <path d="M13 10 Q13 2 22 4" stroke="#4a4d52" stroke-width="3.5" fill="none"/>
+    <ellipse class="glow" cx="22" cy="6" rx="4.5" ry="3" fill="#ffe9a8"/>
+  </svg>
+  <svg class="structure lamp" style="left:24%;bottom:17%;width:22px;height:95px;z-index:1;transform:scaleX(-1)" viewBox="0 0 26 110">
+    <rect x="11" y="10" width="4" height="100" fill="#4a4d52"/>
+    <path d="M13 10 Q13 2 22 4" stroke="#4a4d52" stroke-width="3.5" fill="none"/>
+    <ellipse class="glow" cx="22" cy="6" rx="4.5" ry="3" fill="#ffe9a8"/>
+  </svg>
+  <svg class="structure" style="left:19%;bottom:34%;width:55px;height:80px" viewBox="0 0 40 60"><rect x="17" y="40" width="6" height="20" fill="#6b4f35"/><circle cx="20" cy="26" r="15" fill="#457A3E"/><circle cx="11" cy="33" r="9" fill="#529148"/></svg>
+  <svg class="structure" style="left:.2%;bottom:34%;width:50px;height:85px" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/></svg>
+
+  <!-- street lights along the road -->
+  <svg class="structure lamp" style="left:calc(50% - 285px);bottom:3%;width:28px;height:125px;z-index:1" viewBox="0 0 26 110">
+    <rect x="11" y="10" width="4" height="100" fill="#4a4d52"/>
+    <path d="M13 10 Q13 2 22 4" stroke="#4a4d52" stroke-width="3.5" fill="none"/>
+    <ellipse class="glow" cx="22" cy="6" rx="4.5" ry="3" fill="#ffe9a8"/>
+  </svg>
+  <svg class="structure lamp" style="left:calc(50% + 258px);bottom:3%;width:28px;height:125px;z-index:1;transform:scaleX(-1)" viewBox="0 0 26 110">
+    <rect x="11" y="10" width="4" height="100" fill="#4a4d52"/>
+    <path d="M13 10 Q13 2 22 4" stroke="#4a4d52" stroke-width="3.5" fill="none"/>
+    <ellipse class="glow" cx="22" cy="6" rx="4.5" ry="3" fill="#ffe9a8"/>
+  </svg>
+  <svg class="structure lamp" style="left:calc(50% - 130px);bottom:29%;width:16px;height:72px;z-index:1" viewBox="0 0 26 110">
+    <rect x="11" y="10" width="4" height="100" fill="#4a4d52"/>
+    <path d="M13 10 Q13 2 22 4" stroke="#4a4d52" stroke-width="3.5" fill="none"/>
+    <ellipse class="glow" cx="22" cy="6" rx="4.5" ry="3" fill="#ffe9a8"/>
+  </svg>
+  <svg class="structure lamp" style="left:calc(50% + 114px);bottom:29%;width:16px;height:72px;z-index:1;transform:scaleX(-1)" viewBox="0 0 26 110">
+    <rect x="11" y="10" width="4" height="100" fill="#4a4d52"/>
+    <path d="M13 10 Q13 2 22 4" stroke="#4a4d52" stroke-width="3.5" fill="none"/>
+    <ellipse class="glow" cx="22" cy="6" rx="4.5" ry="3" fill="#ffe9a8"/>
+  </svg>
+
   <!-- Job site house -->
-  <svg class="structure" style="right:22%;bottom:38%;width:280px;height:177px" viewBox="0 0 190 120">
+  <svg class="structure" style="right:17%;bottom:38%;width:280px;height:177px" viewBox="0 0 190 120">
     <polygon points="10,55 85,8 160,55" fill="#8d4a3a"/>
     <rect x="22" y="55" width="126" height="65" fill="#e8dcc8"/>
     <rect x="118" y="14" width="12" height="28" fill="#75777a"/>
@@ -366,6 +433,11 @@ body.dark #loading{color:#9aa0a8}
     <circle cx="164" cy="58" r="22" fill="#457A3E"/>
     <circle cx="152" cy="68" r="14" fill="#529148"/>
   </svg>
+
+  <!-- trees at the job site and home -->
+  <svg class="structure" style="right:33%;bottom:36%;width:55px;height:85px" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/></svg>
+  <svg class="structure" style="right:15%;bottom:37%;width:60px;height:85px" viewBox="0 0 40 60"><rect x="17" y="40" width="6" height="20" fill="#6b4f35"/><circle cx="20" cy="26" r="15" fill="#457A3E"/><circle cx="29" cy="34" r="9" fill="#529148"/></svg>
+  <svg class="structure" style="right:.2%;bottom:37%;width:48px;height:78px" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/></svg>
 
   <!-- Driver's home -->
   <svg class="structure" style="right:1.5%;bottom:38%;width:210px;height:140px" viewBox="0 0 150 100">
@@ -1120,7 +1192,7 @@ async function main(){
   applyWeather(); /* live weather + scenery, non-blocking */
 
   const now = new Date();
-  const T600=etToday(6,0), T630=etToday(6,30), T645=etToday(6,45), T700=etToday(7,0), T715=etToday(7,15), T800=etToday(8,0), T930=etToday(9,30);
+  const T600=etToday(6,0), T630=etToday(6,30), T645=etToday(6,45), T700=etToday(7,0), T715=etToday(7,15), T800=etToday(8,0), T930=etToday(9,30), T1000=etToday(10,0);
   if (parseInt(o.hour,10) >= 15) document.getElementById("scene").classList.add("sunset");
   const dayStart=etToday(3,0);
   document.getElementById("lbSub").textContent = "(today — updates every open)";
@@ -1291,6 +1363,8 @@ async function main(){
       if (now < T) return {state:"pend"};
       /* early birds are never late — at Fusion by 6:45 or off to a job before 6:30 */
       if (row.earlyCredit) return {state:"ok", sub:"early start"};
+      /* arriving right AT 7:00 counts as on time */
+      if (row.fusionArrivalT && row.fusionArrivalT.getTime() <= T.getTime()+60000) return {state:"ok", sub:"arrived "+fmtET(row.fusionArrivalT)};
       const p = await posAt(nm, T);
       /* if they weren't there at 7:00, show when they finally arrived */
       const lateArr = (row.fusionArrivalT && row.fusionArrivalT > T) ? "arrived "+fmtET(row.fusionArrivalT) : "";
@@ -1331,13 +1405,22 @@ async function main(){
 
     /* live zone for the scene */
     row.zone = v.isDriving ? "road" : (atFusion(v.latitude, v.longitude) ? "fusion" : "job");
-    /* driving direction: toward Fusion (front view) or away (rear view)? */
+    /* driving direction: toward Fusion/home (front view, left lane) or away to a job (rear view, right lane)? */
     if (row.zone === "road" && v.bearing!=null && v.bearing>=0){
       let best=CFG.centers[0], bd=Infinity;
       CFG.centers.forEach(cc=>{ const d=havM(v.latitude,v.longitude,cc.lat,cc.lon); if(d<bd){bd=d;best=cc;} });
       const brg = bearingDeg(v.latitude, v.longitude, best.lat, best.lon);
       const sep = Math.abs(((v.bearing - brg + 540) % 360) - 180);
       row.toFusion = sep < 90;
+      let toHome = false;
+      try{
+        const pts = await earlyPoints(nm); /* first point of the day ≈ home */
+        if (pts.length && pts[0].lat!=null && !atFusion(pts[0].lat,pts[0].lon)){
+          const hb = bearingDeg(v.latitude, v.longitude, pts[0].lat, pts[0].lon);
+          toHome = Math.abs(((v.bearing - hb + 540) % 360) - 180) < 60;
+        }
+      }catch(e){}
+      row.inbound = row.toFusion || toHome;
     }
     /* HOME detection: parked where the van started its day (and not at Fusion) */
     if (row.zone === "job"){
@@ -1377,6 +1460,11 @@ async function main(){
         else if (p) row.arrival = {kind:"fusion", text:"Parked off-site", sub:"no trips by 9:30"};
         else row.arrival = {kind:"fusion", text:"No data", sub:""};
       }
+    }
+    /* job-site departure: en route again after 10:00 AM = left the job site */
+    if (!row.sales && row.arrival && row.arrival.kind==="ok"){
+      const after10 = (tripsBy[nm]||[]).find(t=>t.start>T1000);
+      if (after10) row.arrival.sub = "left site "+fmtET(after10.start);
     }
     rows.push(row);
   }
@@ -1424,24 +1512,22 @@ async function main(){
     }
     const type = vehTypeFor(r.name, r.tag);
     if (r.zone === "road"){ roadVans.push({r, type, stripColor}); continue; }
-    /* at Fusion: FRONT of the van · at home: REAR of the van · job site: side view */
-    const bodySVG = r.zone==="fusion" ? frontSVG(type, stripColor)
-                  : r.zone==="home"   ? rearSVG(type, stripColor)
-                  : vehSVG(type, stripColor);
+    /* at Fusion: FRONT of the van · at home & job site: REAR of the van */
+    const bodySVG = r.zone==="fusion" ? frontSVG(type, stripColor) : rearSVG(type, stripColor);
     const el=document.createElement("div");
-    el.className="van"+(type==="small"?" small":"")+(r.zone==="fusion"||r.zone==="home"?" fr":"");
+    el.className="van"+(type==="small"?" small":"")+" fr";
     el.innerHTML = bodySVG + `<span class="vanTag">${esc(r.tag)}</span>`;
     el.title = r.name + (r.driver?(" — "+r.driver):"") + (r.place?(" — "+r.place):"") + (r.sales?" — Sales (not timed)":"");
     lots[r.zone].appendChild(el);
   }
-  /* en-route vans: rear view, staggered up the road toward the horizon */
-  const RDUR = 9;
+  /* en-route vans: outbound (rear view) ride the RIGHT lane away; inbound (front view) ride the LEFT lane home */
+  const RDUR = 18;
   roadVans.forEach((v, i) => {
     const wrap = document.createElement("div");
-    wrap.className = "rv" + (v.type==="small" ? " small" : "") + (v.r.toFusion ? " in" : "");
-    wrap.style.setProperty("--lx", (i%2===0 ? -45 : 45) + "px");   /* alternate lanes */
+    wrap.className = "rv" + (v.type==="small" ? " small" : "") + (v.r.inbound ? " in" : "");
+    wrap.style.setProperty("--lx", (v.r.inbound ? -55 : 55) + "px");   /* left lane = inbound, right lane = outbound */
     wrap.style.animationDelay = "-" + (i * (RDUR / Math.max(roadVans.length,1))).toFixed(2) + "s";
-    const roadSVG = v.r.toFusion ? frontSVG(v.type, v.stripColor) : rearSVG(v.type, v.stripColor);
+    const roadSVG = v.r.inbound ? frontSVG(v.type, v.stripColor) : rearSVG(v.type, v.stripColor);
     wrap.innerHTML = `<div class="van">${roadSVG}<span class="vanTag">${esc(v.r.tag)}</span><span class="speedchip">${kmh2mph(v.r.live.speed)} mph</span></div>`;
     wrap.title = v.r.name + (v.r.driver?(" — "+v.r.driver):"") + (v.r.place?(" — "+v.r.place):"") + (v.r.sales?" — Sales (not timed)":"");
     lots.road.appendChild(wrap);
