@@ -1601,13 +1601,13 @@ async function main(){
   for (const r of rows){
     const stripColor = stripeFor(r);
     const isLeader = leaderDriver && (r.driver===leaderDriver || r.name.includes(leaderDriver));
-    if (isLeader){
-      /* leader is out of the lots — full-screen pursuit */
+    if (isLeader && r.zone === "road"){
+      /* leader only gets chased while EN ROUTE — parked leaders sit in the lot like everyone else */
       startPursuit(r, stripColor);
       continue;
     }
-    if (r.earlyBird){
-      /* the early bird is out of the lots — airlifted across the sky */
+    if (r.earlyBird && r.zone === "road"){
+      /* early bird only flies while EN ROUTE */
       startFlyer(r, stripColor);
       continue;
     }
@@ -1676,8 +1676,11 @@ async function main(){
       <div class="lb-bar"><div class="lb-fill" style="width:${Math.round(n/maxN*100)}%"></div></div>
       <div class="lb-n">${n}</div>
     </div>`).join("") || `<div style="font-size:12px;color:var(--f-gray)">No speeding violations yet today. 🎉</div>`;
+  const leaderRow = rows.find(r=>leaderDriver && (r.driver===leaderDriver || r.name.includes(leaderDriver)));
   document.getElementById("wanted").innerHTML = leaderDriver
-    ? `🚨 <b>${esc(leaderDriver)}</b> leads the fleet with <b>${lbSorted[0][1]}</b> speeding violations today — watch the scene: <b>pulled over, foot chase, wrong cars, tables turned</b>, on repeat.`
+    ? (leaderRow && leaderRow.zone==="road"
+        ? `🚨 <b>${esc(leaderDriver)}</b> leads the fleet with <b>${lbSorted[0][1]}</b> speeding violations today — watch the scene: <b>pulled over, foot chase, wrong cars, tables turned</b>, on repeat.`
+        : `🚨 <b>${esc(leaderDriver)}</b> leads the fleet with <b>${lbSorted[0][1]}</b> speeding violations today — currently parked. The chase resumes when they hit the road.`)
     : `Fleet is clean so far today — nobody is being chased.`;
 
   /* --- daily report: vans that left Fusion between 6:00–8:00 AM --- */
