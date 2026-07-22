@@ -66,7 +66,7 @@ h1,h2,h3{font-weight:700;letter-spacing:.025em}
 #zoneHome{right:0;width:20%}
 /* en-route vans: rear view, driving up the road toward the horizon */
 #roadLane{position:absolute;inset:0;padding:0}
-.rv{position:absolute;bottom:2px;left:50%;margin-left:-33px;animation:toHorizon 9s linear infinite;will-change:transform,opacity;opacity:0}
+.rv{position:absolute;bottom:2px;left:75%;margin-left:-33px;animation:toHorizon 9s linear infinite;will-change:transform,opacity;opacity:0}
 .rv .van{width:auto;animation:none}
 .rv .van svg{width:66px;height:69px}
 .rv.small .van svg{width:51px;height:54px}
@@ -76,6 +76,17 @@ h1,h2,h3{font-weight:700;letter-spacing:.025em}
   84% {opacity:1}
   100%{transform:translateX(calc(var(--lx,0px)/3)) translateY(-200px) scale(.22); opacity:0}
 }
+/* inbound vans (heading to Fusion): come FROM the horizon toward the viewer */
+.rv.in{animation-name:fromHorizon}
+@keyframes fromHorizon{
+  0%  {transform:translateX(calc(var(--lx,0px)/3)) translateY(-200px) scale(.22); opacity:0}
+  8%  {opacity:1}
+  84% {opacity:1}
+  100%{transform:translateX(var(--lx,0px)) translateY(0)      scale(1);   opacity:0}
+}
+/* front/rear-view vans parked in lots */
+.van.fr svg{width:66px;height:69px}
+.van.small.fr svg{width:51px;height:54px}
 /* structures */
 .structure{position:absolute;pointer-events:none}
 /* vehicles */
@@ -301,7 +312,7 @@ body.dark #loading{color:#9aa0a8}
   <div class="kpi"><div class="n" id="kFleet">–</div><div class="l">Vans Tracked</div></div>
   <div class="kpi"><div class="n" id="k700" style="color:var(--ok)">–</div><div class="l">On Time @ 7:00</div></div>
   <div class="kpi"><div class="n" id="kLate" style="color:var(--bad)">–</div><div class="l">Late @ 7:00</div></div>
-  <div class="kpi"><div class="n" id="k730" style="color:var(--f-navy)">–</div><div class="l">En Route @ 7:45</div></div>
+  <div class="kpi"><div class="n" id="k730" style="color:var(--f-navy)">–</div><div class="l">En Route @ 8:00</div></div>
   <div class="kpi"><div class="n" id="kArr" style="color:var(--f-green)">–</div><div class="l">At Job Sites</div></div>
   <div class="kpi"><div class="n" id="kSpeed" style="color:var(--f-red)">–</div><div class="l" id="kSpeedLbl">Speeding Today</div></div>
 </div>
@@ -384,7 +395,7 @@ body.dark #loading{color:#9aa0a8}
   <span><span class="stripchip" style="background:var(--ok)"></span> green stripe = on time / good</span>
   <span><span class="stripchip" style="background:var(--bad)"></span> red stripe = late / not where they should be</span>
   <span><span class="stripchip" style="background:var(--f-light)"></span> gray stripe = checkpoint hasn't happened yet</span>
-  <span><span class="stripchip" style="background:#fff;border:1px solid var(--f-light)"></span> white stripe = never left Fusion after 7:45 / overnight</span>
+  <span><span class="stripchip" style="background:#fff;border:1px solid var(--f-light)"></span> white stripe = never left Fusion after 8:00 / overnight</span>
   <span>🚔 = today's speeding leader — pulled over, foot chase, car swap, chaos on repeat</span>
   <span>🐦 = THE early bird — first van at Fusion this morning, carried across the sky</span>
   <span>🏡 Home = parked where the van started its day · 🏠 Job Site = parked anywhere else</span>
@@ -400,7 +411,7 @@ body.dark #loading{color:#9aa0a8}
       <thead><tr>
         <th>Van / Driver</th>
         <th>7:00 AM<br>At Fusion</th>
-        <th>7:45 AM<br>En Route</th>
+        <th>8:00 AM<br>En Route</th>
         <th>Job Site Arrival<br>(locks at 9:30)</th>
         <th>Now</th>
       </tr></thead>
@@ -417,9 +428,13 @@ body.dark #loading{color:#9aa0a8}
       <h2>Daily Schedule · Mon–Thu</h2>
       <div class="sched">
         <div class="sched-item"><div class="sched-time">7:00a</div><div class="sched-txt"><b>All vans at Fusion.</b> Came in early and left, or headed straight to a job before 6:30? Still on time. Late vans get a red stripe.</div></div>
-        <div class="sched-item"><div class="sched-time">7:45a</div><div class="sched-txt"><b>All vans en route to job sites.</b> Still parked at Fusion = red stripe.</div></div>
+        <div class="sched-item"><div class="sched-time">8:00a</div><div class="sched-txt"><b>All vans en route to job sites.</b> Board shows what time each van left Fusion. Still parked at Fusion = red stripe.</div></div>
         <div class="sched-item"><div class="sched-time">9:30a</div><div class="sched-txt"><b>Job site arrival.</b> Each van's arrival time at its current location is logged — locked for the rest of the day.</div></div>
       </div>
+    </div>
+    <div class="panel" style="margin-top:12px">
+      <h2>📋 Daily Report · Left Fusion 6–8a</h2>
+      <div id="reportBody" style="font-size:12px;color:var(--f-gray)">Loading…</div>
     </div>
   </div>
 </div>
@@ -561,6 +576,7 @@ async function geoLive(){
       isDriving: !!s.isDriving,
       latitude: s.latitude,
       longitude: s.longitude,
+      bearing: s.bearing,
       speed: s.speed || 0,
       driver: (s.driver && s.driver.id && usrById[s.driver.id]) || ""
     });
@@ -660,6 +676,12 @@ function splitName(n){
   return m ? {tag:m[1].trim(), driver:m[2].trim()} : {tag:String(n).trim(), driver:""};
 }
 const kmh2mph = k => Math.round(k*0.621371);
+function bearingDeg(lat1,lon1,lat2,lon2){
+  const r=Math.PI/180;
+  const y=Math.sin((lon2-lon1)*r)*Math.cos(lat2*r);
+  const x=Math.cos(lat1*r)*Math.sin(lat2*r)-Math.sin(lat1*r)*Math.cos(lat2*r)*Math.cos((lon2-lon1)*r);
+  return (Math.atan2(y,x)*180/Math.PI+360)%360;
+}
 /* reverse geocode → "City, ST" (cached in this browser) */
 let GEONAMES = {};
 try { GEONAMES = JSON.parse(localStorage.getItem("vanTrackerGeo")||"{}"); } catch(e){}
@@ -802,6 +824,27 @@ function rearSVG(type, stripColor){
     <text x="22" y="35" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="5" fill="#ffffff" letter-spacing=".4">FUSION</text>
     <rect x="8.5" y="30" width="5" height="3" rx="1" fill="#C1272D"/>
     <rect x="30.5" y="30" width="5" height="3" rx="1" fill="#C1272D"/>
+  </svg>`;
+}
+/* front view — parked at Fusion facing out, or driving toward Fusion */
+function frontSVG(type, stripColor){
+  const c = stripColor || STRIP.none;
+  return `<svg viewBox="0 0 44 46">
+    <ellipse cx="22" cy="43" rx="17" ry="2.5" fill="rgba(0,0,0,.18)"/>
+    <rect x="4.5" y="33" width="10" height="9" rx="2.5" fill="#2c2c2e"/>
+    <rect x="7" y="35.5" width="5" height="4" rx="1.5" fill="#e9ebee"/>
+    <rect x="29.5" y="33" width="10" height="9" rx="2.5" fill="#2c2c2e"/>
+    <rect x="32" y="35.5" width="5" height="4" rx="1.5" fill="#e9ebee"/>
+    <line x1="12" y1="4" x2="12" y2="1.5" stroke="#6e7073" stroke-width="1.2"/>
+    <line x1="32" y1="4" x2="32" y2="1.5" stroke="#6e7073" stroke-width="1.2"/>
+    <line x1="8" y1="1.5" x2="36" y2="1.5" stroke="#d8d9db" stroke-width="1.7"/>
+    <rect x="7" y="4" width="30" height="34" rx="4" fill="#939598" stroke="#6e7073" stroke-width="1.5"/>
+    <rect x="10" y="7" width="24" height="11" rx="2" fill="#CEE2FF" stroke="#6e7073" stroke-width="1"/>
+    <rect x="7" y="24" width="30" height="4" fill="${c}"/>
+    <text x="22" y="22.5" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="5" fill="#ffffff" letter-spacing=".4">FUSION</text>
+    <rect x="8.5" y="29.5" width="6" height="3.5" rx="1" fill="#fff8d8" stroke="#c9b96a" stroke-width=".5"/>
+    <rect x="29.5" y="29.5" width="6" height="3.5" rx="1" fill="#fff8d8" stroke="#c9b96a" stroke-width=".5"/>
+    <rect x="16.5" y="30" width="11" height="2.6" rx="1" fill="#6e7073"/>
   </svg>`;
 }
 function copSVG(){
@@ -1077,7 +1120,7 @@ async function main(){
   applyWeather(); /* live weather + scenery, non-blocking */
 
   const now = new Date();
-  const T630=etToday(6,30), T645=etToday(6,45), T700=etToday(7,0), T715=etToday(7,15), T730=etToday(7,30), T745=etToday(7,45), T930=etToday(9,30);
+  const T600=etToday(6,0), T630=etToday(6,30), T645=etToday(6,45), T700=etToday(7,0), T715=etToday(7,15), T800=etToday(8,0), T930=etToday(9,30);
   if (parseInt(o.hour,10) >= 15) document.getElementById("scene").classList.add("sunset");
   const dayStart=etToday(3,0);
   document.getElementById("lbSub").textContent = "(today — updates every open)";
@@ -1165,6 +1208,30 @@ async function main(){
     const pts = await earlyPoints(vname);
     return pts.some(p=>p.t<=T && p.lat!=null && atFusion(p.lat,p.lon));
   }
+  /* first time the van ARRIVED at Fusion today (real drive-in) */
+  function fusionArrivalTime(vname){
+    const a=(tripsBy[vname]||[]).filter(t=>t.stop>=dayStart && t.lat!=null && atFusion(t.lat,t.lon) && (t.distanceKm||0)>=0.5);
+    return a.length ? a.reduce((x,y)=>x.stop<y.stop?x:y).stop : null;
+  }
+  /* when the van DEPARTED Fusion (start of the trip after its last stop at Fusion) */
+  async function leftFusionAt(vname){
+    const a=(tripsBy[vname]||[]);
+    if(!a.length) return null;
+    for (let i=a.length-1;i>=0;i--){
+      if (a[i].lat!=null && atFusion(a[i].lat,a[i].lon)){
+        return (i+1<a.length) ? a[i+1].start : null; /* still at Fusion if no later trip */
+      }
+    }
+    /* overnight at Fusion: first GPS point of the day is at Fusion → first trip = departure */
+    const pts = await earlyPoints(vname);
+    if (pts.length && pts[0].lat!=null && atFusion(pts[0].lat,pts[0].lon)) return a[0].start;
+    return null;
+  }
+  /* did the van spend the night at Fusion? (first GPS point of the day) */
+  async function overnightAtFusion(vname){
+    const pts = await earlyPoints(vname);
+    return !!(pts.length && pts[0].lat!=null && atFusion(pts[0].lat,pts[0].lon));
+  }
   /* early bird = ARRIVED at Fusion by 6:45a today (drove in — overnight parkers don't count),
      OR was rolling before 6:30a headed somewhere other than Fusion (straight to the job) */
   async function isEarlyBird(vname){
@@ -1225,20 +1292,23 @@ async function main(){
       /* early birds are never late — at Fusion by 6:45 or off to a job before 6:30 */
       if (row.earlyCredit) return {state:"ok", sub:"early start"};
       const p = await posAt(nm, T);
+      /* if they weren't there at 7:00, show when they finally arrived */
+      const lateArr = (row.fusionArrivalT && row.fusionArrivalT > T) ? "arrived "+fmtET(row.fusionArrivalT) : "";
       if (p && !p.driving && atFusion(p.lat,p.lon)) return {state:"ok"};
       /* not at Fusion at T — still on time if they came in earlier and already left */
       if (await wasAtFusionBy(nm, T)) return {state:"ok", sub:"in early, left"};
       if (!p) return {state:"na"};
-      if (p.driving) return {state:"late", sub:"driving"};
-      return {state:"late"};
+      if (p.driving) return {state:"late", sub: lateArr || "driving"};
+      return {state:"late", sub: lateArr || "never came"};
     }
     function routeCheck(T){
-      if (now < T) return {state:"pend"};
-      if (drivingAt(nm,T)) return {state:"ok", sub:"driving"};
+      const leftTxt = row.leftFusion ? "left "+fmtET(row.leftFusion) : "";
+      if (now < T) return {state:"pend", sub: leftTxt};
+      if (drivingAt(nm,T)) return {state:"ok", sub: leftTxt || "driving"};
       const ls = lastStopBefore(nm,T);
       if (ls && ls.lat!=null && !atFusion(ls.lat,ls.lon)){
         const departed=(tripsBy[nm]||[]).some(t=>t.stop<=T && t.stop>=dayStart);
-        if (departed) return {state:"ok", sub:"arrived"};
+        if (departed) return {state:"ok", sub: leftTxt || "arrived"};
       }
       return {state:"late", sub: ls&&ls.lat!=null&&atFusion(ls.lat,ls.lon) ? "at Fusion" : "not moving"};
     }
@@ -1249,15 +1319,26 @@ async function main(){
     if (row.sales){
       /* Sales vans aren't timed */
       const sc = {state:"na", sub:"sales"};
-      row.checks = {c700:sc, c745:sc};
+      row.checks = {c700:sc, c800:sc};
     } else {
+      row.fusionArrivalT = fusionArrivalTime(nm);
+      row.overnight = await overnightAtFusion(nm);
+      row.leftFusion = await leftFusionAt(nm);
       row.earlyCredit = await isEarlyBird(nm);
       row.checks.c700 = await fusionCheck(T700);
-      row.checks.c745 = routeCheck(T745);
+      row.checks.c800 = routeCheck(T800);
     }
 
     /* live zone for the scene */
     row.zone = v.isDriving ? "road" : (atFusion(v.latitude, v.longitude) ? "fusion" : "job");
+    /* driving direction: toward Fusion (front view) or away (rear view)? */
+    if (row.zone === "road" && v.bearing!=null && v.bearing>=0){
+      let best=CFG.centers[0], bd=Infinity;
+      CFG.centers.forEach(cc=>{ const d=havM(v.latitude,v.longitude,cc.lat,cc.lon); if(d<bd){bd=d;best=cc;} });
+      const brg = bearingDeg(v.latitude, v.longitude, best.lat, best.lon);
+      const sep = Math.abs(((v.bearing - brg + 540) % 360) - 180);
+      row.toFusion = sep < 90;
+    }
     /* HOME detection: parked where the van started its day (and not at Fusion) */
     if (row.zone === "job"){
       if (!(tripsBy[nm]||[]).length){
@@ -1306,19 +1387,19 @@ async function main(){
   document.getElementById("kFleet").textContent = rows.length;
   document.getElementById("k700").textContent = now>=T700 ? tracked.filter(r=>r.checks.c700.state==="ok").length : "–";
   document.getElementById("kLate").textContent = now>=T700 ? tracked.filter(r=>r.checks.c700.state==="late").length : "–";
-  document.getElementById("k730").textContent = now>=T745 ? tracked.filter(r=>r.checks.c745.state==="ok").length : "–";
+  document.getElementById("k730").textContent = now>=T800 ? tracked.filter(r=>r.checks.c800.state==="ok").length : "–";
   document.getElementById("kArr").textContent = tracked.filter(r=>r.arrival&&r.arrival.kind==="ok").length;
   document.getElementById("kSpeed").textContent = totalViol;
 
   /* --- current status per van → stripe color (latest applicable checkpoint) --- */
   function stripeFor(r){
     if (r.sales) return STRIP.none; /* sales vans aren't timed */
-    /* white stripe: stayed overnight / never left Fusion after 7:45 */
-    if (now >= T745 && r.neverLeft) return "#ffffff";
-    const seq=[["c700",T700],["c745",T745]];
+    /* white stripe: stayed overnight / never left Fusion after 8:00 */
+    if (now >= T800 && r.neverLeft) return "#ffffff";
+    const seq=[["c700",T700],["c800",T800]];
     let st="";
     for(const [k,T] of seq){ if(now>=T && done(r.checks[k].state)) st = r.checks[k].state; }
-    if (now>=T745){
+    if (now>=T800){
       if (r.arrival.kind==="ok" || r.arrival.kind==="route") st="ok";
       else if (r.arrival.kind==="fusion") st="late";
     }
@@ -1343,9 +1424,13 @@ async function main(){
     }
     const type = vehTypeFor(r.name, r.tag);
     if (r.zone === "road"){ roadVans.push({r, type, stripColor}); continue; }
+    /* at Fusion: FRONT of the van · at home: REAR of the van · job site: side view */
+    const bodySVG = r.zone==="fusion" ? frontSVG(type, stripColor)
+                  : r.zone==="home"   ? rearSVG(type, stripColor)
+                  : vehSVG(type, stripColor);
     const el=document.createElement("div");
-    el.className="van"+(type==="small"?" small":"");
-    el.innerHTML = vehSVG(type, stripColor) + `<span class="vanTag">${esc(r.tag)}</span>`;
+    el.className="van"+(type==="small"?" small":"")+(r.zone==="fusion"||r.zone==="home"?" fr":"");
+    el.innerHTML = bodySVG + `<span class="vanTag">${esc(r.tag)}</span>`;
     el.title = r.name + (r.driver?(" — "+r.driver):"") + (r.place?(" — "+r.place):"") + (r.sales?" — Sales (not timed)":"");
     lots[r.zone].appendChild(el);
   }
@@ -1353,10 +1438,11 @@ async function main(){
   const RDUR = 9;
   roadVans.forEach((v, i) => {
     const wrap = document.createElement("div");
-    wrap.className = "rv" + (v.type==="small" ? " small" : "");
+    wrap.className = "rv" + (v.type==="small" ? " small" : "") + (v.r.toFusion ? " in" : "");
     wrap.style.setProperty("--lx", (i%2===0 ? -45 : 45) + "px");   /* alternate lanes */
     wrap.style.animationDelay = "-" + (i * (RDUR / Math.max(roadVans.length,1))).toFixed(2) + "s";
-    wrap.innerHTML = `<div class="van">${rearSVG(v.type, v.stripColor)}<span class="vanTag">${esc(v.r.tag)}</span><span class="speedchip">${kmh2mph(v.r.live.speed)} mph</span></div>`;
+    const roadSVG = v.r.toFusion ? frontSVG(v.type, v.stripColor) : rearSVG(v.type, v.stripColor);
+    wrap.innerHTML = `<div class="van">${roadSVG}<span class="vanTag">${esc(v.r.tag)}</span><span class="speedchip">${kmh2mph(v.r.live.speed)} mph</span></div>`;
     wrap.title = v.r.name + (v.r.driver?(" — "+v.r.driver):"") + (v.r.place?(" — "+v.r.place):"") + (v.r.sales?" — Sales (not timed)":"");
     lots.road.appendChild(wrap);
   });
@@ -1388,7 +1474,7 @@ async function main(){
     const earlyMark = r.earlyBird ? " 🐦" : "";
     return `<tr>
       <td>${esc(r.tag)}${leaderMark}${earlyMark}<br><span class="drivername">${esc(r.driver)}${r.sales?" · SALES":""}</span></td>
-      <td>${cell(r.checks.c700)}</td><td>${cell(r.checks.c745)}</td>
+      <td>${cell(r.checks.c700)}</td><td>${cell(r.checks.c800)}</td>
       <td>${arrCell(r.arrival)}</td>
       <td style="font-size:10.5px;white-space:nowrap">${nowTxt}</td>
     </tr>`;
@@ -1405,6 +1491,22 @@ async function main(){
   document.getElementById("wanted").innerHTML = leaderDriver
     ? `🚨 <b>${esc(leaderDriver)}</b> leads the fleet with <b>${lbSorted[0][1]}</b> speeding violations today — watch the scene: <b>pulled over, foot chase, wrong cars, tables turned</b>, on repeat.`
     : `Fleet is clean so far today — nobody is being chased.`;
+
+  /* --- daily report: vans that left Fusion between 6:00–8:00 AM --- */
+  const rep = rows.filter(r=>!r.sales && r.leftFusion && r.leftFusion>=T600 && r.leftFusion<=T800)
+                  .sort((a,b)=>a.leftFusion-b.leftFusion);
+  document.getElementById("reportBody").innerHTML = rep.length ? `
+    <table class="board">
+      <thead><tr><th>Van / Driver</th><th>Got to Fusion</th><th>Overnight at Fusion</th><th>Left for Job</th></tr></thead>
+      <tbody>${rep.map(r=>`<tr>
+        <td>${esc(r.tag)}<br><span class="drivername">${esc(r.driver)}</span></td>
+        <td>${r.overnight ? '<span class="cellsub">stayed overnight</span>' : (r.fusionArrivalT ? esc(fmtET(r.fusionArrivalT)) : "—")}</td>
+        <td>${r.overnight ? "✅ yes" : "❌ no"}</td>
+        <td style="font-weight:700;color:var(--f-navy)">${esc(fmtET(r.leftFusion))}</td>
+      </tr>`).join("")}</tbody>
+    </table>
+    <div class="cellsub" style="margin-top:6px">Mon–Thu · vans departing Fusion 6:00–8:00 AM · fresh data on every open</div>`
+    : `No vans left Fusion between 6:00–8:00 AM ${isSchedDay ? "yet today" : "(off-schedule day)"}.`;
 
   document.getElementById("refreshed").textContent = "Live Geotab data · refreshed " + new Intl.DateTimeFormat("en-US",{timeZone:ET,hour:"numeric",minute:"2-digit",second:"2-digit"}).format(new Date()) + " ET · reload any time for fresh data";
   document.getElementById("loading").style.display="none";
