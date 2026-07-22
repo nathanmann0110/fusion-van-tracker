@@ -326,7 +326,7 @@ body.dark #loading{color:#9aa0a8}
     <div id="clock">--:--</div>
     <div id="dateline">Loading…</div>
     <div class="badge-day" id="daybadge">MON–THU SCHEDULE</div>
-    <div style="margin-top:6px"><button class="gear" id="darkBtn" onclick="toggleDark()">🌙 Dark mode</button></div>
+    <div style="margin-top:6px"><button class="gear" id="darkBtn" onclick="toggleDark()">🌙 Dark mode</button> <button class="gear" onclick="location.reload()">🔄 Refresh</button></div>
   </div>
 </div>
 
@@ -1088,6 +1088,13 @@ function tickClock(){
   document.getElementById("dateline").textContent = new Intl.DateTimeFormat("en-US",{timeZone:ET,weekday:"long",month:"long",day:"numeric",year:"numeric"}).format(now) + " · Eastern";
 }
 setInterval(tickClock,1000); tickClock();
+
+/* auto-refresh every 5 minutes while the page is open (skips if the login or settings dialog is up) */
+setInterval(function(){
+  const loginUp = document.getElementById("login").style.display === "flex";
+  const settingsUp = document.getElementById("settings").style.display === "flex";
+  if (!loginUp && !settingsUp) location.reload();
+}, 5*60*1000);
 
 /* road dashes */
 (function(){
