@@ -378,6 +378,13 @@ table.tboard tbody tr:last-child td:not(.mlab){border-bottom:2px solid #414042}
 body.dark table.tboard th:not(.mlab),body.dark table.tboard td:not(.mlab){border-left-color:#fff;border-right-color:#fff}
 body.dark table.tboard thead th:not(.mlab){border-top-color:#fff}
 body.dark table.tboard tbody tr:last-child td:not(.mlab){border-bottom-color:#fff}
+/* ---- header + KPIs live INSIDE the scene, floating over the sky ---- */
+.scene .hdr{position:absolute;top:10px;left:14px;right:14px;z-index:20;margin-bottom:0;align-items:flex-start;pointer-events:none}
+.scene .hdr .wordmark,.scene .hdr-right{background:rgba(255,255,255,.86);border:1px solid var(--f-light);border-radius:14px;padding:9px 16px;box-shadow:0 2px 8px rgba(0,0,0,.18);pointer-events:auto}
+.scene .kpis{position:absolute;top:80px;left:50%;transform:translateX(-50%);z-index:20;margin:0;display:flex;gap:10px;width:auto}
+.scene .kpi{background:rgba(255,255,255,.88);min-width:150px}
+body.dark .scene .hdr .wordmark,body.dark .scene .hdr-right{background:rgba(18,21,26,.85);border-color:#2b2f37}
+body.dark .scene .kpi{background:rgba(24,27,33,.88)}
 </style>
 </head>
 <body>
@@ -401,31 +408,8 @@ body.dark table.tboard tbody tr:last-child td:not(.mlab){border-bottom-color:#ff
   <div class="note">Sign in with your MyGeotab account. Your session is stored only in this browser — your password is never saved. Ask Nathan if you need a Geotab login.</div>
 </div></div>
 
-<div class="hdr">
-  <div class="wordmark">
-    <div class="f1">FUSION</div>
-    <div class="f2">AUDIO+VIDEO</div>
-    <div class="f3">VAN TRACKER</div>
-  </div>
-  <div class="hdr-right">
-    <div id="clock">--:--</div>
-    <div id="dateline">Loading…</div>
-    <div class="badge-day" id="daybadge">MON–THU SCHEDULE</div>
-    <div style="margin-top:6px"><button class="gear" id="darkBtn" onclick="toggleDark()">🌙 Dark mode</button> <button class="gear" onclick="location.reload()">🔄 Refresh</button></div>
-  </div>
-</div>
-
 <div class="banner" id="weekendBanner">The morning schedule runs <b>Monday–Thursday</b>. Today is outside the schedule — showing live fleet status only.</div>
 <div class="errbanner" id="errBanner"></div>
-
-<div class="kpis" id="kpis">
-  <div class="kpi"><div class="n" id="kFleet">–</div><div class="l">Vans Tracked</div></div>
-  <div class="kpi"><div class="n" id="k700" style="color:var(--ok)">–</div><div class="l">On Time @ 7:00</div></div>
-  <div class="kpi"><div class="n" id="kLate" style="color:var(--bad)">–</div><div class="l">Late @ 7:00</div></div>
-  <div class="kpi"><div class="n" id="k730" style="color:var(--f-navy)">–</div><div class="l">En Route @ 8:00</div></div>
-  <div class="kpi"><div class="n" id="kArr" style="color:var(--f-green)">–</div><div class="l">At Job Sites</div></div>
-  <div class="kpi"><div class="n" id="kSpeed" style="color:var(--f-red)">–</div><div class="l" id="kSpeedLbl">Speeding Today</div></div>
-</div>
 
 <div class="scene" id="scene">
   <div class="sun"></div>
@@ -609,6 +593,29 @@ body.dark table.tboard tbody tr:last-child td:not(.mlab){border-bottom-color:#ff
   <div id="lightning"></div>
   <div id="wxChip">⏳ loading weather…</div>
   <div class="pursuit" id="pursuit"></div>
+
+  <!-- header + KPIs overlay the scene so the whole tracker fits on one screen -->
+  <div class="hdr">
+    <div class="wordmark">
+      <div class="f1">FUSION</div>
+      <div class="f2">AUDIO+VIDEO</div>
+      <div class="f3">VAN TRACKER</div>
+    </div>
+    <div class="hdr-right">
+      <div id="clock">--:--</div>
+      <div id="dateline">Loading…</div>
+      <div class="badge-day" id="daybadge">MON–THU SCHEDULE</div>
+      <div style="margin-top:6px"><button class="gear" id="darkBtn" onclick="toggleDark()">🌙 Dark mode</button> <button class="gear" onclick="location.reload()">🔄 Refresh</button></div>
+    </div>
+  </div>
+  <div class="kpis" id="kpis">
+    <div class="kpi"><div class="n" id="kFleet">–</div><div class="l">Vans Tracked</div></div>
+    <div class="kpi"><div class="n" id="k700" style="color:var(--ok)">–</div><div class="l">On Time @ 7:00</div></div>
+    <div class="kpi"><div class="n" id="kLate" style="color:var(--bad)">–</div><div class="l">Late @ 7:00</div></div>
+    <div class="kpi"><div class="n" id="k730" style="color:var(--f-navy)">–</div><div class="l">En Route @ 8:00</div></div>
+    <div class="kpi"><div class="n" id="kArr" style="color:var(--f-green)">–</div><div class="l">At Job Sites</div></div>
+    <div class="kpi"><div class="n" id="kSpeed" style="color:var(--f-red)">–</div><div class="l" id="kSpeedLbl">Speeding Today</div></div>
+  </div>
 </div>
 <div class="legend">
   <span><span class="stripchip" style="background:var(--ok)"></span> green stripe = on time / good</span>
