@@ -131,6 +131,15 @@ h1,h2,h3{font-family:'Mona Sans',Arial,Helvetica,sans-serif;font-weight:700;lett
   99% {left:3%;  top:60%; transform:scaleX(1) scale(.8)}
   100%{left:2%;  top:60%; transform:scaleX(1) scale(.8)}
 }
+/* bear hit by traffic: launched spinning into the air, lands, gets up, wanders on */
+.bear.launched{animation:bearFly 1.7s cubic-bezier(.3,.55,.45,1) forwards}
+@keyframes bearFly{
+  0%  {transform:translateY(0) rotate(0deg)}
+  38% {transform:translateY(-270px) rotate(660deg)}
+  72% {transform:translateY(-46px) rotate(960deg)}
+  100%{transform:translateY(0) rotate(1080deg)}
+}
+.bear.dazed{transform:rotate(104deg)}
 /* Waldo */
 .waldo{position:absolute;width:20px;height:34px;z-index:5;pointer-events:auto}
 .waldo svg{width:100%;height:100%;overflow:visible;display:block}
@@ -211,7 +220,7 @@ h1,h2,h3{font-family:'Mona Sans',Arial,Helvetica,sans-serif;font-weight:700;lett
   transform:scale(0);transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
 .tbubble.show{transform:scale(1)}
 /* ---------------- PANELS ---------------- */
-.cols{display:grid;grid-template-columns:2.8fr 1fr;gap:12px;margin-top:12px;align-items:start}
+.cols{display:flex;flex-direction:column;gap:12px;margin-top:12px}
 .panel{background:#fff;border:1px solid var(--f-light);border-radius:12px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
 .panel h2{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--f-dark);border-bottom:2px solid var(--f-red);display:inline-block;padding-bottom:3px;margin-bottom:10px}
 table.board{width:100%;border-collapse:collapse;font-size:12px}
@@ -220,6 +229,17 @@ table.board th:first-child{text-align:left}
 table.board td{padding:5px 4px;border-bottom:1px solid #f0f1f2;text-align:center;vertical-align:middle}
 table.board td:first-child{text-align:left;font-weight:700;white-space:nowrap}
 table.board tr:hover{background:#fafbfc}
+/* ---- transposed TV report: vans as columns, metrics as rows, 2 bands, 2x type ---- */
+.repbands{display:flex;flex-direction:column;gap:20px}
+table.tboard{table-layout:fixed;width:100%}
+table.tboard th{font-size:15px;padding:8px 5px}
+table.tboard th .vhead{font-size:24px;font-weight:800;color:var(--f-dark);letter-spacing:.02em}
+table.tboard th .drivername{font-size:16px}
+table.tboard td{font-size:24px;padding:10px 5px;line-height:1.25;white-space:normal;overflow-wrap:anywhere;font-weight:400}
+table.tboard td.mlab,table.tboard th.mlab{width:170px;font-size:14px;text-transform:uppercase;letter-spacing:.08em;color:var(--f-gray);text-align:left;font-weight:700;overflow-wrap:normal}
+table.tboard .cellsub{font-size:15px;margin-top:2px}
+table.tboard td.nowcell{font-size:17px;font-weight:700}
+body.dark table.tboard th .vhead{color:#e8e9ea}
 .drivername{font-weight:400;color:var(--f-gray);font-size:11px}
 .dot{display:inline-block;width:13px;height:13px;border-radius:50%;vertical-align:middle}
 .dot.ok{background:var(--ok)}
@@ -577,26 +597,13 @@ body.dark #loading{color:#9aa0a8}
 <div class="cols" id="mainCols" style="display:none">
   <div class="panel">
     <h2>📋 Daily Report — <span id="boardDate"></span></h2>
-    <table class="board">
-      <thead><tr>
-        <th>Van / Driver</th>
-        <th>Arrived<br>at Fusion</th>
-        <th>Left<br>Fusion</th>
-        <th>Job Site<br>Arrival</th>
-        <th>Left Job<br>(after 3p)</th>
-        <th>Day's<br>End</th>
-        <th>Now</th>
-      </tr></thead>
-      <tbody id="boardBody"></tbody>
-    </table>
-    <div class="cellsub" style="margin-top:6px">Day's End = when the van parks at the end of the route that began after 3:00 PM · fresh data on every open</div>
+    <div class="repbands" id="repBands"></div>
+    <div class="cellsub" style="margin-top:8px;font-size:13px">Day's End = when the van parks at the end of the route that began after 3:00 PM · fresh data on every open</div>
   </div>
-  <div>
-    <div class="panel">
-      <h2>🚨 Top Speeding Violations for the Day</h2>
-      <div id="lb"></div>
-      <div class="wanted" id="wanted"></div>
-    </div>
+  <div class="panel">
+    <h2>🚨 Top Speeding Violations for the Day</h2>
+    <div id="lb"></div>
+    <div class="wanted" id="wanted"></div>
   </div>
 </div>
 
@@ -837,6 +844,8 @@ function splitName(n){
   return m ? {tag:m[1].trim(), driver:m[2].trim()} : {tag:String(n).trim(), driver:""};
 }
 const kmh2mph = k => Math.round(k*0.621371);
+/* scene tags show the driver's FIRST NAME (falls back to the van tag if no driver) */
+function firstNameTag(r){ const d=(r.driver||"").trim(); return d ? d.split(/\s+/)[0] : r.tag; }
 function bearingDeg(lat1,lon1,lat2,lon2){
   const r=Math.PI/180;
   const y=Math.sin((lon2-lon1)*r)*Math.cos(lat2*r);
@@ -1164,11 +1173,56 @@ function startFlyer(row, stripColor){
     <span class="bigbird">${birdSVG()}</span>
     <div class="cargo">
       <svg width="90" height="16"><line x1="25" y1="0" x2="36" y2="16" stroke="#6e7073" stroke-width="2"/><line x1="64" y1="0" x2="53" y2="16" stroke="#6e7073" stroke-width="2"/></svg>
-      <div class="van early">${vehSVG(type, stripColor)}<span class="vanTag">${esc(row.tag)}</span><span class="earlychip">🐦 EARLY BIRD${row.ebTime?" · "+fmtET(row.ebTime):""}</span></div>
+      <div class="van early">${vehSVG(type, stripColor)}<span class="vanTag">${esc(firstNameTag(row))}</span><span class="earlychip">🐦 EARLY BIRD${row.ebTime?" · "+fmtET(row.ebTime):""}</span></div>
     </div>
   </div>`;
   scene.appendChild(f);
 }
+
+/* ================= BEAR vs TRAFFIC =================
+   If the bear crosses the street while vans are driving, he gets launched
+   spinning into the air, lands, lies dazed, gets up, and wanders off again. */
+(function(){
+  const sleepB = ms=>new Promise(r=>setTimeout(r,ms));
+  let busy=false, cooldownUntil=0;
+  async function launchBear(bear, scene){
+    busy = true;
+    const s=scene.getBoundingClientRect(), b=bear.getBoundingClientRect();
+    /* freeze him where the van clipped him */
+    bear.style.left=(((b.left-s.left)/s.width)*100).toFixed(2)+"%";
+    bear.style.top =(((b.top -s.top )/s.height)*100).toFixed(2)+"%";
+    bear.style.animation="none"; void bear.offsetWidth;
+    bear.style.animation="";
+    bear.classList.add("launched");           /* up he goes, spinning */
+    await sleepB(1750);
+    bear.classList.remove("launched");
+    bear.style.animation="none";
+    bear.classList.add("dazed");              /* flat on his back */
+    await sleepB(1600);
+    bear.classList.remove("dazed");           /* shakes it off... */
+    bear.style.transition="left 4.5s linear, top 4.5s linear";
+    bear.style.left="2%"; bear.style.top="60%";  /* ...and walks it home */
+    await sleepB(4700);
+    bear.style.transition=""; bear.style.animation=""; bear.style.left=""; bear.style.top="";
+    cooldownUntil = Date.now()+8000;          /* brief grace period before the next hit */
+    busy = false;
+  }
+  setInterval(function(){
+    if (busy || Date.now()<cooldownUntil) return;
+    const bear=document.querySelector(".bear"), scene=document.getElementById("scene");
+    if (!bear || !scene) return;
+    const traffic = document.querySelector("#roadLane .rv") || document.querySelector("#pursuit .runner");
+    if (!traffic) return; /* nobody driving = nobody to hit him */
+    const s=scene.getBoundingClientRect(), b=bear.getBoundingClientRect();
+    const cx=(b.left+b.right)/2, cy=b.bottom;
+    const roadTop = s.bottom - 0.42*(s.bottom-s.top); /* road occupies bottom 42% */
+    if (cy < roadTop) return;
+    /* road is a trapezoid: ~76px wide at the horizon, 480px at the bottom edge */
+    const f=Math.min(Math.max((cy-roadTop)/(s.bottom-roadTop),0),1);
+    const half=38+(240-38)*f;
+    if (Math.abs(cx-(s.left+s.width/2)) < half) launchBear(bear, scene);
+  }, 400);
+})();
 
 /* ================= CLOCK ================= */
 function tickClock(){
@@ -1218,22 +1272,26 @@ function saveSettings(){
 }
 
 /* ================= THE GREAT FOOT-CHASE CAR-SWAP ================= */
-function startPursuit(row, stripColor){
+function startPursuit(row, stripColor, lane){
   const layer = document.getElementById("pursuit");
   const type = vehTypeFor(row.name, row.tag);
+  const laneY = (lane||0) * 52; /* tied leaders each get their own chase lane, stacked */
   const van = document.createElement("div");
   van.className = "runner";
-  van.innerHTML = `<div class="van driving ${type==="small"?"small":""}">${vehSVG(type, stripColor)}<span class="vanTag">🚨 ${esc(row.tag)}</span></div>`;
+  van.style.bottom = (4+laneY)+"px";
+  van.innerHTML = `<div class="van driving ${type==="small"?"small":""}">${vehSVG(type, stripColor)}<span class="vanTag">🚨 ${esc(firstNameTag(row))}</span></div>`;
   van.title = row.name + " — today's speeding leader";
   const cop = document.createElement("div");
   cop.className = "chaser";
+  cop.style.bottom = (4+laneY)+"px";
   cop.innerHTML = `<div class="cop">${copSVG()}<span class="copTag">PURSUIT</span></div>`;
   const copman = document.createElement("div");
-  copman.className = "officer"; copman.innerHTML = officerSVG(); copman.style.opacity="0";
+  copman.className = "officer"; copman.innerHTML = officerSVG(); copman.style.opacity="0"; copman.style.bottom=(8+laneY)+"px";
   const drv = document.createElement("div");
-  drv.className = "officer"; drv.innerHTML = driverSVG(); drv.style.opacity="0";
+  drv.className = "officer"; drv.innerHTML = driverSVG(); drv.style.opacity="0"; drv.style.bottom=(8+laneY)+"px";
   const bubble = document.createElement("div");
   bubble.className = "tbubble"; bubble.textContent = "🎫 TICKET";
+  bubble.style.bottom = (160+laneY)+"px";
   layer.appendChild(van); layer.appendChild(cop); layer.appendChild(copman); layer.appendChild(drv); layer.appendChild(bubble);
 
   const vanBody = van.querySelector(".van");
@@ -1527,7 +1585,10 @@ async function main(){
     if(cur){ counts[cur.driver]=(counts[cur.driver]||0)+1; totalViol++; }
   }
   const lbSorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
-  const leaderDriver = lbSorted.length ? lbSorted[0][0] : null;
+  const maxViol = lbSorted.length ? lbSorted[0][1] : 0;
+  /* everyone tied at the top count is a leader — ties mean multiple simultaneous chases */
+  const leaders = maxViol>0 ? lbSorted.filter(e=>e[1]===maxViol).map(e=>e[0]) : [];
+  const isLeaderRow = r => leaders.some(d=>r.driver===d || r.name.includes(d));
 
   /* --- THE early bird: first van to arrive at Fusion this morning (real drive-in, before 9:30) --- */
   let ebWinner = null, ebTime = null;
@@ -1697,12 +1758,13 @@ async function main(){
   /* --- scene --- */
   const lots={fusion:document.getElementById("fusionLot"), road:document.getElementById("roadLane"), job:document.getElementById("jobLot"), home:document.getElementById("homeLot")};
   const roadVans = [];
+  let pursuitCount = 0;
   for (const r of rows){
     const stripColor = stripeFor(r);
-    const isLeader = leaderDriver && (r.driver===leaderDriver || r.name.includes(leaderDriver));
+    const isLeader = isLeaderRow(r);
     if (isLeader && r.zone === "road"){
-      /* leader only gets chased while EN ROUTE — parked leaders sit in the lot like everyone else */
-      startPursuit(r, stripColor);
+      /* leaders only get chased while EN ROUTE — ties spawn simultaneous chases in stacked lanes */
+      startPursuit(r, stripColor, pursuitCount++);
       continue;
     }
     if (r.earlyBird && r.zone === "road"){
@@ -1716,7 +1778,7 @@ async function main(){
     const bodySVG = r.zone==="fusion" ? frontSVG(type, stripColor) : rearSVG(type, stripColor);
     const el=document.createElement("div");
     el.className="van"+(type==="small"?" small":"")+" fr";
-    el.innerHTML = bodySVG + `<span class="vanTag">${esc(r.tag)}</span>`;
+    el.innerHTML = bodySVG + `<span class="vanTag">${esc(firstNameTag(r))}</span>`;
     el.title = r.name + (r.driver?(" — "+r.driver):"") + (r.place?(" — "+r.place):"") + (r.sales?" — Sales (not timed)":"");
     lots[r.zone].appendChild(el);
   }
@@ -1728,7 +1790,7 @@ async function main(){
     wrap.style.setProperty("--lx", (v.r.inbound ? -55 : 55) + "px");   /* left lane = inbound, right lane = outbound */
     wrap.style.animationDelay = "-" + (i * (RDUR / Math.max(roadVans.length,1))).toFixed(2) + "s";
     const roadSVG = v.r.inbound ? frontSVG(v.type, v.stripColor) : rearSVG(v.type, v.stripColor);
-    wrap.innerHTML = `<div class="van">${roadSVG}<span class="vanTag">${esc(v.r.tag)}</span><span class="speedchip">${kmh2mph(v.r.live.speed)} mph</span></div>`;
+    wrap.innerHTML = `<div class="van">${roadSVG}<span class="vanTag">${esc(firstNameTag(v.r))}</span><span class="speedchip">${kmh2mph(v.r.live.speed)} mph</span></div>`;
     wrap.title = v.r.name + (v.r.driver?(" — "+v.r.driver):"") + (v.r.place?(" — "+v.r.place):"") + (v.r.sales?" — Sales (not timed)":"");
     lots.road.appendChild(wrap);
   });
@@ -1763,56 +1825,68 @@ async function main(){
     return distFromFusion(b) - distFromFusion(a);
   });
   const tOr = d => d ? esc(fmtET(d)) : "—";
-  document.getElementById("boardBody").innerHTML = boardRows.map(r=>{
+  const nowTxtFor = r => {
     const loc = r.place ? " · " + esc(r.place) : "";
-    const nowTxt = r.live.isDriving ? `🚐 ${kmh2mph(r.live.speed)} mph${loc}`
+    return r.live.isDriving ? `🚐 ${kmh2mph(r.live.speed)} mph${loc}`
       : (r.zone==="fusion" ? "🏢 Fusion"
       : (r.zone==="home" ? `🏡 Home${loc}` : `🅿️ ${esc(r.place||"Parked")}`));
-    const leaderMark = leaderDriver && (r.driver===leaderDriver||r.name.includes(leaderDriver)) ? " 🚔" : "";
-    const earlyMark = r.earlyBird ? " 🐦" : "";
-    if (r.sales) return `<tr>
-      <td>${esc(r.tag)}${leaderMark}<br><span class="drivername">${esc(r.driver)} · SALES</span></td>
-      <td colspan="5"><span class="cellsub">Sales — not timed</span></td>
-      <td style="font-size:10.5px;white-space:nowrap">${nowTxt}</td>
-    </tr>`;
-    const arrived = r.overnight ? '<span class="cellsub">overnight at Fusion</span>'
-      : (r.fusionArrivalT ? `<b>${tOr(r.fusionArrivalT)}</b>` : "—");
-    const leftF  = r.leftFusion ? `<b style="color:var(--f-navy)">${tOr(r.leftFusion)}</b>` : "—";
-    const leftJ  = r.leftJob ? `<b>${tOr(r.leftJob)}</b>`
-      : (r.arrival && r.arrival.kind==="ok" ? '<span class="cellsub">on site</span>' : "—");
-    const dayEnd = r.leftJob
+  };
+  /* transposed TV layout: vans run across the top, metrics are rows; fleet split into 2 bands */
+  const cells = {
+    arrived: r => r.sales ? "—" : (r.overnight ? '<span class="cellsub">overnight at Fusion</span>'
+      : (r.fusionArrivalT ? `<b>${tOr(r.fusionArrivalT)}</b>` : "—")),
+    leftF: r => r.sales ? "—" : (r.leftFusion ? `<b style="color:var(--f-navy)">${tOr(r.leftFusion)}</b>` : "—"),
+    job: r => r.sales ? '<span class="cellsub">Sales — not timed</span>' : arrCell(r.arrival),
+    leftJ: r => r.sales ? "—" : (r.leftJob ? `<b>${tOr(r.leftJob)}</b>`
+      : (r.arrival && r.arrival.kind==="ok" ? '<span class="cellsub">on site</span>' : "—")),
+    dayEnd: r => r.sales ? "—" : (r.leftJob
       ? (r.dayEndDriving ? '<span class="arr-route">en route</span>' : `<b style="color:var(--f-red)">${tOr(r.dayEnd)}</b>`)
-      : "—";
-    return `<tr>
-      <td>${esc(r.tag)}${leaderMark}${earlyMark}<br><span class="drivername">${esc(r.driver)}</span></td>
-      <td>${arrived}</td>
-      <td>${leftF}</td>
-      <td>${arrCell(r.arrival)}</td>
-      <td>${leftJ}</td>
-      <td>${dayEnd}</td>
-      <td style="font-size:10.5px;white-space:nowrap">${nowTxt}</td>
-    </tr>`;
-  }).join("");
+      : "—")
+  };
+  const bandHTML = vans => {
+    const heads = vans.map(r=>{
+      const marks = (isLeaderRow(r)?" 🚔":"") + (r.earlyBird?" 🐦":"");
+      return `<th><div class="vhead">${esc(firstNameTag(r))}${marks}</div><span class="drivername">${esc(r.tag)}${r.sales?" · SALES":""}</span></th>`;
+    }).join("");
+    const metricRow = (label, fn) => `<tr><td class="mlab">${label}</td>${vans.map(r=>`<td>${fn(r)}</td>`).join("")}</tr>`;
+    return `<table class="board tboard">
+      <thead><tr><th class="mlab">Van / Driver</th>${heads}</tr></thead>
+      <tbody>
+        ${metricRow("Arrived at Fusion", cells.arrived)}
+        ${metricRow("Left Fusion", cells.leftF)}
+        ${metricRow("Job Site Arrival", cells.job)}
+        ${metricRow("Left Job (after 3p)", cells.leftJ)}
+        ${metricRow("Day's End", cells.dayEnd)}
+        ${metricRow("Now", r=>`<div class="nowcell" style="font-size:17px;font-weight:700">${nowTxtFor(r)}</div>`)}
+      </tbody>
+    </table>`;
+  };
+  const half = Math.ceil(boardRows.length/2);
+  const bands = [boardRows.slice(0,half), boardRows.slice(half)].filter(b=>b.length);
+  document.getElementById("repBands").innerHTML = bands.map(bandHTML).join("");
 
   /* --- leaderboard --- */
   const maxN = lbSorted.length? lbSorted[0][1] : 1;
-  document.getElementById("lb").innerHTML = lbSorted.slice(0,8).map(([d,n],i)=>`
-    <div class="lb-row ${i===0?'leader':''}">
-      <div class="lb-name">${i===0?"🚔 ":""}${esc(d)}</div>
+  document.getElementById("lb").innerHTML = lbSorted.slice(0,8).map(([d,n])=>`
+    <div class="lb-row ${n===maxViol&&maxViol>0?'leader':''}">
+      <div class="lb-name">${n===maxViol&&maxViol>0?"🚔 ":""}${esc(d)}</div>
       <div class="lb-bar"><div class="lb-fill" style="width:${Math.round(n/maxN*100)}%"></div></div>
       <div class="lb-n">${n}</div>
     </div>`).join("") || `<div style="font-size:12px;color:var(--f-gray)">No speeding violations yet today. 🎉</div>`;
-  const leaderRow = rows.find(r=>leaderDriver && (r.driver===leaderDriver || r.name.includes(leaderDriver)));
-  document.getElementById("wanted").innerHTML = leaderDriver
-    ? (leaderRow && leaderRow.zone==="road"
-        ? `🚨 <b>${esc(leaderDriver)}</b> leads the fleet with <b>${lbSorted[0][1]}</b> speeding violations today — watch the scene: <b>pulled over, foot chase, wrong cars, tables turned</b>, on repeat.`
-        : `🚨 <b>${esc(leaderDriver)}</b> leads the fleet with <b>${lbSorted[0][1]}</b> speeding violations today — currently parked. The chase resumes when they hit the road.`)
+  const leaderRows = rows.filter(isLeaderRow);
+  const chasing = leaderRows.filter(r=>r.zone==="road").length;
+  document.getElementById("wanted").innerHTML = leaders.length
+    ? (leaders.length>1
+        ? `🚨 <b>${leaders.map(esc).join("</b> and <b>")}</b> are TIED with <b>${maxViol}</b> speeding violations each — ${chasing>1 ? `<b>${chasing} simultaneous pursuits</b> are underway!` : (chasing===1 ? "one is being chased now; the rest get theirs when they hit the road." : "all currently parked. The chases begin when they hit the road.")}`
+        : (chasing===1
+            ? `🚨 <b>${esc(leaders[0])}</b> leads the fleet with <b>${maxViol}</b> speeding violations today — watch the scene: <b>pulled over, foot chase, wrong cars, tables turned</b>, on repeat.`
+            : `🚨 <b>${esc(leaders[0])}</b> leads the fleet with <b>${maxViol}</b> speeding violations today — currently parked. The chase resumes when they hit the road.`))
     : `Fleet is clean so far today — nobody is being chased.`;
 
   document.getElementById("refreshed").textContent = "Live Geotab data · refreshed " + new Intl.DateTimeFormat("en-US",{timeZone:ET,hour:"numeric",minute:"2-digit",second:"2-digit"}).format(new Date()) + " ET · reload any time for fresh data";
   document.getElementById("loading").style.display="none";
   document.getElementById("mainCols").style.display="grid";
-  console.log("render complete:", rows.length, "vans; leader:", leaderDriver);
+  console.log("render complete:", rows.length, "vans; leaders:", leaders.join(", ") || "none");
 }
 
 /* ================= BOOT / LOGIN ================= */
