@@ -348,6 +348,13 @@ body.dark #settings .box,body.dark #login .box{background:#1c1f25;color:#d8dadd}
 body.dark #settings input,body.dark #login input{background:#14161a;border-color:#3a3f47;color:#e8e9ea}
 body.dark #login{background:linear-gradient(#14161a,#1c1f25)}
 body.dark #loading{color:#9aa0a8}
+/* ---- TV report: each driver's column gets its own outlined box (white in dark mode) ---- */
+table.tboard th:not(.mlab),table.tboard td:not(.mlab){border-left:2px solid #414042;border-right:2px solid #414042}
+table.tboard thead th:not(.mlab){border-top:2px solid #414042}
+table.tboard tbody tr:last-child td:not(.mlab){border-bottom:2px solid #414042}
+body.dark table.tboard th:not(.mlab),body.dark table.tboard td:not(.mlab){border-left-color:#fff;border-right-color:#fff}
+body.dark table.tboard thead th:not(.mlab){border-top-color:#fff}
+body.dark table.tboard tbody tr:last-child td:not(.mlab){border-bottom-color:#fff}
 </style>
 </head>
 <body>
@@ -1179,49 +1186,97 @@ function startFlyer(row, stripColor){
   scene.appendChild(f);
 }
 
-/* ================= BEAR vs TRAFFIC =================
-   If the bear crosses the street while vans are driving, he gets launched
-   spinning into the air, lands, lies dazed, gets up, and wanders off again. */
+/* ================= BEAR AI =================
+   Waypoint wanderer with road smarts:
+   — walks the whole scene (depth scale by y); shows IN FRONT of the parking lot
+   — reaching the road edge: vans en route → turns around; road clear → crosses
+   — caught on the road when traffic appears → launched spinning, dazed, walks it off */
 (function(){
+  const bear=document.querySelector(".bear"), scene=document.getElementById("scene");
+  if(!bear||!scene) return;
   const sleepB = ms=>new Promise(r=>setTimeout(r,ms));
-  let busy=false, cooldownUntil=0;
-  async function launchBear(bear, scene){
-    busy = true;
+  const traffic = ()=>!!(document.querySelector("#roadLane .rv")||document.querySelector("#pursuit .runner"));
+  let x=2, y=60, flip=false, hit=false;
+  bear.style.animation="none"; /* JS drives him now, not the CSS wander */
+  const scaleFor = yy => (.55 + Math.min(Math.max((yy-20)/62,0),1)*.75);
+  const setT = ()=>{ bear.style.transform="scaleX("+(flip?-1:1)+") scale("+scaleFor(y).toFixed(2)+")"; };
+  function jumpTo(){ bear.style.transition="none"; bear.style.left=x+"%"; bear.style.top=y+"%"; setT(); }
+  jumpTo();
+  /* road trapezoid half-width (in % of scene) at a given bear-top y% */
+  function halfPct(yy){
+    const W=scene.clientWidth||1400;
+    const f=Math.min(Math.max((yy+6-58)/42,0),1);
+    return (38+202*f)/W*100;
+  }
+  async function walkTo(tx,ty){
+    bear.style.transition="none";
+    flip = tx < x; setT(); void bear.offsetWidth; /* face the right way instantly */
+    const dur=Math.max(1.6, Math.hypot(tx-x,(ty-y)*1.2)/2.4);
+    x=tx; y=ty;
+    bear.style.transition="left "+dur+"s linear, top "+dur+"s linear, transform "+dur+"s linear";
+    bear.style.left=x+"%"; bear.style.top=y+"%"; setT();
+    const end=Date.now()+dur*1000;
+    while(Date.now()<end){ if(hit) return false; await sleepB(150); }
+    return true;
+  }
+  const sideOf = v => v<50 ? "L" : "R";
+  const spot = side => side==="L" ? {x:1+Math.random()*32, y:56+Math.random()*26}
+                                  : {x:58+Math.random()*38, y:56+Math.random()*26};
+  async function loop(){
+    await sleepB(1500);
+    while(true){
+      if(hit){ await sleepB(400); continue; }
+      let t;
+      const r=Math.random();
+      if(r<.12) t={x:76+Math.random()*12, y:30+Math.random()*9}; /* mountain hike */
+      else t=spot(Math.random()<.5?"L":"R");
+      if(sideOf(t.x)!==sideOf(x)){
+        /* he wants the other side — walk to the road's edge first */
+        const ey=Math.max(58, Math.min(t.y, 82));
+        const h=halfPct(ey);
+        const nearEdge = sideOf(x)==="L" ? 50-h-4.5 : 50+h+0.5;
+        const farEdge  = sideOf(x)==="L" ? 50+h+0.5 : 50-h-4.5;
+        if(!await walkTo(nearEdge, ey)) continue;
+        await sleepB(700); /* look both ways */
+        if(traffic()){
+          /* vans en route — turn around and wander back */
+          const back=spot(sideOf(x));
+          if(!await walkTo(back.x, back.y)) continue;
+          continue;
+        }
+        if(!await walkTo(farEdge, ey)) continue; /* road's clear — cross */
+      }
+      if(!await walkTo(t.x, t.y)) continue;
+      await sleepB(400+Math.random()*1800);
+    }
+  }
+  async function launchBear(){
+    hit=true;
     const s=scene.getBoundingClientRect(), b=bear.getBoundingClientRect();
-    /* freeze him where the van clipped him */
-    bear.style.left=(((b.left-s.left)/s.width)*100).toFixed(2)+"%";
-    bear.style.top =(((b.top -s.top )/s.height)*100).toFixed(2)+"%";
-    bear.style.animation="none"; void bear.offsetWidth;
-    bear.style.animation="";
+    x=((b.left-s.left)/s.width)*100; y=((b.top-s.top)/s.height)*100;
+    jumpTo(); void bear.offsetWidth;
     bear.classList.add("launched");           /* up he goes, spinning */
     await sleepB(1750);
     bear.classList.remove("launched");
-    bear.style.animation="none";
-    bear.classList.add("dazed");              /* flat on his back */
+    bear.style.transform="rotate(104deg) scale("+scaleFor(y).toFixed(2)+")"; /* flat on his back */
     await sleepB(1600);
-    bear.classList.remove("dazed");           /* shakes it off... */
-    bear.style.transition="left 4.5s linear, top 4.5s linear";
-    bear.style.left="2%"; bear.style.top="60%";  /* ...and walks it home */
+    flip=true; x=2; y=60;                     /* shakes it off and walks home */
+    bear.style.transition="left 4.5s linear, top 4.5s linear"; setT();
+    bear.style.left=x+"%"; bear.style.top=y+"%";
     await sleepB(4700);
-    bear.style.transition=""; bear.style.animation=""; bear.style.left=""; bear.style.top="";
-    cooldownUntil = Date.now()+8000;          /* brief grace period before the next hit */
-    busy = false;
+    hit=false;
   }
+  /* watcher: parking-lot visibility + getting clipped on the road */
   setInterval(function(){
-    if (busy || Date.now()<cooldownUntil) return;
-    const bear=document.querySelector(".bear"), scene=document.getElementById("scene");
-    if (!bear || !scene) return;
-    const traffic = document.querySelector("#roadLane .rv") || document.querySelector("#pursuit .runner");
-    if (!traffic) return; /* nobody driving = nobody to hit him */
     const s=scene.getBoundingClientRect(), b=bear.getBoundingClientRect();
-    const cx=(b.left+b.right)/2, cy=b.bottom;
-    const roadTop = s.bottom - 0.42*(s.bottom-s.top); /* road occupies bottom 42% */
-    if (cy < roadTop) return;
-    /* road is a trapezoid: ~76px wide at the horizon, 480px at the bottom edge */
-    const f=Math.min(Math.max((cy-roadTop)/(s.bottom-roadTop),0),1);
-    const half=38+(240-38)*f;
-    if (Math.abs(cx-(s.left+s.width/2)) < half) launchBear(bear, scene);
+    const px=((b.left+b.right)/2-s.left)/s.width*100;
+    const py=(b.bottom-s.top)/s.height*100;
+    bear.style.zIndex = (px<26.5 && py>77) ? 3 : ""; /* on the lot → in front, stays visible */
+    if(hit) return;
+    if(py<58) return;
+    if(Math.abs(px-50) < halfPct(py-6) && traffic()) launchBear();
   }, 400);
+  loop();
 })();
 
 /* ================= CLOCK ================= */
