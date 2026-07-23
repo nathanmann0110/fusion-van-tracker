@@ -49,13 +49,26 @@ h1,h2,h3{font-family:'Mona Sans',Arial,Helvetica,sans-serif;font-weight:700;lett
 @keyframes drift{from{left:-140px}to{left:105%}}
 .mtns{position:absolute;left:0;right:0;top:0;height:60%;width:100%}
 .ground{position:absolute;left:0;right:0;bottom:0;height:42%;background:linear-gradient(#b9c6ae,#a9b8a0)}
-/* after 3 PM the scene shifts to sunset */
-.scene.sunset{background:linear-gradient(#41436f 0%, #8a5a8f 30%, #ff9a5a 50%, #ffd08a 57%, #d8c2a8 60%, #b3a795 100%)}
-.scene.sunset .sun{top:118px;background:radial-gradient(circle,#ffd9a0 0%,#ff9d4d 55%,#ff6a2a 100%);box-shadow:0 0 55px 22px rgba(255,110,45,.75)}
-.scene.sunset .cloud{background:#f7c9a8;opacity:.8}
-.scene.sunset .cloud::before,.scene.sunset .cloud::after{background:#f7c9a8}
-.scene.sunset .ground{background:linear-gradient(#96a189,#7f8d78)}
-.scene.sunset .mtns polygon{opacity:.85}
+/* ---- time-of-day phases (sky gradient itself is set inline by applySky(), blended with weather) ---- */
+#stars{position:absolute;inset:0;pointer-events:none;z-index:0;transition:opacity 1s}
+.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle 3s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.25}50%{opacity:.95}}
+.scene.ph-night .sun{top:70px;background:radial-gradient(circle,#f4f6f9 0%,#dfe4ec 55%,#b9c2cf 100%);box-shadow:0 0 28px 9px rgba(215,225,240,.45);animation:none}
+.scene.ph-night .cloud{opacity:.25}
+.scene.ph-night .ground{background:linear-gradient(#3d4a42,#2e3a33)}
+.scene.ph-night .road{background:#3a3d42}
+.scene.ph-night .mtns polygon{opacity:.5}
+.scene.ph-dawn .sun{top:150px;background:radial-gradient(circle,#fff2cf 0%,#ffc97a 55%,#ff9e56 100%);box-shadow:0 0 45px 16px rgba(255,170,90,.6)}
+.scene.ph-dawn .ground{background:linear-gradient(#a3b199,#8fa08c)}
+.scene.ph-sunset .sun{top:125px;background:radial-gradient(circle,#ffd9a0 0%,#ff9d4d 55%,#ff6a2a 100%);box-shadow:0 0 55px 22px rgba(255,110,45,.75)}
+.scene.ph-sunset .cloud{background:#f7c9a8;opacity:.8}
+.scene.ph-sunset .cloud::before,.scene.ph-sunset .cloud::after{background:#f7c9a8}
+.scene.ph-sunset .ground{background:linear-gradient(#96a189,#7f8d78)}
+.scene.ph-sunset .mtns polygon{opacity:.85}
+.scene.ph-dusk .sun{top:165px;background:radial-gradient(circle,#ffd9a0 0%,#e0854a 55%,#b35a2e 100%);box-shadow:0 0 38px 12px rgba(220,110,55,.5)}
+.scene.ph-dusk .cloud{opacity:.45}
+.scene.ph-dusk .ground{background:linear-gradient(#6e7a68,#59665a)}
+.scene.ph-dusk .mtns polygon{opacity:.7}
 /* road */
 .road{position:absolute;left:50%;bottom:0;width:480px;height:42%;margin-left:-240px;
   background:#5a5d61;clip-path:polygon(0 100%,100% 100%,58% 0,42% 0)}
@@ -94,28 +107,29 @@ h1,h2,h3{font-family:'Mona Sans',Arial,Helvetica,sans-serif;font-weight:700;lett
 /* front/rear-view vans parked in lots */
 .van.fr svg{width:66px;height:69px}
 .van.small.fr svg{width:51px;height:54px}
-/* bear wandering the whole scene */
-.bear{position:absolute;left:2%;top:60%;width:52px;height:34px;z-index:3;pointer-events:none;animation:bearWander 95s linear infinite}
+/* bear wandering the whole scene — z-index 0 keeps him BEHIND vans, trees, houses,
+   and the Fusion building (everything painted after him); scale() fakes depth */
+.bear{position:absolute;left:2%;top:60%;width:60px;height:39px;z-index:0;pointer-events:none;animation:bearWander 95s linear infinite}
 .bear svg{width:100%;height:100%;overflow:visible}
 .bear .bl1,.bear .bl3{transform-box:fill-box;transform-origin:top center;animation:stepA .5s ease-in-out infinite alternate}
 .bear .bl2,.bear .bl4{transform-box:fill-box;transform-origin:top center;animation:stepB .5s ease-in-out infinite alternate}
 @keyframes bearWander{
-  0%  {left:2%;  top:60%; transform:scaleX(1)}
-  10% {left:16%; top:66%; transform:scaleX(1)}
-  14% {left:17%; top:66%; transform:scaleX(-1)}
-  24% {left:5%;  top:76%; transform:scaleX(-1)}
-  28% {left:6%;  top:77%; transform:scaleX(1)}
-  42% {left:38%; top:82%; transform:scaleX(1)}
-  52% {left:56%; top:72%; transform:scaleX(1)}
-  60% {left:70%; top:60%; transform:scaleX(1)}
-  67% {left:79%; top:38%; transform:scaleX(1) rotate(-24deg)}
-  72% {left:85%; top:26%; transform:scaleX(1) rotate(-24deg)}
-  75% {left:84%; top:28%; transform:scaleX(-1) rotate(22deg)}
-  84% {left:64%; top:62%; transform:scaleX(-1) rotate(0deg)}
-  92% {left:28%; top:70%; transform:scaleX(-1)}
-  97% {left:6%;  top:62%; transform:scaleX(-1)}
-  99% {left:3%;  top:60%; transform:scaleX(1)}
-  100%{left:2%;  top:60%; transform:scaleX(1)}
+  0%  {left:2%;  top:60%; transform:scaleX(1) scale(.8)}
+  10% {left:16%; top:66%; transform:scaleX(1) scale(.95)}
+  14% {left:17%; top:66%; transform:scaleX(-1) scale(.95)}
+  24% {left:5%;  top:76%; transform:scaleX(-1) scale(1.15)}
+  28% {left:6%;  top:77%; transform:scaleX(1) scale(1.15)}
+  42% {left:38%; top:82%; transform:scaleX(1) scale(1.3)}
+  52% {left:56%; top:72%; transform:scaleX(1) scale(1.1)}
+  60% {left:70%; top:60%; transform:scaleX(1) scale(.8)}
+  67% {left:79%; top:38%; transform:scaleX(1) rotate(-24deg) scale(.6)}
+  72% {left:85%; top:26%; transform:scaleX(1) rotate(-24deg) scale(.5)}
+  75% {left:84%; top:28%; transform:scaleX(-1) rotate(22deg) scale(.5)}
+  84% {left:64%; top:62%; transform:scaleX(-1) rotate(0deg) scale(.85)}
+  92% {left:28%; top:70%; transform:scaleX(-1) scale(1.05)}
+  97% {left:6%;  top:62%; transform:scaleX(-1) scale(.85)}
+  99% {left:3%;  top:60%; transform:scaleX(1) scale(.8)}
+  100%{left:2%;  top:60%; transform:scaleX(1) scale(.8)}
 }
 /* Waldo */
 .waldo{position:absolute;width:20px;height:34px;z-index:5;pointer-events:auto}
@@ -197,7 +211,7 @@ h1,h2,h3{font-family:'Mona Sans',Arial,Helvetica,sans-serif;font-weight:700;lett
   transform:scale(0);transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
 .tbubble.show{transform:scale(1)}
 /* ---------------- PANELS ---------------- */
-.cols{display:grid;grid-template-columns:2.1fr 1fr;gap:12px;margin-top:12px;align-items:start}
+.cols{display:grid;grid-template-columns:2.8fr 1fr;gap:12px;margin-top:12px;align-items:start}
 .panel{background:#fff;border:1px solid var(--f-light);border-radius:12px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
 .panel h2{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--f-dark);border-bottom:2px solid var(--f-red);display:inline-block;padding-bottom:3px;margin-bottom:10px}
 table.board{width:100%;border-collapse:collapse;font-size:12px}
@@ -379,6 +393,32 @@ body.dark #loading{color:#9aa0a8}
   <div class="ground"></div>
   <div class="road" id="road"></div>
 
+  <!-- the bear — painted early so he walks BEHIND vans, trees, houses, and Fusion -->
+  <div class="bear"><svg viewBox="0 0 62 40">
+    <!-- far-side legs -->
+    <path class="bl2" d="M15 25 q-1.2 6 -1.6 9 q-.1 2 1.9 2 l3 0 q1.7 0 1.2-2 l-.6-9 Z" fill="#4e3520"/>
+    <path class="bl4" d="M35 24.5 q-1 6.5 -1.4 9.5 q-.1 2 1.9 2 l3 0 q1.7 0 1.2-2 l-.6-9.5 Z" fill="#4e3520"/>
+    <!-- body with shoulder hump -->
+    <path d="M8 26 Q5.5 17 11 12.5 Q15 7.5 24 7 Q33 6.2 40 9.5 Q46 12.5 47.5 18.5 Q48.5 24 44 26.5 Q36 30.5 22 30.5 Q11 30.5 8 26 Z" fill="#6b4a2f"/>
+    <path d="M13 13 Q19 7.8 27 7.4 Q21.5 10.5 18.5 14.5 Q14.5 16.5 13 13 Z" fill="#7d5a3a" opacity=".85"/>
+    <path d="M13.5 27 Q24 30 40.5 26.5 Q34 29.3 21.5 29.3 Q16 29.3 13.5 27 Z" fill="#54371f" opacity=".7"/>
+    <!-- stubby tail -->
+    <circle cx="8.3" cy="19.5" r="2.5" fill="#5d3f27"/>
+    <!-- near-side legs -->
+    <path class="bl1" d="M18.5 26 q-1 5.5 -1.4 8.5 q-.1 2 1.9 2 l3.1 0 q1.7 0 1.2-2 l-.7-8.5 Z" fill="#59391f"/>
+    <path class="bl3" d="M38.5 25 q-.8 6 -1.2 9.5 q-.1 2 1.9 2 l3.1 0 q1.7 0 1.2-2 l-.8-9.5 Z" fill="#59391f"/>
+    <!-- head, snout, ears -->
+    <path d="M43 10.5 Q46.5 6 51 7.5 Q55.5 9 56.5 13 Q57.5 16.5 55.5 18.5 Q53 21 49 20.8 Q44.5 20.5 43 17 Q41.8 13.5 43 10.5 Z" fill="#6b4a2f"/>
+    <path d="M55 13 Q59 12.8 60.3 15.2 Q61 17 59.2 17.8 Q56.5 19 54 18.2 Z" fill="#8a6a48"/>
+    <circle cx="59.8" cy="15.4" r="1.3" fill="#241a12"/>
+    <path d="M58.8 18.4 Q57 19.6 55.2 18.9" stroke="#3a281a" stroke-width=".7" fill="none" stroke-linecap="round"/>
+    <circle cx="44.8" cy="7.5" r="2.7" fill="#5d3f27"/><circle cx="44.8" cy="7.9" r="1.3" fill="#8a6a48"/>
+    <circle cx="51.5" cy="6.3" r="2.5" fill="#5d3f27"/><circle cx="51.5" cy="6.7" r="1.2" fill="#8a6a48"/>
+    <circle cx="51" cy="12.3" r="1.1" fill="#1b1b1d"/><circle cx="51.3" cy="12" r=".35" fill="#fff"/>
+    <!-- claws -->
+    <path d="M18 36.7 l.9 1.6 M19.8 36.8 l.7 1.6 M21.5 36.8 l.5 1.6 M38.2 36.7 l.9 1.6 M40 36.8 l.7 1.6 M41.7 36.8 l.5 1.6" stroke="#241a12" stroke-width=".65" stroke-linecap="round"/>
+  </svg></div>
+
   <!-- Fusion HQ building -->
   <svg class="structure" style="left:2.5%;bottom:38%;width:300px;height:195px" viewBox="0 0 200 130">
     <rect x="10" y="30" width="140" height="100" rx="3" fill="#a9abae"/>
@@ -396,20 +436,6 @@ body.dark #loading{color:#9aa0a8}
     <text x="80" y="20" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="11" fill="#ffffff" letter-spacing="1.5">FUSION</text>
     <text x="80" y="30" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="6.5" fill="#C1272D" letter-spacing="2">AUDIO+VIDEO</text>
   </svg>
-
-  <!-- bear climbing the mountain -->
-  <div class="bear"><svg viewBox="0 0 46 30">
-    <ellipse cx="20" cy="17" rx="13" ry="8" fill="#6b4a2f"/>
-    <circle cx="34" cy="12" r="6" fill="#6b4a2f"/>
-    <circle cx="37.5" cy="7.5" r="2" fill="#59391f"/>
-    <circle cx="35.8" cy="11.5" r=".9" fill="#1b1b1d"/>
-    <ellipse cx="38.8" cy="13.8" rx="1.7" ry="1.2" fill="#4a331f"/>
-    <circle cx="7" cy="14" r="2.6" fill="#59391f"/>
-    <rect class="bl1" x="12" y="21" width="3.4" height="9" rx="1.6" fill="#59391f"/>
-    <rect class="bl2" x="18" y="21" width="3.4" height="9" rx="1.6" fill="#59391f"/>
-    <rect class="bl3" x="24" y="21" width="3.4" height="9" rx="1.6" fill="#59391f"/>
-    <rect class="bl4" x="29" y="21" width="3.4" height="9" rx="1.6" fill="#59391f"/>
-  </svg></div>
 
   <!-- Fusion parking lot with stall lines -->
   <svg class="structure" style="left:.5%;bottom:1%;width:25%;height:135px;z-index:1" viewBox="0 0 400 135" preserveAspectRatio="none">
@@ -550,35 +576,26 @@ body.dark #loading{color:#9aa0a8}
 
 <div class="cols" id="mainCols" style="display:none">
   <div class="panel">
-    <h2>Morning Checkpoint Board — <span id="boardDate"></span></h2>
+    <h2>📋 Daily Report — <span id="boardDate"></span></h2>
     <table class="board">
       <thead><tr>
         <th>Van / Driver</th>
-        <th>7:00 AM<br>At Fusion</th>
-        <th>8:00 AM<br>En Route</th>
-        <th>Job Site Arrival<br>(locks at 9:30)</th>
+        <th>Arrived<br>at Fusion</th>
+        <th>Left<br>Fusion</th>
+        <th>Job Site<br>Arrival</th>
+        <th>Left Job<br>(after 3p)</th>
+        <th>Day's<br>End</th>
         <th>Now</th>
       </tr></thead>
       <tbody id="boardBody"></tbody>
     </table>
+    <div class="cellsub" style="margin-top:6px">Day's End = when the van parks at the end of the route that began after 3:00 PM · fresh data on every open</div>
   </div>
   <div>
-    <div class="panel" style="margin-bottom:12px">
-      <h2>🚨 Speeding Leaderboard <span style="font-size:9px;color:var(--f-gray)" id="lbSub">(today)</span></h2>
+    <div class="panel">
+      <h2>🚨 Top Speeding Violations for the Day</h2>
       <div id="lb"></div>
       <div class="wanted" id="wanted"></div>
-    </div>
-    <div class="panel">
-      <h2>Daily Schedule · Mon–Thu</h2>
-      <div class="sched">
-        <div class="sched-item"><div class="sched-time">7:00a</div><div class="sched-txt"><b>All vans at Fusion.</b> Came in early and left, or headed straight to a job before 6:30? Still on time. Late vans get a red stripe.</div></div>
-        <div class="sched-item"><div class="sched-time">8:00a</div><div class="sched-txt"><b>All vans en route to job sites.</b> Board shows what time each van left Fusion. Still parked at Fusion = red stripe.</div></div>
-        <div class="sched-item"><div class="sched-time">9:30a</div><div class="sched-txt"><b>Job site arrival.</b> Each van's arrival time at its current location is logged — locked for the rest of the day.</div></div>
-      </div>
-    </div>
-    <div class="panel" style="margin-top:12px">
-      <h2>📋 Daily Report · Left Fusion 6–8a</h2>
-      <div id="reportBody" style="font-size:12px;color:var(--f-gray)">Loading…</div>
     </div>
   </div>
 </div>
@@ -845,6 +862,59 @@ async function cityState(lat, lon){
   }catch(e){ return ""; }
 }
 
+/* ================= SKY — time of day × weather ================= */
+function hexBlend(a,b,w){
+  const pa=parseInt(a.slice(1),16), pb=parseInt(b.slice(1),16);
+  const r=Math.round(((pa>>16)&255)*(1-w)+((pb>>16)&255)*w);
+  const g=Math.round(((pa>>8)&255)*(1-w)+((pb>>8)&255)*w);
+  const bl=Math.round((pa&255)*(1-w)+(pb&255)*w);
+  return "#"+((1<<24)|(r<<16)|(g<<8)|bl).toString(16).slice(1);
+}
+/* [until ET minutes, phase, 4 gradient stops: zenith → mid-sky → horizon glow → horizon base] */
+const SKY_PHASES=[
+  [5*60+30, "night", ["#0b1626","#14243c","#1d3350","#243b4f"]],
+  [6*60+45, "dawn",  ["#39476b","#7a6a92","#e8a06a","#ffd9a0"]],
+  [8*60,    "day",   ["#7fb8e6","#a6d2f0","#ffe9c2","#e8e2d2"]],
+  [16*60,   "day",   ["#8ec9ee","#bfe0f5","#ffe9c2","#e8e2d2"]],
+  [19*60,   "sunset",["#41436f","#8a5a8f","#ff9a5a","#ffd08a"]],
+  [20*60+30,"dusk",  ["#232a4d","#4a3f6e","#b06a52","#c98d5e"]],
+  [24*60+1, "night", ["#0b1626","#14243c","#1d3350","#243b4f"]]
+];
+const WX_TINT={sunny:null, cloudy:["#9aa7b3",.5], rain:["#5b6a7a",.6], storm:["#2e3742",.75], snow:["#dfe6ee",.55]};
+let CUR_WX="sunny";
+function applySky(){
+  const scene=document.getElementById("scene");
+  if(!scene) return;
+  const o=etNowParts();
+  const mins=parseInt(o.hour,10)*60+parseInt(o.minute,10);
+  let ph=SKY_PHASES[SKY_PHASES.length-1];
+  for(const p of SKY_PHASES){ if(mins<p[0]){ ph=p; break; } }
+  scene.classList.remove("ph-night","ph-dawn","ph-day","ph-sunset","ph-dusk","sunset");
+  scene.classList.add("ph-"+ph[1]);
+  let stops=ph[2];
+  const tint=WX_TINT[CUR_WX];
+  if(tint) stops=stops.map(c=>hexBlend(c,tint[0],tint[1]));
+  scene.style.background="linear-gradient("+stops[0]+" 0%, "+stops[1]+" 42%, "+stops[2]+" 58%, "+stops[3]+" 60%, "+hexBlend(stops[3],"#9aa79b",.5)+" 100%)";
+  /* stars at night & dusk (dimmed by clouds) */
+  let st=document.getElementById("stars");
+  if(ph[1]==="night"||ph[1]==="dusk"){
+    if(!st){
+      st=document.createElement("div"); st.id="stars";
+      for(let i=0;i<60;i++){
+        const s=document.createElement("div"); s.className="star";
+        s.style.left=(Math.random()*100)+"%"; s.style.top=(Math.random()*45)+"%";
+        const z=(Math.random()*1.6+.7); s.style.width=z+"px"; s.style.height=z+"px";
+        s.style.animationDelay=(Math.random()*3)+"s"; s.style.animationDuration=(2.2+Math.random()*2.5)+"s";
+        st.appendChild(s);
+      }
+      scene.insertBefore(st, scene.firstChild);
+    }
+    st.style.opacity = CUR_WX!=="sunny" ? ".15" : (ph[1]==="night" ? "1" : ".5");
+  } else if(st){ st.remove(); }
+}
+applySky();
+setInterval(applySky, 60000);
+
 /* ================= LIVE WEATHER (Open-Meteo, no key needed) ================= */
 async function applyWeather(){
   try{
@@ -868,7 +938,7 @@ function setWeatherScene(cat, icon, label, temp){
   const scene = document.getElementById("scene");
   scene.classList.remove("wx-sunny","wx-cloudy","wx-rain","wx-storm","wx-snow");
   scene.classList.add("wx-"+cat);
-  if (cat!=="sunny") scene.classList.remove("sunset");
+  CUR_WX = cat; applySky(); /* re-tint the sky for the current time of day × weather */
   document.getElementById("wxChip").innerHTML = icon+" <b>"+(temp!=null?temp+"°F":"")+"</b> "+esc(label)+" · Greenville";
   const precip = document.getElementById("precip");
   precip.innerHTML = "";
@@ -1312,10 +1382,8 @@ async function main(){
   applyWeather(); /* live weather + scenery, non-blocking */
 
   const now = new Date();
-  const T600=etToday(6,0), T630=etToday(6,30), T645=etToday(6,45), T700=etToday(7,0), T715=etToday(7,15), T800=etToday(8,0), T930=etToday(9,30), T1000=etToday(10,0);
-  if (parseInt(o.hour,10) >= 15) document.getElementById("scene").classList.add("sunset");
+  const T600=etToday(6,0), T630=etToday(6,30), T645=etToday(6,45), T700=etToday(7,0), T715=etToday(7,15), T800=etToday(8,0), T930=etToday(9,30), T1000=etToday(10,0), T1500=etToday(15,0);
   const dayStart=etToday(3,0);
-  document.getElementById("lbSub").textContent = "(today — updates every open)";
   document.getElementById("kSpeedLbl").textContent = "Speeding Today";
 
   let live, trips, exceptions;
@@ -1586,6 +1654,18 @@ async function main(){
       const after10 = (tripsBy[nm]||[]).find(t=>t.start>T1000);
       if (after10) row.arrival.sub = "left site "+fmtET(after10.start);
     }
+    /* after-3pm: last job departure + day's end.
+       Left Job = start of the first trip that begins after 3:00 PM.
+       Day's End = when that (possibly multi-leg) route finally parks — the last trip's stop.
+       While the van is still driving, day's end stays open ("en route"). */
+    if (!row.sales){
+      const after3 = (tripsBy[nm]||[]).filter(t=>t.start>=T1500);
+      if (after3.length){
+        row.leftJob = after3[0].start;
+        if (v.isDriving) row.dayEndDriving = true;
+        else { const all=tripsBy[nm]||[]; if (all.length) row.dayEnd = all[all.length-1].stop; }
+      }
+    }
     rows.push(row);
   }
 
@@ -1682,6 +1762,7 @@ async function main(){
     if (a.sales !== b.sales) return a.sales ? 1 : -1;
     return distFromFusion(b) - distFromFusion(a);
   });
+  const tOr = d => d ? esc(fmtET(d)) : "—";
   document.getElementById("boardBody").innerHTML = boardRows.map(r=>{
     const loc = r.place ? " · " + esc(r.place) : "";
     const nowTxt = r.live.isDriving ? `🚐 ${kmh2mph(r.live.speed)} mph${loc}`
@@ -1689,10 +1770,26 @@ async function main(){
       : (r.zone==="home" ? `🏡 Home${loc}` : `🅿️ ${esc(r.place||"Parked")}`));
     const leaderMark = leaderDriver && (r.driver===leaderDriver||r.name.includes(leaderDriver)) ? " 🚔" : "";
     const earlyMark = r.earlyBird ? " 🐦" : "";
+    if (r.sales) return `<tr>
+      <td>${esc(r.tag)}${leaderMark}<br><span class="drivername">${esc(r.driver)} · SALES</span></td>
+      <td colspan="5"><span class="cellsub">Sales — not timed</span></td>
+      <td style="font-size:10.5px;white-space:nowrap">${nowTxt}</td>
+    </tr>`;
+    const arrived = r.overnight ? '<span class="cellsub">overnight at Fusion</span>'
+      : (r.fusionArrivalT ? `<b>${tOr(r.fusionArrivalT)}</b>` : "—");
+    const leftF  = r.leftFusion ? `<b style="color:var(--f-navy)">${tOr(r.leftFusion)}</b>` : "—";
+    const leftJ  = r.leftJob ? `<b>${tOr(r.leftJob)}</b>`
+      : (r.arrival && r.arrival.kind==="ok" ? '<span class="cellsub">on site</span>' : "—");
+    const dayEnd = r.leftJob
+      ? (r.dayEndDriving ? '<span class="arr-route">en route</span>' : `<b style="color:var(--f-red)">${tOr(r.dayEnd)}</b>`)
+      : "—";
     return `<tr>
-      <td>${esc(r.tag)}${leaderMark}${earlyMark}<br><span class="drivername">${esc(r.driver)}${r.sales?" · SALES":""}</span></td>
-      <td>${cell(r.checks.c700)}</td><td>${cell(r.checks.c800)}</td>
+      <td>${esc(r.tag)}${leaderMark}${earlyMark}<br><span class="drivername">${esc(r.driver)}</span></td>
+      <td>${arrived}</td>
+      <td>${leftF}</td>
       <td>${arrCell(r.arrival)}</td>
+      <td>${leftJ}</td>
+      <td>${dayEnd}</td>
       <td style="font-size:10.5px;white-space:nowrap">${nowTxt}</td>
     </tr>`;
   }).join("");
@@ -1711,22 +1808,6 @@ async function main(){
         ? `🚨 <b>${esc(leaderDriver)}</b> leads the fleet with <b>${lbSorted[0][1]}</b> speeding violations today — watch the scene: <b>pulled over, foot chase, wrong cars, tables turned</b>, on repeat.`
         : `🚨 <b>${esc(leaderDriver)}</b> leads the fleet with <b>${lbSorted[0][1]}</b> speeding violations today — currently parked. The chase resumes when they hit the road.`)
     : `Fleet is clean so far today — nobody is being chased.`;
-
-  /* --- daily report: vans that left Fusion between 6:00–8:00 AM --- */
-  const rep = rows.filter(r=>!r.sales && r.leftFusion && r.leftFusion>=T600 && r.leftFusion<=T800)
-                  .sort((a,b)=>a.leftFusion-b.leftFusion);
-  document.getElementById("reportBody").innerHTML = rep.length ? `
-    <table class="board">
-      <thead><tr><th>Van / Driver</th><th>Got to Fusion</th><th>Overnight at Fusion</th><th>Left for Job</th></tr></thead>
-      <tbody>${rep.map(r=>`<tr>
-        <td>${esc(r.tag)}<br><span class="drivername">${esc(r.driver)}</span></td>
-        <td>${r.overnight ? '<span class="cellsub">stayed overnight</span>' : (r.fusionArrivalT ? esc(fmtET(r.fusionArrivalT)) : "—")}</td>
-        <td>${r.overnight ? "✅ yes" : "❌ no"}</td>
-        <td style="font-weight:700;color:var(--f-navy)">${esc(fmtET(r.leftFusion))}</td>
-      </tr>`).join("")}</tbody>
-    </table>
-    <div class="cellsub" style="margin-top:6px">Mon–Thu · vans departing Fusion 6:00–8:00 AM · fresh data on every open</div>`
-    : `No vans left Fusion between 6:00–8:00 AM ${isSchedDay ? "yet today" : "(off-schedule day)"}.`;
 
   document.getElementById("refreshed").textContent = "Live Geotab data · refreshed " + new Intl.DateTimeFormat("en-US",{timeZone:ET,hour:"numeric",minute:"2-digit",second:"2-digit"}).format(new Date()) + " ET · reload any time for fresh data";
   document.getElementById("loading").style.display="none";
