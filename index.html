@@ -197,6 +197,29 @@ h1,h2,h3{font-family:'Mona Sans',Arial,Helvetica,sans-serif;font-weight:700;lett
 @keyframes sirenB{0%,49%{opacity:.15}50%,100%{opacity:1}}
 .copTag{font-size:10px;font-weight:800;color:#fff;background:var(--bad);border-radius:6px;padding:1px 6px;margin-top:2px;animation:blinkTag 1s infinite}
 @keyframes blinkTag{50%{opacity:.4}}
+/* ---------------- ROAD PURSUIT (weave through traffic → shoulder → ticket) ---------------- */
+.pw{position:absolute;bottom:2px;left:50%;margin-left:-33px;z-index:3;opacity:0;will-change:transform,opacity}
+.pw .van svg{width:66px;height:69px}
+.pw .copr{position:relative;display:inline-flex;flex-direction:column;align-items:center}
+.pw .copr svg{width:66px;height:69px;display:block}
+@keyframes pwUp{
+  0%  {transform:translateY(0) scale(1);        opacity:0}
+  6%  {opacity:1}
+  90% {opacity:1}
+  100%{transform:translateY(-200px) scale(.22); opacity:0}
+}
+.pw .weave{animation:pwWeave 2.1s ease-in-out infinite alternate}
+.pw .weave.w2{animation-duration:1.7s;animation-delay:-.8s}
+@keyframes pwWeave{from{transform:translateX(-58px)}to{transform:translateX(58px)}}
+.pw .off{position:relative}
+.pw .miniOfficer{position:absolute;left:-16px;bottom:2px;width:24px;height:41px;opacity:0}
+.pw .miniOfficer svg{width:24px;height:41px;display:block;overflow:visible}
+.pw .miniOfficer.walking .legL{animation:stepA .5s ease-in-out infinite alternate}
+.pw .miniOfficer.walking .legR{animation:stepB .5s ease-in-out infinite alternate}
+.pw .miniOfficer .legL,.pw .miniOfficer .legR{transform-box:fill-box;transform-origin:top center}
+.pw .miniBubble{position:absolute;top:-48px;left:50%;transform:translateX(-50%) scale(0);transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+  background:#fff;border:3px dashed var(--bad);color:var(--bad);font-size:20px;font-weight:800;border-radius:12px;padding:4px 12px;white-space:nowrap;z-index:9}
+.pw .miniBubble.show{transform:translateX(-50%) scale(1)}
 /* ---------------- TRAFFIC STOP (chase → pull over → ticket) ---------------- */
 .pursuit{position:absolute;left:0;right:0;bottom:0;height:130px;z-index:7;pointer-events:none}
 .runner{position:absolute;bottom:4px;left:-150px;will-change:left}
@@ -592,7 +615,7 @@ body.dark table.tboard tbody tr:last-child td:not(.mlab){border-bottom-color:#ff
   <span><span class="stripchip" style="background:var(--bad)"></span> red stripe = late / not where they should be</span>
   <span><span class="stripchip" style="background:var(--f-light)"></span> gray stripe = checkpoint hasn't happened yet</span>
   <span><span class="stripchip" style="background:#fff;border:1px solid var(--f-light)"></span> white stripe = never left Fusion after 8:00 / overnight</span>
-  <span>🚔 = today's speeding leader — pulled over, foot chase, car swap, chaos on repeat</span>
+  <span>🚔 = today's speeding leader — weaving through en-route traffic until they're pulled onto the shoulder</span>
   <span>🐦 = THE early bird — first van at Fusion this morning, carried across the sky</span>
   <span>🏡 Home = parked where the van started its day · 🏠 Job Site = parked anywhere else</span>
   <span>🔍 Waldo is hiding somewhere new on every refresh — good luck</span>
@@ -1195,7 +1218,7 @@ function startFlyer(row, stripColor){
   const bear=document.querySelector(".bear"), scene=document.getElementById("scene");
   if(!bear||!scene) return;
   const sleepB = ms=>new Promise(r=>setTimeout(r,ms));
-  const traffic = ()=>!!(document.querySelector("#roadLane .rv")||document.querySelector("#pursuit .runner"));
+  const traffic = ()=>!!document.querySelector("#roadLane .rv, #roadLane .pw");
   let x=2, y=60, flip=false, hit=false;
   bear.style.animation="none"; /* JS drives him now, not the CSS wander */
   const scaleFor = yy => (.55 + Math.min(Math.max((yy-20)/62,0),1)*.75);
@@ -1326,8 +1349,8 @@ function saveSettings(){
   location.reload();
 }
 
-/* ================= THE GREAT FOOT-CHASE CAR-SWAP ================= */
-function startPursuit(row, stripColor, lane){
+/* ================= RETIRED foreground chase (replaced by the road pursuit below) ================= */
+function startPursuitLegacy(row, stripColor, lane){
   const layer = document.getElementById("pursuit");
   const type = vehTypeFor(row.name, row.tag);
   const laneY = (lane||0) * 52; /* tied leaders each get their own chase lane, stacked */
@@ -1482,6 +1505,101 @@ function startPursuit(row, stripColor, lane){
       await sleep(900);
     }
   })();
+}
+
+/* ================= ROAD PURSUIT =================
+   The chase happens ON the en-route road: cop and leader weave through the
+   driving vans; when pulled over they pull OFF the road onto the shoulder,
+   the officer writes the ticket, then they merge back on and drive off. */
+function copRearSVG(){
+  return `<svg viewBox="0 0 44 46">
+    <ellipse cx="22" cy="43" rx="17" ry="2.5" fill="rgba(0,0,0,.18)"/>
+    <rect x="4.5" y="33" width="10" height="9" rx="2.5" fill="#2c2c2e"/>
+    <rect x="7" y="35.5" width="5" height="4" rx="1.5" fill="#e9ebee"/>
+    <rect x="29.5" y="33" width="10" height="9" rx="2.5" fill="#2c2c2e"/>
+    <rect x="32" y="35.5" width="5" height="4" rx="1.5" fill="#e9ebee"/>
+    <rect x="7" y="6" width="30" height="32" rx="4" fill="#1b1b1d" stroke="#0c0c0d" stroke-width="1.5"/>
+    <rect class="lightR" x="12" y="2" width="8" height="4.5" rx="1.5" fill="#ff1f1f"/>
+    <rect class="lightB" x="24" y="2" width="8" height="4.5" rx="1.5" fill="#1f6bff"/>
+    <rect x="11" y="9" width="22" height="9" rx="1.5" fill="#CEE2FF" stroke="#0c0c0d" stroke-width="1"/>
+    <rect x="7" y="22" width="30" height="5" fill="#ffffff"/>
+    <text x="22" y="26.4" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="4.4" fill="#1b1b1d">POLICE</text>
+    <rect x="8.5" y="30" width="6" height="3" rx="1" fill="#C1272D"/>
+    <rect x="29.5" y="30" width="6" height="3" rx="1" fill="#C1272D"/>
+  </svg>`;
+}
+function startPursuit(row, stripColor, lane){
+  const layer = document.getElementById("roadLane");
+  const type = vehTypeFor(row.name, row.tag);
+  const vanW = document.createElement("div");
+  vanW.className = "pw";
+  vanW.title = row.name + " — today's speeding leader";
+  vanW.innerHTML = `<div class="weave"><div class="off">
+      <div class="van driving">${rearSVG(type, stripColor)}<span class="vanTag">🚨 ${esc(firstNameTag(row))}</span></div>
+      <div class="miniOfficer">${officerSVG()}</div>
+      <div class="miniBubble">🎫 TICKET</div>
+    </div></div>`;
+  const copW = document.createElement("div");
+  copW.className = "pw";
+  copW.innerHTML = `<div class="weave w2"><div class="off">
+      <div class="copr">${copRearSVG()}<span class="copTag">PURSUIT</span></div>
+    </div></div>`;
+  layer.appendChild(vanW); layer.appendChild(copW);
+  const CH = 16; /* seconds for a full run up the road */
+  const sleep = ms=>new Promise(r=>setTimeout(r,ms));
+  const vOff=vanW.querySelector(".off"), cOff=copW.querySelector(".off");
+  const vWv=vanW.querySelector(".weave"), cWv=copW.querySelector(".weave");
+  const officer=vanW.querySelector(".miniOfficer"), bub=vanW.querySelector(".miniBubble");
+  const tag=copW.querySelector(".copTag"), vanBody=vanW.querySelector(".van");
+  const weaveState = s => { vWv.style.animationPlayState=s; cWv.style.animationPlayState=s; };
+  async function run(){
+    while(true){
+      /* reset at the bottom of the road, cop trailing */
+      vanW.style.animation="none"; copW.style.animation="none";
+      vOff.style.transition="none"; cOff.style.transition="none";
+      vOff.style.transform="translateX(0)"; cOff.style.transform="translateX(0)";
+      officer.style.opacity="0"; officer.style.transform="translate(0,0)";
+      bub.classList.remove("show");
+      tag.textContent="PURSUIT"; vanBody.classList.add("driving");
+      void vanW.offsetWidth;
+      vanW.style.animation = "pwUp "+CH+"s linear";
+      copW.style.animation = "pwUp "+CH+"s linear 1.1s";
+      weaveState("running");
+      /* bob and weave through en-route traffic until the pull-over point */
+      const stopAt = (0.24 + Math.random()*0.28) * CH * 1000;
+      await sleep(stopAt);
+      vanW.style.animationPlayState="paused";
+      await sleep(250);
+      copW.style.animationPlayState="paused";
+      weaveState("paused");
+      tag.textContent="PULLED OVER";
+      /* off the road and onto the shoulder */
+      vOff.style.transition="transform 2.2s ease-out"; cOff.style.transition="transform 2.4s ease-out";
+      vOff.style.transform="translateX(320px)"; cOff.style.transform="translateX(320px)";
+      await sleep(2500);
+      vanBody.classList.remove("driving");
+      /* the officer walks up and writes the ticket */
+      officer.style.opacity="1"; officer.classList.add("walking");
+      officer.style.transition="transform 2.6s linear"; officer.style.transform="translate(30px,-4px)";
+      await sleep(2700);
+      officer.classList.remove("walking");
+      bub.classList.add("show");
+      await sleep(3400);
+      bub.classList.remove("show");
+      officer.classList.add("walking");
+      officer.style.transform="translate(0,0)";
+      await sleep(2700);
+      officer.style.opacity="0"; officer.classList.remove("walking");
+      /* merge back into traffic and finish the run to the horizon */
+      vanBody.classList.add("driving");
+      vOff.style.transform="translateX(0)"; cOff.style.transform="translateX(0)";
+      await sleep(2400);
+      vanW.style.animationPlayState="running"; copW.style.animationPlayState="running";
+      weaveState("running");
+      await sleep(Math.max(0, CH*1000 - stopAt) + 2000);
+    }
+  }
+  setTimeout(run, (lane||0)*5000); /* tied leaders stagger onto the road */
 }
 
 /* ================= MAIN ================= */
@@ -1934,7 +2052,7 @@ async function main(){
     ? (leaders.length>1
         ? `🚨 <b>${leaders.map(esc).join("</b> and <b>")}</b> are TIED with <b>${maxViol}</b> speeding violations each — ${chasing>1 ? `<b>${chasing} simultaneous pursuits</b> are underway!` : (chasing===1 ? "one is being chased now; the rest get theirs when they hit the road." : "all currently parked. The chases begin when they hit the road.")}`
         : (chasing===1
-            ? `🚨 <b>${esc(leaders[0])}</b> leads the fleet with <b>${maxViol}</b> speeding violations today — watch the scene: <b>pulled over, foot chase, wrong cars, tables turned</b>, on repeat.`
+            ? `🚨 <b>${esc(leaders[0])}</b> leads the fleet with <b>${maxViol}</b> speeding violations today — watch the road: <b>weaving through traffic until the law pulls them onto the shoulder</b>, on repeat.`
             : `🚨 <b>${esc(leaders[0])}</b> leads the fleet with <b>${maxViol}</b> speeding violations today — currently parked. The chase resumes when they hit the road.`))
     : `Fleet is clean so far today — nobody is being chased.`;
 
