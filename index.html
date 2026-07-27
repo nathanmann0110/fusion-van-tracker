@@ -138,7 +138,6 @@ h1,h2,h3{font-family:'Mona Sans',Arial,Helvetica,sans-serif;font-weight:700;lett
 .bsLamp.red{background:#e02020;box-shadow:0 0 12px rgba(224,32,32,.95);animation:bsFlash .5s steps(1) infinite}
 @keyframes bsFlash{0%,55%{opacity:1}56%,100%{opacity:.3}}
 .bsPole{width:5px;height:42px;background:#4a4d52;margin:0 auto;border-radius:2px}
-.scene.stopTraffic #roadLane *{animation-play-state:paused!important}
 /* ---- bear lunch-box raid ---- */
 .vanDoor{position:absolute;left:9px;bottom:5px;width:15px;height:26px;background:#84868a;border:1.5px solid #6e7073;border-radius:2.5px;transform-origin:left center;transform:perspective(130px) rotateY(0deg);transition:transform .55s ease;z-index:2}
 .vanDoor.open{transform:perspective(130px) rotateY(-105deg)}
@@ -1292,6 +1291,42 @@ function startFlyer(row, stripColor){
   const sideOf = v => v<50 ? "L" : "R";
   const spot = side => side==="L" ? {x:1+Math.random()*32, y:56+Math.random()*26}
                                   : {x:58+Math.random()*38, y:56+Math.random()*26};
+  /* ---- red-light traffic control: vans stop at a stop line BEFORE the stripes,
+     never on them; anyone already on the crosswalk clears it first, and when the
+     animation loops them back around they queue up at the line like everyone else */
+  let stopTimer=null; const stoppedVans=[];
+  function beginStopping(){
+    const check=()=>{
+      const s=scene.getBoundingClientRect(), h=s.height;
+      const crossTop=s.bottom-0.235*h, crossBot=s.bottom-0.14*h, band=0.07*h;
+      document.querySelectorAll("#roadLane .rv, #roadLane .pw").forEach(el=>{
+        if(el.__stopped) return;
+        if(el.style.animationPlayState==="paused") return; /* pursuit's own pull-over — leave it be */
+        const r=el.getBoundingClientRect();
+        if(!r.height) return;
+        const vb=r.bottom;
+        const inbound=el.classList.contains("in");
+        const atLine = inbound
+          ? (vb>=crossTop-band && vb<=crossTop-6)   /* coming down — stop above the stripes */
+          : (vb>=crossBot+6 && vb<=crossBot+band);  /* heading up — stop below the stripes */
+        if(atLine){
+          el.__stopped=true; stoppedVans.push(el);
+          el.style.animationPlayState="paused";
+          const w=el.querySelector(".weave"); if(w) w.style.animationPlayState="paused";
+        }
+      });
+    };
+    check();
+    stopTimer=setInterval(check,120);
+  }
+  function releaseTraffic(){
+    if(stopTimer){ clearInterval(stopTimer); stopTimer=null; }
+    stoppedVans.splice(0).forEach(el=>{
+      el.__stopped=false;
+      el.style.animationPlayState="";
+      const w=el.querySelector(".weave"); if(w) w.style.animationPlayState="";
+    });
+  }
   /* every road crossing happens at the BEAR CROSSWALK — traffic stops at the flashing red */
   async function travelTo(tx,ty){
     if(sideOf(tx)!==sideOf(x)){
@@ -1303,14 +1338,14 @@ function startFlyer(row, stripColor){
       const lamp = document.getElementById("bsLamp");
       const mustStop = traffic();
       if(mustStop && lamp){
-        lamp.classList.add("red");            /* flashing red — every van stops */
-        scene.classList.add("stopTraffic");
-        await sleepB(1100);
+        lamp.classList.add("red");            /* flashing red — vans queue at the stop line */
+        beginStopping();
+        await sleepB(1400);                   /* let anyone on the stripes clear them */
       }
       await walkTo(farEdge, CROSS_Y);         /* crosses on the stripes */
       if(mustStop && lamp){
         lamp.classList.remove("red");         /* green — traffic rolls on */
-        scene.classList.remove("stopTraffic");
+        releaseTraffic();
       }
     }
     return walkTo(tx,ty);
