@@ -1350,9 +1350,17 @@ function startFlyer(row, stripColor){
     }
     return walkTo(tx,ty);
   }
-  /* lunch-box raid: pick a parked van, open the door, help himself, close it up */
-  async function raidVan(){
-    const vans=[...document.querySelectorAll("#fusionLot .van, #jobLot .van, #homeLot .van")];
+  /* lunch-box raid: pick a parked van (optionally on one side of the road),
+     open the door, help himself, close it up */
+  async function raidVan(side){
+    const s0=scene.getBoundingClientRect();
+    let vans=[...document.querySelectorAll("#fusionLot .van, #jobLot .van, #homeLot .van")];
+    if(side) vans=vans.filter(el=>{
+      const rr=el.getBoundingClientRect();
+      if(!rr.width) return false;
+      const cx=((rr.left+rr.width/2)-s0.left)/s0.width*100;
+      return side==="L" ? cx<50 : cx>=50;
+    });
     if(!vans.length) return;
     const v=vans[Math.floor(Math.random()*vans.length)];
     const s=scene.getBoundingClientRect(), r=v.getBoundingClientRect();
@@ -1384,11 +1392,18 @@ function startFlyer(row, stripColor){
   async function loop(){
     await sleepB(1500);
     while(true){
-      const r=Math.random();
-      if(r<.3) await raidVan();                                             /* lunch time */
-      else if(r<.42) await travelTo(76+Math.random()*12, 30+Math.random()*9); /* mountain hike */
-      else { const t=spot(Math.random()<.5?"L":"R"); await travelTo(t.x, t.y); }
-      await sleepB(400+Math.random()*1800);
+      /* the routine: raid a van on this side → cross at the BEAR CROSSWALK →
+         raid a van on the other side → then wander around for a while */
+      await raidVan("L");                     /* lunch stop #1 — Fusion side */
+      await sleepB(600);
+      await raidVan("R");                     /* travelTo crosses the crosswalk on the way */
+      await sleepB(600);
+      const strolls = 2+Math.floor(Math.random()*3);
+      for(let i=0;i<strolls;i++){
+        if(Math.random()<.18) await travelTo(76+Math.random()*12, 30+Math.random()*9); /* mountain hike */
+        else { const t=spot(Math.random()<.5?"L":"R"); await travelTo(t.x, t.y); }
+        await sleepB(400+Math.random()*1800);
+      }
     }
   }
   /* watcher: keep him visible while he's on the Fusion parking lot */
