@@ -131,6 +131,21 @@ h1,h2,h3{font-family:'Mona Sans',Arial,Helvetica,sans-serif;font-weight:700;lett
   99% {left:3%;  top:60%; transform:scaleX(1) scale(.8)}
   100%{left:2%;  top:60%; transform:scaleX(1) scale(.8)}
 }
+/* ---- BEAR CROSSWALK signal + stopped traffic ---- */
+#bearSignPost{width:76px;text-align:center;pointer-events:none}
+.bsHead{background:#ffd94d;border:2px solid #2c2c2e;border-radius:8px;font-size:9px;font-weight:800;color:#2c2c2e;padding:3px 4px;line-height:1.15;letter-spacing:.04em;font-family:Arial,sans-serif}
+.bsLamp{width:15px;height:15px;border-radius:50%;background:#2e9e46;border:3px solid #2c2c2e;margin:3px auto;box-shadow:0 0 9px rgba(46,158,70,.85)}
+.bsLamp.red{background:#e02020;box-shadow:0 0 12px rgba(224,32,32,.95);animation:bsFlash .5s steps(1) infinite}
+@keyframes bsFlash{0%,55%{opacity:1}56%,100%{opacity:.3}}
+.bsPole{width:5px;height:42px;background:#4a4d52;margin:0 auto;border-radius:2px}
+.scene.stopTraffic #roadLane *{animation-play-state:paused!important}
+/* ---- bear lunch-box raid ---- */
+.vanDoor{position:absolute;left:9px;bottom:5px;width:15px;height:26px;background:#84868a;border:1.5px solid #6e7073;border-radius:2.5px;transform-origin:left center;transform:perspective(130px) rotateY(0deg);transition:transform .55s ease;z-index:2}
+.vanDoor.open{transform:perspective(130px) rotateY(-105deg)}
+.bearLunch{position:absolute;left:50%;top:-34px;transform:translateX(-50%);text-align:center;z-index:4;pointer-events:none}
+.bearLunch .lbox{font-size:22px;animation:chompB .45s ease-in-out infinite alternate}
+@keyframes chompB{from{transform:translateY(0) rotate(-6deg)}to{transform:translateY(-5px) rotate(8deg)}}
+.bearLunch .chomp{font-size:10px;font-weight:800;background:rgba(255,255,255,.9);border:1px solid var(--f-light);border-radius:8px;padding:1px 6px;color:#414042;white-space:nowrap;margin-top:2px}
 /* bear hit by traffic: launched spinning into the air, lands, gets up, wanders on */
 .bear.launched{animation:bearFly 1.7s cubic-bezier(.3,.55,.45,1) forwards}
 @keyframes bearFly{
@@ -427,6 +442,23 @@ body.dark .scene .kpi{background:rgba(24,27,33,.88)}
   <div class="ground"></div>
   <div class="road" id="road"></div>
 
+  <!-- BEAR CROSSWALK: stripes on the street + signal post; en-route traffic stops when the bear crosses -->
+  <svg class="structure" style="left:50%;bottom:14.5%;width:340px;height:50px;transform:translateX(-50%)" viewBox="0 0 340 50" preserveAspectRatio="none">
+    <text x="170" y="12" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="10.5" fill="#ffffff" opacity=".9" letter-spacing="3">BEAR CROSSWALK</text>
+    <g fill="#f5f6f8" opacity=".92">
+      <rect x="6" y="17" width="22" height="30" rx="2"/><rect x="40" y="17" width="22" height="30" rx="2"/>
+      <rect x="74" y="17" width="22" height="30" rx="2"/><rect x="108" y="17" width="22" height="30" rx="2"/>
+      <rect x="142" y="17" width="22" height="30" rx="2"/><rect x="176" y="17" width="22" height="30" rx="2"/>
+      <rect x="210" y="17" width="22" height="30" rx="2"/><rect x="244" y="17" width="22" height="30" rx="2"/>
+      <rect x="278" y="17" width="22" height="30" rx="2"/><rect x="312" y="17" width="22" height="30" rx="2"/>
+    </g>
+  </svg>
+  <div class="structure" id="bearSignPost" style="left:calc(50% + 178px);bottom:12.5%;z-index:2">
+    <div class="bsHead">🐻 BEAR<br>CROSSWALK</div>
+    <div class="bsLamp" id="bsLamp"></div>
+    <div class="bsPole"></div>
+  </div>
+
   <!-- the bear — painted early so he walks BEHIND vans, trees, houses, and Fusion -->
   <div class="bear"><svg viewBox="0 0 62 40">
     <!-- far-side legs -->
@@ -522,6 +554,9 @@ body.dark .scene .kpi{background:rgba(24,27,33,.88)}
     <rect x="118" y="14" width="12" height="28" fill="#75777a"/>
     <rect x="72" y="78" width="26" height="42" fill="#5b4632"/>
     <circle cx="93" cy="100" r="2" fill="#C5A757"/>
+    <rect x="74" y="83" width="22" height="13" rx="1.5" fill="#ffffff" stroke="#75777a" stroke-width=".6"/>
+    <text x="85" y="88.6" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="4.2" fill="#414042">CLIENT'S</text>
+    <text x="85" y="93.8" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="4.2" fill="#414042">HOUSE</text>
     <g fill="#CEE2FF" stroke="#75777a" stroke-width="1.5">
       <rect x="34" y="66" width="24" height="20"/><rect x="112" y="66" width="24" height="20"/>
     </g>
@@ -553,6 +588,8 @@ body.dark .scene .kpi{background:rgba(24,27,33,.88)}
     <rect x="88" y="22" width="9" height="22" fill="#75777a"/>
     <rect x="55" y="65" width="20" height="35" fill="#4a5568"/>
     <circle cx="71" cy="83" r="1.8" fill="#C5A757"/>
+    <rect x="57" y="69.5" width="16" height="8.5" rx="1" fill="#ffffff" stroke="#75777a" stroke-width=".5"/>
+    <text x="65" y="75.6" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="4.6" fill="#414042">HOME</text>
     <g fill="#fff3c4" stroke="#75777a" stroke-width="1.2">
       <rect x="26" y="56" width="18" height="15"/><rect x="90" y="56" width="18" height="15"/>
     </g>
@@ -625,6 +662,7 @@ body.dark .scene .kpi{background:rgba(24,27,33,.88)}
   <span>🚔 = today's speeding leader — weaving through en-route traffic until they're pulled onto the shoulder</span>
   <span>🐦 = THE early bird — first van at Fusion this morning, carried across the sky</span>
   <span>🏡 Home = parked where the van started its day · 🏠 Job Site = parked anywhere else</span>
+  <span>🐻 the bear crosses only at the BEAR CROSSWALK — en-route vans stop at the flashing red — and he raids parked vans for lunch boxes</span>
   <span>🔍 Waldo is hiding somewhere new on every refresh — good luck</span>
   <span>Sales vans (Bill Bacon, Michael Santana) show location only — no morning timing</span>
 </div>
@@ -1219,14 +1257,16 @@ function startFlyer(row, stripColor){
 /* ================= BEAR AI =================
    Waypoint wanderer with road smarts:
    — walks the whole scene (depth scale by y); shows IN FRONT of the parking lot
-   — reaching the road edge: vans en route → turns around; road clear → crosses
-   — caught on the road when traffic appears → launched spinning, dazed, walks it off */
+   — crosses the street ONLY at the BEAR CROSSWALK: if vans are en route the signal
+     goes flashing red and all traffic stops until he's across, then back to green
+   — randomly raids parked vans: opens the door, eats the lunch box, closes it */
 (function(){
   const bear=document.querySelector(".bear"), scene=document.getElementById("scene");
   if(!bear||!scene) return;
   const sleepB = ms=>new Promise(r=>setTimeout(r,ms));
   const traffic = ()=>!!document.querySelector("#roadLane .rv, #roadLane .pw");
   let x=2, y=60, flip=false, hit=false;
+  const CROSS_Y = 76; /* bear-top y% that puts his paws on the crosswalk stripes */
   bear.style.animation="none"; /* JS drives him now, not the CSS wander */
   const scaleFor = yy => (.55 + Math.min(Math.max((yy-20)/62,0),1)*.75);
   const setT = ()=>{ bear.style.transform="scaleX("+(flip?-1:1)+") scale("+scaleFor(y).toFixed(2)+")"; };
@@ -1252,59 +1292,77 @@ function startFlyer(row, stripColor){
   const sideOf = v => v<50 ? "L" : "R";
   const spot = side => side==="L" ? {x:1+Math.random()*32, y:56+Math.random()*26}
                                   : {x:58+Math.random()*38, y:56+Math.random()*26};
+  /* every road crossing happens at the BEAR CROSSWALK — traffic stops at the flashing red */
+  async function travelTo(tx,ty){
+    if(sideOf(tx)!==sideOf(x)){
+      const h=halfPct(CROSS_Y);
+      const nearEdge = sideOf(x)==="L" ? 50-h-4.5 : 50+h+0.5;
+      const farEdge  = sideOf(x)==="L" ? 50+h+0.5 : 50-h-4.5;
+      await walkTo(nearEdge, CROSS_Y);        /* amble to the crosswalk */
+      await sleepB(500);                      /* look both ways */
+      const lamp = document.getElementById("bsLamp");
+      const mustStop = traffic();
+      if(mustStop && lamp){
+        lamp.classList.add("red");            /* flashing red — every van stops */
+        scene.classList.add("stopTraffic");
+        await sleepB(1100);
+      }
+      await walkTo(farEdge, CROSS_Y);         /* crosses on the stripes */
+      if(mustStop && lamp){
+        lamp.classList.remove("red");         /* green — traffic rolls on */
+        scene.classList.remove("stopTraffic");
+      }
+    }
+    return walkTo(tx,ty);
+  }
+  /* lunch-box raid: pick a parked van, open the door, help himself, close it up */
+  async function raidVan(){
+    const vans=[...document.querySelectorAll("#fusionLot .van, #jobLot .van, #homeLot .van")];
+    if(!vans.length) return;
+    const v=vans[Math.floor(Math.random()*vans.length)];
+    const s=scene.getBoundingClientRect(), r=v.getBoundingClientRect();
+    if(!r.width) return;
+    const vx=((r.left+r.width/2)-s.left)/s.width*100;
+    const vy=(r.bottom-s.top)/s.height*100;
+    const fromRight = vx>50;
+    const bx=Math.min(Math.max(vx+(fromRight?3.6:-3.6),0),95);
+    await travelTo(bx, Math.min(Math.max(vy-6.2,56),84));
+    bear.style.zIndex="3";
+    flip = fromRight; setT();                 /* face the van */
+    const door=document.createElement("div"); door.className="vanDoor";
+    v.appendChild(door);
+    await sleepB(250); door.classList.add("open");
+    await sleepB(800);
+    const lunch=document.createElement("div"); lunch.className="bearLunch";
+    lunch.innerHTML='<div class="lbox">🧺</div><div class="chomp">nom nom nom</div>';
+    bear.appendChild(lunch);
+    await sleepB(2800);
+    lunch.querySelector(".chomp").textContent="😋 all gone";
+    lunch.querySelector(".lbox").style.opacity=".25";
+    await sleepB(1200);
+    lunch.remove();
+    door.classList.remove("open");            /* closes the door back */
+    await sleepB(650); door.remove();
+    bear.style.zIndex="";
+    await sleepB(400);
+  }
   async function loop(){
     await sleepB(1500);
     while(true){
-      if(hit){ await sleepB(400); continue; }
-      let t;
       const r=Math.random();
-      if(r<.12) t={x:76+Math.random()*12, y:30+Math.random()*9}; /* mountain hike */
-      else t=spot(Math.random()<.5?"L":"R");
-      if(sideOf(t.x)!==sideOf(x)){
-        /* he wants the other side — walk to the road's edge first */
-        const ey=Math.max(58, Math.min(t.y, 82));
-        const h=halfPct(ey);
-        const nearEdge = sideOf(x)==="L" ? 50-h-4.5 : 50+h+0.5;
-        const farEdge  = sideOf(x)==="L" ? 50+h+0.5 : 50-h-4.5;
-        if(!await walkTo(nearEdge, ey)) continue;
-        await sleepB(700); /* look both ways */
-        if(traffic()){
-          /* vans en route — turn around and wander back */
-          const back=spot(sideOf(x));
-          if(!await walkTo(back.x, back.y)) continue;
-          continue;
-        }
-        if(!await walkTo(farEdge, ey)) continue; /* road's clear — cross */
-      }
-      if(!await walkTo(t.x, t.y)) continue;
+      if(r<.3) await raidVan();                                             /* lunch time */
+      else if(r<.42) await travelTo(76+Math.random()*12, 30+Math.random()*9); /* mountain hike */
+      else { const t=spot(Math.random()<.5?"L":"R"); await travelTo(t.x, t.y); }
       await sleepB(400+Math.random()*1800);
     }
   }
-  async function launchBear(){
-    hit=true;
-    const s=scene.getBoundingClientRect(), b=bear.getBoundingClientRect();
-    x=((b.left-s.left)/s.width)*100; y=((b.top-s.top)/s.height)*100;
-    jumpTo(); void bear.offsetWidth;
-    bear.classList.add("launched");           /* up he goes, spinning */
-    await sleepB(1750);
-    bear.classList.remove("launched");
-    bear.style.transform="rotate(104deg) scale("+scaleFor(y).toFixed(2)+")"; /* flat on his back */
-    await sleepB(1600);
-    flip=true; x=2; y=60;                     /* shakes it off and walks home */
-    bear.style.transition="left 4.5s linear, top 4.5s linear"; setT();
-    bear.style.left=x+"%"; bear.style.top=y+"%";
-    await sleepB(4700);
-    hit=false;
-  }
-  /* watcher: parking-lot visibility + getting clipped on the road */
+  /* watcher: keep him visible while he's on the Fusion parking lot */
   setInterval(function(){
+    if(bear.style.zIndex==="3") return; /* mid-raid — leave him in front */
     const s=scene.getBoundingClientRect(), b=bear.getBoundingClientRect();
     const px=((b.left+b.right)/2-s.left)/s.width*100;
     const py=(b.bottom-s.top)/s.height*100;
-    bear.style.zIndex = (px<26.5 && py>77) ? 3 : ""; /* on the lot → in front, stays visible */
-    if(hit) return;
-    if(py<58) return;
-    if(Math.abs(px-50) < halfPct(py-6) && traffic()) launchBear();
+    bear.style.zIndex = (px<26.5 && py>77) ? 3 : "";
   }, 400);
   loop();
 })();
@@ -1851,7 +1909,8 @@ async function main(){
       }catch(e){}
       row.inbound = row.toFusion || toHome;
     }
-    /* HOME detection: parked where the van started its day (and not at Fusion) */
+    /* HOME detection: home = where the van FIRST MOVED FROM this morning (its first
+       GPS point of the day) — unless that starting point was Fusion itself */
     if (row.zone === "job"){
       if (!(tripsBy[nm]||[]).length){
         row.zone = "home"; /* hasn't moved all day */
@@ -1859,6 +1918,7 @@ async function main(){
         try{
           const first = await geoLogRecords(nm, dayStart.toISOString(), now.toISOString(), 2);
           if (first.length && first[0].latitude!=null &&
+              !atFusion(first[0].latitude, first[0].longitude) &&
               havM(v.latitude, v.longitude, first[0].latitude, first[0].longitude) <= 400) row.zone = "home";
         }catch(e){}
       }
