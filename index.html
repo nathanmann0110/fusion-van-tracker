@@ -35,7 +35,7 @@ h1,h2,h3{font-family:'Mona Sans',Arial,Helvetica,sans-serif;font-weight:700;lett
 .banner{background:#fff6e5;border:1px solid var(--f-gold);border-radius:8px;padding:8px 12px;font-size:12px;margin-bottom:10px;display:none}
 .errbanner{background:#fdecea;border:1px solid var(--bad);border-radius:8px;padding:8px 12px;font-size:12px;margin-bottom:10px;display:none;color:#7a1712}
 /* ---------------- SCENE ---------------- */
-.scene{position:relative;height:600px;border-radius:14px;overflow:hidden;border:1px solid var(--f-light);
+.scene{position:relative;height:50vh;min-height:420px;border-radius:14px;overflow:hidden;border:1px solid var(--f-light);
   background:linear-gradient(#8ec9ee 0%, #bfe0f5 42%, #ffe9c2 58%, #e8e2d2 60%, #cfd4cd 100%);box-shadow:0 2px 8px rgba(0,0,0,.08)}
 .sun{position:absolute;left:50%;top:86px;width:74px;height:74px;margin-left:-37px;border-radius:50%;
   background:radial-gradient(circle,#fff6d8 0%,#ffd766 55%,#ffb833 100%);box-shadow:0 0 46px 18px rgba(255,200,80,.65);animation:sunpulse 5s ease-in-out infinite}
@@ -72,8 +72,8 @@ h1,h2,h3{font-family:'Mona Sans',Arial,Helvetica,sans-serif;font-weight:700;lett
 /* road */
 .road{position:absolute;left:50%;bottom:0;width:480px;height:42%;margin-left:-240px;
   background:#5a5d61;clip-path:polygon(0 100%,100% 100%,58% 0,42% 0)}
-.dash{position:absolute;left:50%;width:6px;margin-left:-3px;background:#ffe27a;border-radius:2px;animation:dashmove 1.1s linear infinite;opacity:0}
-@keyframes dashmove{0%{opacity:0}10%{opacity:1}90%{opacity:1}100%{opacity:0}}
+/* solid double-yellow center line (SVG injected into #road by JS) */
+.centerline{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 /* zones */
 .zone{position:absolute;bottom:0;height:50%;display:flex;flex-direction:column;justify-content:flex-end}
 .zoneLabel{position:absolute;top:-30px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.85);border:1px solid var(--f-light);
@@ -109,10 +109,22 @@ h1,h2,h3{font-family:'Mona Sans',Arial,Helvetica,sans-serif;font-weight:700;lett
 .van.small.fr svg{width:51px;height:54px}
 /* bear wandering the whole scene — z-index 0 keeps him BEHIND vans, trees, houses,
    and the Fusion building (everything painted after him); scale() fakes depth */
-.bear{position:absolute;left:2%;top:60%;width:60px;height:39px;z-index:0;pointer-events:none;animation:bearWander 95s linear infinite}
+.bear{position:absolute;left:2%;top:60%;width:75px;height:49px;z-index:0;pointer-events:none;animation:bearWander 95s linear infinite}
 .bear svg{width:100%;height:100%;overflow:visible}
-.bear .bl1,.bear .bl3{transform-box:fill-box;transform-origin:top center;animation:stepA .5s ease-in-out infinite alternate}
-.bear .bl2,.bear .bl4{transform-box:fill-box;transform-origin:top center;animation:stepB .5s ease-in-out infinite alternate}
+.bear .bl1,.bear .bl3{transform-box:fill-box;transform-origin:top center;animation:stepA 1s ease-in-out infinite alternate}
+.bear .bl2,.bear .bl4{transform-box:fill-box;transform-origin:top center;animation:stepB 1s ease-in-out infinite alternate}
+/* lazy bear: sitting under a tree with his honey tub — legs stop stepping */
+.bear.sitting .bl1,.bear.sitting .bl2,.bear.sitting .bl3,.bear.sitting .bl4{animation-play-state:paused}
+/* bear vs WALDO: the grab, the shake, the ragdoll toss */
+.bear.shaking svg{animation:bearShake .26s linear infinite}
+@keyframes bearShake{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(6deg)}}
+.heldWaldo{position:absolute;right:-11px;top:-10px;width:16px;height:27px;transform-origin:top center;animation:shakeW .22s linear infinite;pointer-events:none}
+.heldWaldo svg{width:100%;height:100%;overflow:visible;display:block}
+@keyframes shakeW{0%,100%{transform:rotate(-44deg)}50%{transform:rotate(44deg)}}
+.waldo.ragdoll svg{animation:ragSpin .45s linear infinite}
+@keyframes ragSpin{to{transform:rotate(360deg)}}
+.bearLunch.honey .lbox{animation:honeySlurp 1.3s ease-in-out infinite alternate}
+@keyframes honeySlurp{from{transform:translateY(0) rotate(-10deg)}to{transform:translateY(-3px) rotate(12deg)}}
 @keyframes bearWander{
   0%  {left:2%;  top:60%; transform:scaleX(1) scale(.8)}
   10% {left:16%; top:66%; transform:scaleX(1) scale(.95)}
@@ -168,8 +180,45 @@ h1,h2,h3{font-family:'Mona Sans',Arial,Helvetica,sans-serif;font-weight:700;lett
 .waldo .wlL,.waldo .wlR{transform-box:fill-box;transform-origin:top center}
 .waldo.running .wlL{animation:stepA .4s ease-in-out infinite alternate}
 .waldo.running .wlR{animation:stepB .4s ease-in-out infinite alternate}
+/* Waldo's bike: spinning wheels while he rides, backflips off the street-jump ramps */
+.waldo.biking{width:46px;height:41px}
+.waldo.biking .wwF,.waldo.biking .wwB{transform-box:fill-box;transform-origin:center;animation:wheelSpin .45s linear infinite}
+@keyframes wheelSpin{to{transform:rotate(360deg)}}
+/* parked bike + Waldo's one office visit (front door swings open, desk shows in the window) */
+.parkedBike{position:absolute;width:46px;height:41px;z-index:1;pointer-events:none}
+.parkedBike svg{width:100%;height:100%;overflow:visible;display:block;transform:rotate(9deg)}
+#fusionDoorway{position:absolute;left:calc(2.5% + 96px);bottom:38%;width:51px;height:45px;background:#1d1f22;opacity:0;transition:opacity .3s;pointer-events:none;z-index:1}
+#fusionDoor{position:absolute;left:calc(2.5% + 96px);bottom:38%;width:51px;height:45px;background:#414042;pointer-events:none;z-index:1;
+  transform-origin:left center;transition:transform .6s ease;transform:perspective(300px) rotateY(0deg)}
+#fusionDoor::after{content:"";position:absolute;left:4px;top:4px;right:4px;bottom:0;background:#CEE2FF;opacity:.8}
+#fusionDoor.open{transform:perspective(300px) rotateY(-78deg)}
+#waldoDesk{position:absolute;left:calc(2.5% + 123px);bottom:calc(38% + 72px);width:33px;height:24px;display:none;z-index:1;pointer-events:none}
+#waldoDesk svg{width:100%;height:100%;display:block}
+#waldoBed{position:absolute;left:calc(98.5% - 174px);bottom:calc(38% + 40px);width:25px;height:21px;display:none;z-index:1;pointer-events:none}
+#waldoBed svg{width:100%;height:100%;display:block}
+/* the bear's office window + his bed in the OTHER home window */
+#bearDesk{position:absolute;left:calc(2.5% + 168px);bottom:calc(38% + 72px);width:33px;height:24px;display:none;z-index:1;pointer-events:none}
+#bearDesk svg{width:100%;height:100%;display:block}
+#bearBed{position:absolute;left:calc(98.5% - 84px);bottom:calc(38% + 40px);width:25px;height:21px;display:none;z-index:1;pointer-events:none}
+#bearBed svg{width:100%;height:100%;display:block}
+/* crosswalk RODEO */
+.bearRider{position:absolute;left:26%;top:-24px;width:18px;height:30px;pointer-events:none;animation:riderBounce .32s ease-in-out infinite alternate}
+.bearRider svg{width:100%;height:100%;overflow:visible;display:block}
+@keyframes riderBounce{from{transform:rotate(-12deg)}to{transform:rotate(12deg) translateY(-3px)}}
+.bear.bucking svg{animation:buckKick .5s ease-in-out infinite}
+.bear.onbike .wwF,.bear.onbike .wwB{transform-box:fill-box;transform-origin:center;animation:wheelSpin .4s linear infinite}
+@keyframes buckKick{0%,100%{transform:rotate(0)}30%{transform:rotate(-13deg)}70%{transform:rotate(10deg)}}
+/* speeding-stop FOOT CHASE runners */
+.footRun{position:absolute;width:26px;height:32px;z-index:6;pointer-events:none}
+.footRun svg{width:100%;height:100%;overflow:visible;display:block}
+.footRun .legL,.footRun .legR{transform-box:fill-box;transform-origin:top center}
+.footRun.running .legL{animation:stepA .44s ease-in-out infinite alternate}
+.footRun.running .legR{animation:stepB .44s ease-in-out infinite alternate}
 /* street lights */
 .lamp .glow{filter:drop-shadow(0 0 6px #ffd766)}
+/* Fusion lot: vans park IN the painted stalls (absolute slots), not a flex row */
+#fusionLot{position:absolute;left:0;right:0;top:0;bottom:0;padding:0}
+#fusionLot .van.stalled{position:absolute;transform:translateX(-50%)}
 /* structures */
 .structure{position:absolute;pointer-events:none}
 /* vehicles */
@@ -193,7 +242,7 @@ h1,h2,h3{font-family:'Mona Sans',Arial,Helvetica,sans-serif;font-weight:700;lett
 @keyframes wiggle{from{transform:rotate(-8deg)}to{transform:rotate(10deg)}}
 .van.early .vanTag{background:var(--f-gold);color:#414042}
 /* the ONE early bird — carried across the sky */
-.flyer{position:absolute;top:44px;left:-260px;z-index:6;animation:flyAcross 24s linear infinite;pointer-events:none}
+.flyer{position:absolute;top:44px;left:-260px;z-index:6;animation:flyAcross 48s linear infinite;pointer-events:none}
 .flyer .inner{display:flex;flex-direction:column;align-items:center;animation:flyBob 3.2s ease-in-out infinite}
 .flyer .bigbird svg{width:120px;height:80px;overflow:visible;display:block}
 .flyer .bigbird .bwing{transform-box:fill-box;transform-origin:100% 100%;animation:flap .5s ease-in-out infinite alternate}
@@ -226,14 +275,6 @@ h1,h2,h3{font-family:'Mona Sans',Arial,Helvetica,sans-serif;font-weight:700;lett
 .pw .weave.w2{animation-duration:1.7s;animation-delay:-.8s}
 @keyframes pwWeave{from{transform:translateX(-58px)}to{transform:translateX(58px)}}
 .pw .off{position:relative}
-.pw .miniOfficer{position:absolute;left:-16px;bottom:2px;width:24px;height:41px;opacity:0}
-.pw .miniOfficer svg{width:24px;height:41px;display:block;overflow:visible}
-.pw .miniOfficer.walking .legL{animation:stepA .5s ease-in-out infinite alternate}
-.pw .miniOfficer.walking .legR{animation:stepB .5s ease-in-out infinite alternate}
-.pw .miniOfficer .legL,.pw .miniOfficer .legR{transform-box:fill-box;transform-origin:top center}
-.pw .miniBubble{position:absolute;top:-48px;left:50%;transform:translateX(-50%) scale(0);transition:transform .35s cubic-bezier(.34,1.56,.64,1);
-  background:#fff;border:3px dashed var(--bad);color:var(--bad);font-size:20px;font-weight:800;border-radius:12px;padding:4px 12px;white-space:nowrap;z-index:9}
-.pw .miniBubble.show{transform:translateX(-50%) scale(1)}
 /* ---------------- TRAFFIC STOP (chase → pull over → ticket) ---------------- */
 .pursuit{position:absolute;left:0;right:0;bottom:0;height:130px;z-index:7;pointer-events:none}
 .runner{position:absolute;bottom:4px;left:-150px;will-change:left}
@@ -257,9 +298,9 @@ h1,h2,h3{font-family:'Mona Sans',Arial,Helvetica,sans-serif;font-weight:700;lett
   transform:scale(0);transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
 .tbubble.show{transform:scale(1)}
 /* ---------------- PANELS ---------------- */
-.cols{display:flex;flex-direction:column;gap:12px;margin-top:12px}
-.panel{background:#fff;border:1px solid var(--f-light);border-radius:12px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
-.panel h2{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--f-dark);border-bottom:2px solid var(--f-red);display:inline-block;padding-bottom:3px;margin-bottom:10px}
+.cols{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.panel{background:#fff;border:1px solid var(--f-light);border-radius:12px;padding:8px 10px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.panel h2{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--f-dark);border-bottom:2px solid var(--f-red);display:inline-block;padding-bottom:2px;margin-bottom:5px}
 table.board{width:100%;border-collapse:collapse;font-size:12px}
 table.board th{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--f-gray);padding:6px 4px;border-bottom:1px solid var(--f-light);text-align:center}
 table.board th:first-child{text-align:left}
@@ -267,15 +308,15 @@ table.board td{padding:5px 4px;border-bottom:1px solid #f0f1f2;text-align:center
 table.board td:first-child{text-align:left;font-weight:700;white-space:nowrap}
 table.board tr:hover{background:#fafbfc}
 /* ---- transposed TV report: vans as columns, metrics as rows, 2 bands, 2x type ---- */
-.repbands{display:flex;flex-direction:column;gap:20px}
+.repbands{display:flex;flex-direction:column;gap:10px}
 table.tboard{table-layout:fixed;width:100%}
-table.tboard th{font-size:15px;padding:8px 5px}
-table.tboard th .vhead{font-size:24px;font-weight:800;color:var(--f-dark);letter-spacing:.02em}
-table.tboard th .drivername{font-size:16px}
-table.tboard td{font-size:24px;padding:10px 5px;line-height:1.25;white-space:normal;overflow-wrap:anywhere;font-weight:400}
-table.tboard td.mlab,table.tboard th.mlab{width:170px;font-size:14px;text-transform:uppercase;letter-spacing:.08em;color:var(--f-gray);text-align:left;font-weight:700;overflow-wrap:normal}
-table.tboard .cellsub{font-size:15px;margin-top:2px}
-table.tboard td.nowcell{font-size:17px;font-weight:700}
+table.tboard th{font-size:12px;padding:3px 4px}
+table.tboard th .vhead{font-size:17px;font-weight:800;color:var(--f-dark);letter-spacing:.02em}
+table.tboard th .drivername{font-size:12px}
+table.tboard td{font-size:16px;padding:3px 4px;line-height:1.12;white-space:normal;overflow-wrap:anywhere;font-weight:400}
+table.tboard td.mlab,table.tboard th.mlab{width:125px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--f-gray);text-align:left;font-weight:700;overflow-wrap:normal}
+table.tboard .cellsub{font-size:11px;margin-top:0}
+table.tboard td.nowcell{font-size:12px;font-weight:700}
 body.dark table.tboard th .vhead{color:#e8e9ea}
 .drivername{font-weight:400;color:var(--f-gray);font-size:11px}
 .dot{display:inline-block;width:13px;height:13px;border-radius:50%;vertical-align:middle}
@@ -395,10 +436,112 @@ body.dark table.tboard tbody tr:last-child td:not(.mlab){border-bottom-color:#ff
 /* ---- header + KPIs live INSIDE the scene, floating over the sky ---- */
 .scene .hdr{position:absolute;top:10px;left:14px;right:14px;z-index:20;margin-bottom:0;align-items:flex-start;pointer-events:none}
 .scene .hdr .wordmark,.scene .hdr-right{background:rgba(255,255,255,.86);border:1px solid var(--f-light);border-radius:14px;padding:9px 16px;box-shadow:0 2px 8px rgba(0,0,0,.18);pointer-events:auto}
-.scene .kpis{position:absolute;top:80px;left:50%;transform:translateX(-50%);z-index:20;margin:0;display:flex;gap:10px;width:auto}
+.scene .kpis{display:none} /* KPI stats hidden per Nathan 2026-07-27 */
 .scene .kpi{background:rgba(255,255,255,.88);min-width:150px}
+/* trees 3x, anchored at their base */
+.structure.tree{transform:scale(3);transform-origin:50% 100%;z-index:2} /* bear & Waldo pass BEHIND trees */
+/* red strobe light beside each name on the speeding leaderboard */
+.lb-strobe{width:15px;height:15px;border-radius:50%;background:#ff2222;flex:0 0 auto;animation:strobeRed .55s steps(2,start) infinite}
+@keyframes strobeRed{0%,49%{opacity:1;box-shadow:0 0 12px 5px rgba(255,30,30,.85)}50%,100%{opacity:.12;box-shadow:none}}
 body.dark .scene .hdr .wordmark,body.dark .scene .hdr-right{background:rgba(18,21,26,.85);border-color:#2b2f37}
 body.dark .scene .kpi{background:rgba(24,27,33,.88)}
+/* ---------------- THEMES: "South Park" — paper-cutout mountain-town winter ---------------- */
+#spSnow{position:absolute;inset:0;pointer-events:none;z-index:8;overflow:hidden;display:none}
+body.theme-southpark #spSnow{display:block}
+#spSnow i{position:absolute;top:-14px;border-radius:50%;background:#fff;box-shadow:0 0 4px rgba(255,255,255,.75);animation:spFall linear infinite}
+@keyframes spFall{from{top:-14px}to{top:104%}}
+body.theme-southpark .ground{background:linear-gradient(#f4f9fd,#e2edf5 40%,#cfdde9)}
+body.theme-southpark .mtns polygon[fill="#2A4562"]{fill:#5a7d9d}
+body.theme-southpark .mtns polygon[fill="#3a5a7d"]{fill:#7595b3}
+body.theme-southpark .structure.tree{filter:saturate(.72) brightness(1.12) hue-rotate(-14deg)}
+body.theme-southpark:not(.dark) .panel{background:#eef6fc}
+body.theme-southpark:not(.dark) .scene .hdr .wordmark,body.theme-southpark:not(.dark) .scene .hdr-right{background:rgba(238,246,252,.9)}
+/* ---------------- THEME: "Simpsons" — saturated cartoon suburbia ---------------- */
+body.theme-simpsons .ground{background:linear-gradient(#8fd45c,#6fbf3f 45%,#57a82e)}
+body.theme-simpsons .mtns polygon[fill="#2A4562"]{fill:#a9746b}
+body.theme-simpsons .mtns polygon[fill="#3a5a7d"]{fill:#c08d77}
+body.theme-simpsons .structure.tree{filter:saturate(1.6) brightness(1.08) hue-rotate(10deg)}
+body.theme-simpsons .cloud{filter:brightness(1.2) drop-shadow(0 2px 0 rgba(0,0,0,.06));transform:scale(1.35)}
+body.theme-simpsons:not(.dark) .panel{background:#fff6d8}
+body.theme-simpsons:not(.dark) .scene .hdr .wordmark,body.theme-simpsons:not(.dark) .scene .hdr-right{background:rgba(255,246,216,.92)}
+.simpFolk{display:none;position:absolute;inset:0;pointer-events:none;z-index:3}
+body.theme-simpsons .simpFolk{display:block}
+.simpFolk .sf{position:absolute}
+.simpFolk .sf svg{width:100%;height:100%;display:block;overflow:visible;animation:kidBob 2.8s ease-in-out infinite}
+.simpFolk .sf.f2 svg{animation-delay:-1s}
+.simpFolk .sf.f3 svg{animation-delay:-1.9s}
+.simpFolk .donut svg{animation:donutRock 3.6s ease-in-out infinite}
+@keyframes donutRock{0%,100%{transform:rotate(8deg)}50%{transform:rotate(-6deg)}}
+/* paper-cutout townsfolk, out enjoying the snow */
+.spKids{display:none;position:absolute;inset:0;pointer-events:none;z-index:3}
+body.theme-southpark .spKids{display:block}
+.spKid{position:absolute;width:34px;height:46px}
+.spKid svg{width:100%;height:100%;display:block;overflow:visible;animation:kidBob 2.4s ease-in-out infinite}
+.spKid.k2 svg{animation-delay:-.8s}
+.spKid.k3 svg{animation-delay:-1.6s}
+@keyframes kidBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2.5px)}}
+/* ---------------- THEME: "Chuck Norris" — sun-baked western desert ---------------- */
+body.theme-chuck .ground{background:linear-gradient(#e9c98d,#dcb271 45%,#c99a54)}
+body.theme-chuck .mtns polygon[fill="#2A4562"]{fill:#a5643f}
+body.theme-chuck .mtns polygon[fill="#3a5a7d"]{fill:#c48757}
+body.theme-chuck .structure.tree{filter:sepia(.55) saturate(1.15) brightness(1.02)}
+body.theme-chuck .cloud{filter:sepia(.3) brightness(1.06)}
+body.theme-chuck:not(.dark) .panel{background:#f7ecd7}
+body.theme-chuck:not(.dark) .scene .hdr .wordmark,body.theme-chuck:not(.dark) .scene .hdr-right{background:rgba(247,236,215,.92)}
+.westFolk{display:none;position:absolute;inset:0;pointer-events:none;z-index:2}
+body.theme-chuck .westFolk{display:block}
+.westFolk .wf{position:absolute}
+.westFolk .wf svg,.westFolk .tw svg{width:100%;height:100%;display:block;overflow:visible}
+.westFolk .tw{position:absolute;bottom:8%;left:-60px;width:34px;height:34px;animation:twRoll 24s linear infinite}
+.westFolk .tw svg{animation:twSpin 1.4s linear infinite}
+@keyframes twRoll{0%{left:-60px}25%{bottom:11%}50%{bottom:7%}75%{bottom:10%}100%{left:104%}}
+@keyframes twSpin{to{transform:rotate(360deg)}}
+/* Chuck rides with his theme — he exists nowhere else */
+body:not(.theme-chuck) .chuck,body:not(.theme-chuck) .chuckSmoke,body:not(.theme-chuck) .crackOl,body:not(.theme-chuck) .feather{display:none!important}
+body:not(.theme-chuck) .van.crumpled > svg{transform:none;filter:none}
+body:not(.theme-chuck) .structure.tree.felled{transform:scale(3)}
+body:not(.theme-chuck) .flyer.shot .inner{animation:flyBob 3.2s ease-in-out infinite}
+/* ---------------- CHUCK NORRIS ---------------- */
+.chuck{position:absolute;left:92%;top:60%;width:36px;height:59px;z-index:1;pointer-events:none}
+.chuck svg{width:100%;height:100%;overflow:visible;display:block}
+.chuck .clL,.chuck .clR{transform-box:fill-box;transform-origin:top center}
+.chuck.running .clL{animation:stepA .55s ease-in-out infinite alternate}
+.chuck.running .clR{animation:stepB .55s ease-in-out infinite alternate}
+.chuck .armR{transform-box:fill-box;transform-origin:15% 12%}
+.chuck.chopping .armR{animation:chChop .32s ease-in-out infinite}
+.chuck.frenzy .armR{animation:chChop .13s linear infinite}
+@keyframes chChop{0%,100%{transform:rotate(-105deg)}55%{transform:rotate(18deg)}}
+.chuck .gArm{opacity:0}
+.chuck.aiming .gArm{opacity:1}
+.chuck.aiming .armR{opacity:0}
+.chuck .mflash{opacity:0}
+.chuck.aiming .mflash{opacity:1;animation:mFlash .2s linear infinite alternate;transform-box:fill-box;transform-origin:0 50%}
+@keyframes mFlash{from{transform:scale(.5)}to{transform:scale(1.3)}}
+.chBub{position:absolute;left:50%;top:-20px;transform:translateX(-50%);background:#fff;border:2px dashed var(--f-red);color:var(--f-red);
+  font-weight:800;font-size:11px;border-radius:9px;padding:2px 8px;white-space:nowrap;z-index:9;pointer-events:none}
+/* trees go DOWN (and quietly regrow later — they know better than to stay dead) */
+.structure.tree{transition:transform 1.1s cubic-bezier(.55,-0.35,.7,-0.05),opacity .6s}
+.structure.tree.felled{transform:scale(3) rotate(82deg)}
+.structure.tree.felled.fL{transform:scale(3) rotate(-82deg)}
+.structure.tree.regrow{transition:none}
+/* karate damage on the vans */
+.van .crackOl{position:absolute;left:16%;top:12%;width:68%;height:40%;z-index:3;pointer-events:none}
+.van .crackOl svg{width:100%;height:100%;overflow:visible;display:block}
+.van.jolt > svg{animation:chJolt .5s ease}
+@keyframes chJolt{0%,100%{transform:none}25%{transform:translateX(-3px) rotate(-2deg)}60%{transform:translateX(3px) rotate(2deg)}}
+.van.crumpled > svg{transform:scaleY(.68) scaleX(.95) skewX(-6deg);transform-origin:50% 100%;filter:brightness(.88) saturate(.75);transition:transform .25s ease}
+.chuckSmoke{position:absolute;left:50%;bottom:4px;width:0;height:0;z-index:5;pointer-events:none}
+.chuckSmoke i{position:absolute;left:0;bottom:0;width:26px;height:26px;margin-left:-13px;border-radius:50%;opacity:0;
+  background:radial-gradient(circle at 40% 40%, rgba(214,216,220,.95), rgba(150,153,158,.55) 60%, rgba(150,153,158,0) 72%);
+  transform:translate(0,0) scale(.35);animation:chPuff 1.9s ease-out infinite}
+@keyframes chPuff{0%{opacity:0;transform:translate(0,0) scale(.35)}12%{opacity:.95}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(var(--s))}}
+/* the early bird gets shot down (temporarily — it's a cartoon) */
+.flyer.shot .inner{animation:birdFall 2.1s cubic-bezier(.5,0,.9,.55) forwards}
+.flyer.shot .bwing{animation:none}
+.flyer.shot .cargo{animation:none}
+@keyframes birdFall{to{transform:translateY(560px) rotate(46deg)}}
+.feather{position:absolute;z-index:8;font-size:14px;pointer-events:none;animation:featherFall 3.4s ease-in forwards}
+@keyframes featherFall{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(200px) rotate(240deg)}}
 </style>
 </head>
 <body>
@@ -443,8 +586,7 @@ body.dark .scene .kpi{background:rgba(24,27,33,.88)}
 
   <!-- BEAR CROSSWALK: stripes on the street + signal post; en-route traffic stops when the bear crosses -->
   <svg class="structure" style="left:50%;bottom:14.5%;width:340px;height:50px;transform:translateX(-50%)" viewBox="0 0 340 50" preserveAspectRatio="none">
-    <text x="170" y="12" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="10.5" fill="#ffffff" opacity=".9" letter-spacing="3">BEAR CROSSWALK</text>
-    <g fill="#f5f6f8" opacity=".92">
+    <g fill="#ffd23f" opacity=".95">
       <rect x="6" y="17" width="22" height="30" rx="2"/><rect x="40" y="17" width="22" height="30" rx="2"/>
       <rect x="74" y="17" width="22" height="30" rx="2"/><rect x="108" y="17" width="22" height="30" rx="2"/>
       <rect x="142" y="17" width="22" height="30" rx="2"/><rect x="176" y="17" width="22" height="30" rx="2"/>
@@ -453,9 +595,138 @@ body.dark .scene .kpi{background:rgba(24,27,33,.88)}
     </g>
   </svg>
   <div class="structure" id="bearSignPost" style="left:calc(50% + 178px);bottom:12.5%;z-index:2">
-    <div class="bsHead">🐻 BEAR<br>CROSSWALK</div>
+    <div class="bsHead">🐻</div>
     <div class="bsLamp" id="bsLamp"></div>
     <div class="bsPole"></div>
+  </div>
+
+  <!-- paper-cutout townsfolk — only out and about in the South Park theme -->
+  <div class="spKids">
+    <div class="spKid k1" style="left:27.5%;bottom:4.5%"><svg viewBox="0 0 22 30">
+      <ellipse cx="11" cy="28.4" rx="8" ry="1.8" fill="rgba(0,0,0,.14)"/>
+      <ellipse cx="11" cy="20.5" rx="7.5" ry="7" fill="#6d4fa1"/>
+      <rect x="6.5" y="25.8" width="3.6" height="3" rx="1" fill="#3a3a3e"/><rect x="11.9" y="25.8" width="3.6" height="3" rx="1" fill="#3a3a3e"/>
+      <ellipse cx="3.9" cy="21" rx="2" ry="1.6" fill="#C1272D"/><ellipse cx="18.1" cy="21" rx="2" ry="1.6" fill="#C1272D"/>
+      <circle cx="11" cy="9" r="7" fill="#f6d7b8"/>
+      <path d="M4 8.4 A7 7 0 0 1 18 8.4 Z" fill="#f2c400"/>
+      <rect x="4" y="7.4" width="14" height="1.8" rx=".9" fill="#d9ae00"/>
+      <circle cx="11" cy="1.4" r="1.7" fill="#C1272D"/>
+      <circle cx="8.8" cy="11" r="1.9" fill="#fff"/><circle cx="13.2" cy="11" r="1.9" fill="#fff"/>
+      <circle cx="9.4" cy="11.3" r=".55" fill="#1b1b1d"/><circle cx="12.6" cy="11.3" r=".55" fill="#1b1b1d"/>
+      <path d="M9.5 14.4 Q11 15.4 12.5 14.4" stroke="#1b1b1d" stroke-width=".5" fill="none"/>
+    </svg></div>
+    <div class="spKid k2" style="left:30.6%;bottom:8%;width:29px;height:39px"><svg viewBox="0 0 22 30">
+      <ellipse cx="11" cy="28.4" rx="8" ry="1.8" fill="rgba(0,0,0,.14)"/>
+      <ellipse cx="11" cy="20.5" rx="7.5" ry="7" fill="#1f7f86"/>
+      <rect x="6.5" y="25.8" width="3.6" height="3" rx="1" fill="#2c2c2e"/><rect x="11.9" y="25.8" width="3.6" height="3" rx="1" fill="#2c2c2e"/>
+      <ellipse cx="3.9" cy="21" rx="2" ry="1.6" fill="#2b5fb8"/><ellipse cx="18.1" cy="21" rx="2" ry="1.6" fill="#2b5fb8"/>
+      <circle cx="11" cy="9" r="7" fill="#f0c9a4"/>
+      <path d="M4 8.4 A7 7 0 0 1 18 8.4 Z" fill="#C1272D"/>
+      <rect x="4" y="7.4" width="14" height="1.8" rx=".9" fill="#8f1d21"/>
+      <circle cx="8.8" cy="11" r="1.9" fill="#fff"/><circle cx="13.2" cy="11" r="1.9" fill="#fff"/>
+      <circle cx="9.4" cy="11.3" r=".55" fill="#1b1b1d"/><circle cx="12.6" cy="11.3" r=".55" fill="#1b1b1d"/>
+      <path d="M9.3 14.6 Q11 15.2 12.7 14.6" stroke="#1b1b1d" stroke-width=".5" fill="none"/>
+    </svg></div>
+    <div class="spKid k3" style="left:66%;bottom:5.5%"><svg viewBox="0 0 22 30">
+      <ellipse cx="11" cy="28.4" rx="8" ry="1.8" fill="rgba(0,0,0,.14)"/>
+      <ellipse cx="11" cy="20.5" rx="7.5" ry="7" fill="#c4467f"/>
+      <rect x="6.5" y="25.8" width="3.6" height="3" rx="1" fill="#3a3a3e"/><rect x="11.9" y="25.8" width="3.6" height="3" rx="1" fill="#3a3a3e"/>
+      <ellipse cx="3.9" cy="21" rx="2" ry="1.6" fill="#f2c400"/><ellipse cx="18.1" cy="21" rx="2" ry="1.6" fill="#f2c400"/>
+      <circle cx="11" cy="9" r="7" fill="#e9bd94"/>
+      <path d="M4 8.4 A7 7 0 0 1 18 8.4 Z" fill="#2e8b57"/>
+      <rect x="4" y="7.4" width="14" height="1.8" rx=".9" fill="#226b42"/>
+      <circle cx="11" cy="1.4" r="1.7" fill="#f2c400"/>
+      <circle cx="8.8" cy="11" r="1.9" fill="#fff"/><circle cx="13.2" cy="11" r="1.9" fill="#fff"/>
+      <circle cx="9.4" cy="11.3" r=".55" fill="#1b1b1d"/><circle cx="12.6" cy="11.3" r=".55" fill="#1b1b1d"/>
+      <path d="M9.5 14.4 Q11 15.4 12.5 14.4" stroke="#1b1b1d" stroke-width=".5" fill="none"/>
+    </svg></div>
+  </div>
+
+  <!-- saturated-cartoon townsfolk + a very large donut — Simpsons theme only -->
+  <div class="simpFolk">
+    <div class="sf f1" style="left:24%;bottom:4.5%;width:30px;height:44px"><svg viewBox="0 0 22 32">
+      <ellipse cx="11" cy="30.6" rx="7.5" ry="1.6" fill="rgba(0,0,0,.14)"/>
+      <rect x="7" y="24" width="3.2" height="6" rx="1.2" fill="#2f4fa2"/><rect x="11.8" y="24" width="3.2" height="6" rx="1.2" fill="#2f4fa2"/>
+      <rect x="5.8" y="14.5" width="10.4" height="10.5" rx="2.5" fill="#e8542f"/>
+      <path d="M5.8 17 L2.8 21.5 M16.2 17 L19.2 21.5" stroke="#e8542f" stroke-width="2.6" stroke-linecap="round"/>
+      <circle cx="2.6" cy="22" r="1.5" fill="#ffd90f"/><circle cx="19.4" cy="22" r="1.5" fill="#ffd90f"/>
+      <circle cx="11" cy="8.6" r="6" fill="#ffd90f"/>
+      <path d="M5.6 6.4 L7 3.4 L8.4 5.4 L9.8 2.6 L11.2 5.2 L12.6 2.8 L14 5.4 L15.4 3.6 L16.4 6.4" fill="none" stroke="#ffd90f" stroke-width="1.8" stroke-linejoin="round"/>
+      <circle cx="8.8" cy="8" r="2" fill="#fff"/><circle cx="13.2" cy="8" r="2" fill="#fff"/>
+      <circle cx="9.3" cy="8.3" r=".55" fill="#1b1b1d"/><circle cx="12.7" cy="8.3" r=".55" fill="#1b1b1d"/>
+      <ellipse cx="11" cy="10.4" rx="1.5" ry=".9" fill="#f4c430"/>
+      <path d="M8.8 12.6 Q11 14 13.4 12.4" stroke="#1b1b1d" stroke-width=".55" fill="none"/>
+    </svg></div>
+    <div class="sf f2" style="left:69%;bottom:5.5%;width:30px;height:56px"><svg viewBox="0 0 22 40">
+      <ellipse cx="11" cy="38.6" rx="7.5" ry="1.6" fill="rgba(0,0,0,.14)"/>
+      <path d="M6 22 L16 22 L18 38 L4 38 Z" fill="#2e9e8f"/>
+      <path d="M6.2 24 L2.8 29 M15.8 24 L19.2 29" stroke="#2e9e8f" stroke-width="2.6" stroke-linecap="round"/>
+      <circle cx="2.6" cy="29.6" r="1.4" fill="#ffd90f"/><circle cx="19.4" cy="29.6" r="1.4" fill="#ffd90f"/>
+      <circle cx="11" cy="16.6" r="5.6" fill="#ffd90f"/>
+      <circle cx="8" cy="8.5" r="3.4" fill="#7b4bb7"/><circle cx="14" cy="8.5" r="3.4" fill="#7b4bb7"/>
+      <circle cx="11" cy="5" r="3.6" fill="#7b4bb7"/><circle cx="11" cy="10.5" r="3.8" fill="#7b4bb7"/>
+      <circle cx="8.9" cy="16" r="1.9" fill="#fff"/><circle cx="13.1" cy="16" r="1.9" fill="#fff"/>
+      <circle cx="9.4" cy="16.3" r=".5" fill="#1b1b1d"/><circle cx="12.6" cy="16.3" r=".5" fill="#1b1b1d"/>
+      <ellipse cx="11" cy="18.2" rx="1.4" ry=".85" fill="#f4c430"/>
+      <path d="M9 20.4 Q11 21.6 13 20.4" stroke="#1b1b1d" stroke-width=".5" fill="none"/>
+      <circle cx="6.2" cy="14" r="1.1" fill="#e8542f"/><circle cx="15.8" cy="14" r="1.1" fill="#e8542f"/>
+    </svg></div>
+    <div class="sf f3 donut" style="left:62%;bottom:4%;width:44px;height:44px"><svg viewBox="0 0 30 30">
+      <circle cx="15" cy="15.6" r="12.6" fill="#e0a25e"/>
+      <path d="M2.6 14.4 A12.6 12.6 0 0 1 27.4 14.4 Q26 17.8 22.6 16.4 Q20.6 20 17.4 17.6 Q14.4 21 11.6 17.6 Q8.2 20.2 6.4 16.6 Q3.6 17.6 2.6 14.4 Z" fill="#ef6aa8"/>
+      <circle cx="15" cy="15.6" r="4.4" fill="#3f9fe8"/>
+      <circle cx="15" cy="15.2" r="4.4" fill="#7ec3f0"/>
+      <g stroke-width="1.1" stroke-linecap="round">
+        <path d="M8 9.5 l2 -1" stroke="#fff45c"/><path d="M13 6.6 l2.2 .4" stroke="#59d98c"/>
+        <path d="M19 7.4 l1.8 1" stroke="#5cc8ff"/><path d="M23 11.4 l2 -.6" stroke="#fff45c"/>
+        <path d="M10.5 12.8 l2 -.7" stroke="#5cc8ff"/><path d="M18.6 12.4 l2 .6" stroke="#59d98c"/>
+      </g>
+    </svg></div>
+  </div>
+
+  <!-- sun-baked desert props — Chuck Norris theme only -->
+  <div class="westFolk">
+    <div class="wf" style="left:22.5%;bottom:31%;width:34px;height:58px"><svg viewBox="0 0 24 40">
+      <path d="M10.4 22 q-6.2 .4 -6.2 -6.4 l0 -3.2" stroke="#5f8f4e" stroke-width="4.6" fill="none" stroke-linecap="round"/>
+      <path d="M14 18 q6.2 .4 6.2 -6 l0 -2.4" stroke="#5f8f4e" stroke-width="4.6" fill="none" stroke-linecap="round"/>
+      <rect x="9.7" y="6.5" width="5" height="33.5" rx="2.5" fill="#63944f"/>
+      <path d="M11.4 8 V38 M13.6 8 V38" stroke="#4e7a3e" stroke-width=".7"/>
+      <circle cx="12.2" cy="6.4" r="1.6" fill="#e88fb0"/>
+    </svg></div>
+    <div class="wf" style="left:60.5%;bottom:33.5%;width:24px;height:42px"><svg viewBox="0 0 24 40">
+      <path d="M14 20 q6 .4 6 -5.6 l0 -2.6" stroke="#6a9a55" stroke-width="4.4" fill="none" stroke-linecap="round"/>
+      <rect x="9.7" y="8" width="5" height="32" rx="2.5" fill="#6a9a55"/>
+      <path d="M11.4 9.5 V38 M13.6 9.5 V38" stroke="#547f42" stroke-width=".7"/>
+    </svg></div>
+    <div class="wf" style="right:24.5%;bottom:4%;width:44px;height:74px"><svg viewBox="0 0 24 40">
+      <path d="M10.4 21 q-6.4 .4 -6.4 -6.6 l0 -4" stroke="#578a47" stroke-width="4.8" fill="none" stroke-linecap="round"/>
+      <path d="M14 16.5 q6.4 .4 6.4 -6.2 l0 -3" stroke="#578a47" stroke-width="4.8" fill="none" stroke-linecap="round"/>
+      <rect x="9.6" y="5" width="5.2" height="35" rx="2.6" fill="#5c9049"/>
+      <path d="M11.3 6.5 V38.5 M13.7 6.5 V38.5" stroke="#487438" stroke-width=".7"/>
+      <circle cx="12.2" cy="4.8" r="1.7" fill="#e88fb0"/>
+    </svg></div>
+    <div class="wf" style="left:38.5%;bottom:35.8%;width:28px;height:19px"><svg viewBox="0 0 30 20">
+      <path d="M6 4 Q1 3 1 8 Q1 11 5 10.5 L8.5 9 Z" fill="#e8e2d4"/>
+      <path d="M24 4 Q29 3 29 8 Q29 11 25 10.5 L21.5 9 Z" fill="#e8e2d4"/>
+      <path d="M8 4 Q15 1 22 4 Q23 10 19 13 Q17.5 18 15 18 Q12.5 18 11 13 Q7 10 8 4 Z" fill="#f2ecdd"/>
+      <ellipse cx="11.6" cy="8.6" rx="1.7" ry="2.2" fill="#5a5245"/><ellipse cx="18.4" cy="8.6" rx="1.7" ry="2.2" fill="#5a5245"/>
+      <ellipse cx="15" cy="14.6" rx="1" ry="1.6" fill="#8b8271"/>
+    </svg></div>
+    <div class="wf" style="left:12%;bottom:6.5%;width:36px;height:36px"><svg viewBox="0 0 30 30" transform="rotate(12)">
+      <circle cx="15" cy="15" r="13" fill="none" stroke="#7a5230" stroke-width="3"/>
+      <circle cx="15" cy="15" r="2.6" fill="#7a5230"/>
+      <path d="M15 2 V28 M2 15 H28 M6 6 L24 24 M24 6 L6 24" stroke="#8a5f38" stroke-width="1.8"/>
+    </svg></div>
+    <div class="tw" style="animation-duration:24s"><svg viewBox="0 0 34 34">
+      <g fill="none" stroke="#b08d55" stroke-width="1">
+        <circle cx="17" cy="17" r="14" opacity=".5"/><circle cx="17" cy="17" r="9" opacity=".6"/>
+        <path d="M17 3 C10 10 24 24 17 31 M3 17 C10 24 24 10 31 17 M7 7 C14 12 20 22 27 27 M27 7 C20 12 14 22 7 27"/>
+      </g></svg></div>
+    <div class="tw" style="animation-duration:31s;animation-delay:-14s;width:24px;height:24px;bottom:11%"><svg viewBox="0 0 34 34">
+      <g fill="none" stroke="#bd9a60" stroke-width="1">
+        <circle cx="17" cy="17" r="14" opacity=".5"/><circle cx="17" cy="17" r="9" opacity=".6"/>
+        <path d="M17 3 C10 10 24 24 17 31 M3 17 C10 24 24 10 31 17 M7 7 C14 12 20 22 27 27 M27 7 C20 12 14 22 7 27"/>
+      </g></svg></div>
   </div>
 
   <!-- the bear — painted early so he walks BEHIND vans, trees, houses, and Fusion -->
@@ -502,12 +773,89 @@ body.dark .scene .kpi{background:rgba(24,27,33,.88)}
     <text x="80" y="30" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="6.5" fill="#C1272D" letter-spacing="2">AUDIO+VIDEO</text>
   </svg>
 
+  <!-- Fusion front door that actually opens (for Waldo's one office visit) + Waldo at his desk in the window -->
+  <div id="fusionDoorway"></div>
+  <div id="fusionDoor"></div>
+  <div id="waldoDesk"><svg viewBox="0 0 22 16">
+    <rect width="22" height="16" fill="#cfe3ff"/>
+    <rect x="12.5" y="5.5" width="6" height="4.5" rx=".5" fill="#414042"/>
+    <rect x="14" y="10" width="3" height="1.2" fill="#6e7073"/>
+    <circle cx="7" cy="6.2" r="2.6" fill="#f2c9a0"/>
+    <rect x="4.3" y="2.6" width="5.4" height="1.9" rx=".9" fill="#fff"/>
+    <rect x="4.3" y="3.6" width="5.4" height=".9" fill="#C1272D"/>
+    <circle cx="7" cy="1.8" r=".9" fill="#C1272D"/>
+    <circle cx="5.9" cy="6.2" r=".8" fill="none" stroke="#1b1b1d" stroke-width=".45"/>
+    <circle cx="8.1" cy="6.2" r=".8" fill="none" stroke="#1b1b1d" stroke-width=".45"/>
+    <rect x="3.8" y="8.2" width="6.4" height="4" rx="1" fill="#fff"/>
+    <rect x="3.8" y="9" width="6.4" height=".9" fill="#C1272D"/>
+    <rect x="3.8" y="10.8" width="6.4" height=".9" fill="#C1272D"/>
+    <rect x="0" y="11.6" width="22" height="4.4" fill="#8b6f4c"/>
+    <rect x="0" y="11.6" width="22" height="1" fill="#a5895f"/>
+  </svg></div>
+  <!-- Waldo flat out in bed — shows through the HOME window during his 30-second nap -->
+  <div id="waldoBed"><svg viewBox="0 0 18 15">
+    <rect width="18" height="15" fill="#f3e7c3"/>
+    <rect x="0" y="12.6" width="18" height="2.4" fill="#8b6f4c"/>
+    <rect x="1" y="4.8" width="1.6" height="8" rx=".4" fill="#7a5a30"/>
+    <rect x="15.8" y="7.6" width="1.4" height="5.4" rx=".4" fill="#7a5a30"/>
+    <rect x="1.6" y="8.2" width="15.4" height="3.2" rx=".8" fill="#fff"/>
+    <rect x="2.2" y="7.4" width="3.6" height="2" rx=".9" fill="#fff" stroke="#d8d9db" stroke-width=".3"/>
+    <path d="M6.4 8.9 Q11 6.4 15.6 8.9 L15.6 11 L6.4 11 Z" fill="#C1272D"/>
+    <rect x="6.4" y="9.6" width="9.2" height=".6" fill="#fff" opacity=".9"/>
+    <circle cx="4.6" cy="7.9" r="1.6" fill="#f2c9a0"/>
+    <rect x="3" y="5.9" width="3.2" height="1.1" rx=".5" fill="#fff"/>
+    <rect x="3" y="6.45" width="3.2" height=".55" fill="#C1272D"/>
+    <circle cx="4.6" cy="5.5" r=".55" fill="#C1272D"/>
+    <circle cx="4.1" cy="8" r=".5" fill="none" stroke="#1b1b1d" stroke-width=".3"/>
+    <circle cx="5.2" cy="8" r=".5" fill="none" stroke="#1b1b1d" stroke-width=".3"/>
+    <text x="11.6" y="4.8" font-family="Arial" font-weight="bold" font-size="2.8" fill="#414042">z z</text>
+  </svg></div>
+  <!-- the bear hard at work in ANOTHER Fusion window -->
+  <div id="bearDesk"><svg viewBox="0 0 22 16">
+    <rect width="22" height="16" fill="#cfe3ff"/>
+    <rect x="12.5" y="5.5" width="6" height="4.5" rx=".5" fill="#414042"/>
+    <rect x="14" y="10" width="3" height="1.2" fill="#6e7073"/>
+    <circle cx="4.7" cy="4.6" r="1.3" fill="#5d3f27"/><circle cx="9.1" cy="4.6" r="1.3" fill="#5d3f27"/>
+    <circle cx="6.9" cy="7" r="3.1" fill="#6b4a2f"/>
+    <ellipse cx="8.4" cy="7.9" rx="1.6" ry="1.1" fill="#8a6a48"/>
+    <circle cx="9" cy="7.5" r=".4" fill="#241a12"/>
+    <circle cx="5.9" cy="6.2" r=".45" fill="#1b1b1d"/><circle cx="7.8" cy="6.2" r=".45" fill="#1b1b1d"/>
+    <rect x="0" y="11.6" width="22" height="4.4" fill="#8b6f4c"/>
+    <rect x="0" y="11.6" width="22" height="1" fill="#a5895f"/>
+    <ellipse cx="4.6" cy="11.7" rx="1.2" ry=".7" fill="#6b4a2f"/><ellipse cx="9.2" cy="11.7" rx="1.2" ry=".7" fill="#6b4a2f"/>
+  </svg></div>
+  <!-- and the bear out cold in the OTHER home window -->
+  <div id="bearBed"><svg viewBox="0 0 18 15">
+    <rect width="18" height="15" fill="#f3e7c3"/>
+    <rect x="0" y="12.6" width="18" height="2.4" fill="#8b6f4c"/>
+    <rect x="1" y="4.8" width="1.6" height="8" rx=".4" fill="#7a5a30"/>
+    <rect x="15.8" y="7.6" width="1.4" height="5.4" rx=".4" fill="#7a5a30"/>
+    <rect x="1.6" y="8.2" width="15.4" height="3.2" rx=".8" fill="#fff"/>
+    <rect x="2.2" y="7.4" width="3.6" height="2" rx=".9" fill="#fff" stroke="#d8d9db" stroke-width=".3"/>
+    <path d="M6.4 8.9 Q11 6.2 15.6 8.9 L15.6 11 L6.4 11 Z" fill="#2A4562"/>
+    <rect x="6.4" y="9.6" width="9.2" height=".6" fill="#fff" opacity=".9"/>
+    <circle cx="3.4" cy="6.4" r=".9" fill="#5d3f27"/><circle cx="6.2" cy="6.4" r=".9" fill="#5d3f27"/>
+    <circle cx="4.8" cy="7.9" r="2" fill="#6b4a2f"/>
+    <ellipse cx="6" cy="8.5" rx="1.1" ry=".8" fill="#8a6a48"/>
+    <circle cx="6.4" cy="8.2" r=".3" fill="#241a12"/>
+    <path d="M3.7 7.7 q.4 .3 .8 0 M5.3 7.7 q.4 .3 .8 0" stroke="#1b1b1d" stroke-width=".3" fill="none"/>
+    <text x="11.4" y="4.8" font-family="Arial" font-weight="bold" font-size="2.8" fill="#414042">Z Z</text>
+  </svg></div>
+
   <!-- Fusion parking lot with stall lines -->
   <svg class="structure" style="left:.5%;bottom:1%;width:25%;height:135px;z-index:1" viewBox="0 0 400 135" preserveAspectRatio="none">
     <rect x="0" y="18" width="400" height="117" rx="6" fill="#63666b"/>
     <g stroke="#e8e9ea" stroke-width="3" opacity=".6">
-      <line x1="45" y1="26" x2="45" y2="66"/><line x1="105" y1="26" x2="105" y2="66"/><line x1="165" y1="26" x2="165" y2="66"/><line x1="225" y1="26" x2="225" y2="66"/><line x1="285" y1="26" x2="285" y2="66"/><line x1="345" y1="26" x2="345" y2="66"/>
-      <line x1="45" y1="88" x2="45" y2="128"/><line x1="105" y1="88" x2="105" y2="128"/><line x1="165" y1="88" x2="165" y2="128"/><line x1="225" y1="88" x2="225" y2="128"/><line x1="285" y1="88" x2="285" y2="128"/><line x1="345" y1="88" x2="345" y2="128"/>
+      <line x1="15" y1="26" x2="15" y2="66"/><line x1="89" y1="26" x2="89" y2="66"/><line x1="163" y1="26" x2="163" y2="66"/><line x1="237" y1="26" x2="237" y2="66"/><line x1="311" y1="26" x2="311" y2="66"/><line x1="385" y1="26" x2="385" y2="66"/>
+      <line x1="15" y1="88" x2="15" y2="128"/><line x1="89" y1="88" x2="89" y2="128"/><line x1="163" y1="88" x2="163" y2="128"/><line x1="237" y1="88" x2="237" y2="128"/><line x1="311" y1="88" x2="311" y2="128"/><line x1="385" y1="88" x2="385" y2="128"/>
+    </g>
+  </svg>
+  <!-- sidewalk: parking lot to the Fusion front door -->
+  <svg class="structure" style="left:calc(2.5% + 96px);bottom:calc(1% + 96px);width:51px;height:calc(37% - 88px);z-index:1" viewBox="0 0 51 200" preserveAspectRatio="none">
+    <polygon points="8,0 43,0 51,200 0,200" fill="#b9bcc0"/>
+    <polygon points="8,0 43,0 41,5 10,5" fill="#9a9da1"/>
+    <g stroke="#94979b" stroke-width="2">
+      <line x1="7" y1="25" x2="44" y2="25"/><line x1="6" y1="50" x2="45" y2="50"/><line x1="5" y1="75" x2="46" y2="75"/><line x1="4" y1="100" x2="47" y2="100"/><line x1="3" y1="125" x2="48" y2="125"/><line x1="2" y1="150" x2="49" y2="150"/><line x1="1" y1="175" x2="50" y2="175"/>
     </g>
   </svg>
   <!-- parking lot lights + trees -->
@@ -521,8 +869,8 @@ body.dark .scene .kpi{background:rgba(24,27,33,.88)}
     <path d="M13 10 Q13 2 22 4" stroke="#4a4d52" stroke-width="3.5" fill="none"/>
     <ellipse class="glow" cx="22" cy="6" rx="4.5" ry="3" fill="#ffe9a8"/>
   </svg>
-  <svg class="structure" style="left:19%;bottom:34%;width:55px;height:80px" viewBox="0 0 40 60"><rect x="17" y="40" width="6" height="20" fill="#6b4f35"/><circle cx="20" cy="26" r="15" fill="#457A3E"/><circle cx="11" cy="33" r="9" fill="#529148"/></svg>
-  <svg class="structure" style="left:.2%;bottom:34%;width:50px;height:85px" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/></svg>
+  <svg class="structure tree" style="left:19%;bottom:34%;width:55px;height:80px" viewBox="0 0 40 60"><rect x="17" y="40" width="6" height="20" fill="#6b4f35"/><circle cx="20" cy="26" r="15" fill="#457A3E"/><circle cx="11" cy="33" r="9" fill="#529148"/></svg>
+  <svg class="structure tree" style="left:.2%;bottom:34%;width:50px;height:85px" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/></svg>
 
   <!-- street lights along the road -->
   <svg class="structure lamp" style="left:calc(50% - 285px);bottom:3%;width:28px;height:125px;z-index:1" viewBox="0 0 26 110">
@@ -566,19 +914,18 @@ body.dark .scene .kpi{background:rgba(24,27,33,.88)}
   </svg>
 
   <!-- trees at the job site and home -->
-  <svg class="structure" style="right:33%;bottom:36%;width:55px;height:85px" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/></svg>
+  <svg class="structure tree" style="right:33%;bottom:36%;width:55px;height:85px" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/></svg>
   <!-- more trees everywhere -->
-  <svg class="structure" style="left:28%;bottom:39%;width:44px;height:70px" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/></svg>
-  <svg class="structure" style="left:34%;bottom:37.5%;width:52px;height:74px" viewBox="0 0 40 60"><rect x="17" y="40" width="6" height="20" fill="#6b4f35"/><circle cx="20" cy="26" r="15" fill="#457A3E"/><circle cx="11" cy="34" r="9" fill="#529148"/></svg>
-  <svg class="structure" style="left:7%;bottom:36%;width:48px;height:76px" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/></svg>
-  <svg class="structure" style="left:14.5%;bottom:38.5%;width:40px;height:62px" viewBox="0 0 40 60"><rect x="17" y="40" width="6" height="20" fill="#6b4f35"/><circle cx="20" cy="26" r="15" fill="#3f6f3a"/></svg>
-  <svg class="structure" style="right:38%;bottom:39%;width:46px;height:72px" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/></svg>
-  <svg class="structure" style="right:45%;bottom:37.5%;width:40px;height:60px" viewBox="0 0 40 60"><rect x="17" y="40" width="6" height="20" fill="#6b4f35"/><circle cx="20" cy="26" r="15" fill="#529148"/></svg>
-  <svg class="structure" style="right:10.5%;bottom:36%;width:44px;height:70px" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/></svg>
-  <svg class="structure" style="left:30%;bottom:4%;width:64px;height:98px;z-index:1" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/></svg>
-  <svg class="structure" style="right:30%;bottom:6%;width:58px;height:88px;z-index:1" viewBox="0 0 40 60"><rect x="17" y="40" width="6" height="20" fill="#6b4f35"/><circle cx="20" cy="26" r="15" fill="#457A3E"/><circle cx="29" cy="34" r="9" fill="#529148"/></svg>
-  <svg class="structure" style="right:15%;bottom:37%;width:60px;height:85px" viewBox="0 0 40 60"><rect x="17" y="40" width="6" height="20" fill="#6b4f35"/><circle cx="20" cy="26" r="15" fill="#457A3E"/><circle cx="29" cy="34" r="9" fill="#529148"/></svg>
-  <svg class="structure" style="right:.2%;bottom:37%;width:48px;height:78px" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/></svg>
+  <svg class="structure tree" style="left:28%;bottom:39%;width:44px;height:70px" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/></svg>
+  <svg class="structure tree" style="left:34%;bottom:37.5%;width:52px;height:74px" viewBox="0 0 40 60"><rect x="17" y="40" width="6" height="20" fill="#6b4f35"/><circle cx="20" cy="26" r="15" fill="#457A3E"/><circle cx="11" cy="34" r="9" fill="#529148"/></svg>
+  <svg class="structure tree" style="left:14.5%;bottom:38.5%;width:40px;height:62px" viewBox="0 0 40 60"><rect x="17" y="40" width="6" height="20" fill="#6b4f35"/><circle cx="20" cy="26" r="15" fill="#3f6f3a"/></svg>
+  <svg class="structure tree" style="right:38%;bottom:39%;width:46px;height:72px" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/></svg>
+  <svg class="structure tree" style="right:45%;bottom:37.5%;width:40px;height:60px" viewBox="0 0 40 60"><rect x="17" y="40" width="6" height="20" fill="#6b4f35"/><circle cx="20" cy="26" r="15" fill="#529148"/></svg>
+  <svg class="structure tree" style="right:10.5%;bottom:36%;width:44px;height:70px" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/></svg>
+  <svg class="structure tree" style="left:30%;bottom:4%;width:64px;height:98px;z-index:2" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/></svg>
+  <svg class="structure tree" style="right:30%;bottom:6%;width:58px;height:88px;z-index:2" viewBox="0 0 40 60"><rect x="17" y="40" width="6" height="20" fill="#6b4f35"/><circle cx="20" cy="26" r="15" fill="#457A3E"/><circle cx="29" cy="34" r="9" fill="#529148"/></svg>
+  <svg class="structure tree" style="right:15%;bottom:37%;width:60px;height:85px" viewBox="0 0 40 60"><rect x="17" y="40" width="6" height="20" fill="#6b4f35"/><circle cx="20" cy="26" r="15" fill="#457A3E"/><circle cx="29" cy="34" r="9" fill="#529148"/></svg>
+  <svg class="structure tree" style="right:.2%;bottom:37%;width:48px;height:78px" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/></svg>
 
   <!-- Driver's home -->
   <svg class="structure" style="right:1.5%;bottom:38%;width:210px;height:140px" viewBox="0 0 150 100">
@@ -641,7 +988,7 @@ body.dark .scene .kpi{background:rgba(24,27,33,.88)}
       <div id="clock">--:--</div>
       <div id="dateline">Loading…</div>
       <div class="badge-day" id="daybadge">MON–THU SCHEDULE</div>
-      <div style="margin-top:6px"><button class="gear" id="darkBtn" onclick="toggleDark()">🌙 Dark mode</button> <button class="gear" onclick="location.reload()">🔄 Refresh</button></div>
+      <div style="margin-top:6px"><button class="gear" id="themeBtn" onclick="cycleTheme()">🏔️ South Park</button> <button class="gear" id="darkBtn" onclick="toggleDark()">🌙 Dark mode</button> <button class="gear" onclick="location.reload()">🔄 Refresh</button></div>
     </div>
   </div>
   <div class="kpis" id="kpis">
@@ -658,11 +1005,14 @@ body.dark .scene .kpi{background:rgba(24,27,33,.88)}
   <span><span class="stripchip" style="background:var(--bad)"></span> red stripe = late / not where they should be</span>
   <span><span class="stripchip" style="background:var(--f-light)"></span> gray stripe = checkpoint hasn't happened yet</span>
   <span><span class="stripchip" style="background:#fff;border:1px solid var(--f-light)"></span> white stripe = never left Fusion after 8:00 / overnight</span>
-  <span>🚔 = today's speeding leader — weaving through en-route traffic until they're pulled onto the shoulder</span>
+  <span>🚔 = today's speeding leader — pulled onto the shoulder, then BOTH bail out for a foot chase across the whole screen (and back) before they take off again</span>
   <span>🐦 = THE early bird — first van at Fusion this morning, carried across the sky</span>
   <span>🏡 Home = parked where the van started its day · 🏠 Job Site = parked anywhere else</span>
-  <span>🐻 the bear crosses only at the BEAR CROSSWALK — en-route vans stop at the flashing red — and he raids parked vans for lunch boxes</span>
-  <span>🔍 Waldo is hiding somewhere new on every refresh — good luck</span>
+  <span>🐻 the bear crosses only at the crosswalk — en-route vans stop at the flashing red — and between lunch raids and Waldo chases he now works a shift and takes a nap, same as Waldo (they get separate windows)</span>
+  <span>🚲 once per refresh Waldo ditches the bike halfway up the sidewalk, puts in a one-minute desk shift at Fusion, then rides home for a one-minute lie-down — watch the windows</span>
+  <span>🤠 and if those two meet at the crosswalk: Waldo rides the bear for about five seconds, gets bucked clear off the screen, and rolls back in from the other side</span>
+  <span>🚴 leave a bike unattended and the bear WILL steal it and joyride — and if he catches Waldo mid-chase he takes the bike instead, and Waldo does the chasing until he gets it back</span>
+  <span>🤠 CHUCK NORRIS theme (theme button: Classic → South Park → Simpsons → Chuck Norris): the whole scene turns western desert — cacti, tumbleweeds, red-rock mesas — and Chuck roams it karate-chopping trees clean over, HI-YAing windshields into spiderwebs, crumpling whole vans in a cloud of smoke, and shooting the early bird right out of the sky (everything he breaks fixes itself a minute later, out of pure fear)</span>
   <span>Sales vans (Bill Bacon, Michael Santana) show location only — no morning timing</span>
 </div>
 
@@ -672,9 +1022,10 @@ body.dark .scene .kpi{background:rgba(24,27,33,.88)}
   <div class="panel">
     <h2>📋 Daily Report — <span id="boardDate"></span></h2>
     <div class="repbands" id="repBands"></div>
-    <div class="cellsub" style="margin-top:8px;font-size:13px">Day's End = when the van parks at the end of the route that began after 3:00 PM · fresh data on every open</div>
+    <div class="cellsub" style="margin-top:8px;font-size:13px">Day's End = when the van parks at the end of the route that began after 3:00 PM · moves under 500 yds around the site (loading up) don't count as leaving · fresh data on every open</div>
   </div>
-  <div class="panel">
+  <!-- speeding leaderboard panel hidden per Nathan 2026-07-27 — ids kept so JS keeps working; road chase still runs -->
+  <div class="panel" style="display:none">
     <h2>🚨 Top Speeding Violations for the Day</h2>
     <div id="lb"></div>
     <div class="wanted" id="wanted"></div>
@@ -715,6 +1066,45 @@ let CFG = DEFAULTS;
 try { const s = localStorage.getItem("vanTrackerCfg"); if (s) CFG = JSON.parse(s); } catch(e){}
 
 /* ================= DARK MODE ================= */
+/* ---------------- THEMES ---------------- */
+const THEMES=["classic","southpark","simpsons","chuck"]; /* room for more later */
+function applyTheme(){
+  const th = localStorage.getItem("vanTrackerTheme")||"classic";
+  const sp = th==="southpark";
+  document.body.classList.toggle("theme-southpark", sp);
+  document.body.classList.toggle("theme-simpsons", th==="simpsons");
+  document.body.classList.toggle("theme-chuck", th==="chuck");
+  const btn=document.getElementById("themeBtn");
+  if(btn){
+    const next=THEMES[(THEMES.indexOf(th)+1)%THEMES.length];
+    const LBL={classic:"🎨 Classic", southpark:"🏔️ South Park", simpsons:"🍩 Simpsons", chuck:"🤠 Chuck Norris"};
+    btn.textContent = LBL[next] || "🎨 Theme"; /* button shows what you switch TO */
+  }
+  const scene=document.getElementById("scene");
+  let sn=document.getElementById("spSnow");
+  if(sp && scene && !sn){                     /* gentle mountain-town snowfall */
+    sn=document.createElement("div"); sn.id="spSnow";
+    for(let i=0;i<38;i++){
+      const f=document.createElement("i");
+      const sz=(5+Math.random()*6).toFixed(1);
+      f.style.width=sz+"px"; f.style.height=sz+"px";
+      f.style.left=(Math.random()*100)+"%";
+      f.style.opacity=(.45+Math.random()*.55).toFixed(2);
+      f.style.animationDuration=(7+Math.random()*8).toFixed(1)+"s";
+      f.style.animationDelay=(-Math.random()*12).toFixed(1)+"s";
+      sn.appendChild(f);
+    }
+    scene.appendChild(sn);
+  } else if(!sp && sn) sn.remove();
+  if(typeof applySky==="function") applySky(); /* repaint the sky for the new theme */
+}
+function cycleTheme(){
+  const cur=localStorage.getItem("vanTrackerTheme")||"classic";
+  const next=THEMES[(THEMES.indexOf(cur)+1)%THEMES.length];
+  try{ localStorage.setItem("vanTrackerTheme", next); }catch(e){}
+  applyTheme();
+}
+setTimeout(applyTheme, 0);
 function toggleDark(){
   const on = document.body.classList.toggle("dark");
   try{ localStorage.setItem("vanTrackerDark", on ? "1" : "0"); }catch(e){}
@@ -968,6 +1358,27 @@ let CUR_WX="sunny";
 function applySky(){
   const scene=document.getElementById("scene");
   if(!scene) return;
+  if(document.body.classList.contains("theme-southpark")){
+    /* crisp paper-cutout winter day, whatever the clock says */
+    scene.classList.remove("ph-night","ph-dawn","ph-sunset","ph-dusk","sunset");
+    scene.classList.add("ph-day");
+    scene.style.background="linear-gradient(#7fadd2 0%, #b9d7ec 55%, #eaf4fb 100%)";
+    return;
+  }
+  if(document.body.classList.contains("theme-chuck")){
+    /* permanent high-noon desert haze */
+    scene.classList.remove("ph-night","ph-dawn","ph-sunset","ph-dusk","sunset");
+    scene.classList.add("ph-day");
+    scene.style.background="linear-gradient(#e8a35c 0%, #f2c987 50%, #fbe9c2 100%)";
+    return;
+  }
+  if(document.body.classList.contains("theme-simpsons")){
+    /* permanently sunny cartoon afternoon */
+    scene.classList.remove("ph-night","ph-dawn","ph-sunset","ph-dusk","sunset");
+    scene.classList.add("ph-day");
+    scene.style.background="linear-gradient(#3f9fe8 0%, #7ec3f0 55%, #cfeafd 100%)";
+    return;
+  }
   const o=etNowParts();
   const mins=parseInt(o.hour,10)*60+parseInt(o.minute,10);
   let ph=SKY_PHASES[SKY_PHASES.length-1];
@@ -1072,17 +1483,30 @@ function chromeWheel(cx, cy){
     <line x1="${cx-3}" y1="${cy}" x2="${cx+3}" y2="${cy}" stroke="#9ea1a4" stroke-width="1"/>
     <circle cx="${cx}" cy="${cy}" r="1.1" fill="#75777a"/></g>`;
 }
+function monsterWheel(cx, cy){
+  /* huge knobby monster-truck tire with chrome hub */
+  return `<g class="wheel"><circle cx="${cx}" cy="${cy}" r="8" fill="#1d1d1f"/>
+    <circle cx="${cx}" cy="${cy}" r="6.9" fill="none" stroke="#0c0c0d" stroke-width="2.1" stroke-dasharray="2.6 2.3"/>
+    <circle cx="${cx}" cy="${cy}" r="3.6" fill="#e9ebee" stroke="#b9bcbf" stroke-width=".7"/>
+    <line x1="${cx}" y1="${cy-2.8}" x2="${cx}" y2="${cy+2.8}" stroke="#9ea1a4" stroke-width="1"/>
+    <line x1="${cx-2.8}" y1="${cy}" x2="${cx+2.8}" y2="${cy}" stroke="#9ea1a4" stroke-width="1"/>
+    <circle cx="${cx}" cy="${cy}" r="1.1" fill="#75777a"/></g>`;
+}
 function vehSVG(type, stripColor){
   const c = stripColor || STRIP.none;
+  /* lifted monster pickup — big knobby tires, raised body on a visible lift kit */
   if (type === "pickup") return `<svg viewBox="0 0 60 34">
-    <rect x="2" y="11" width="27" height="11" rx="2" fill="#939598" stroke="#6e7073" stroke-width="1.5"/>
-    <rect x="4.5" y="13" width="22" height="3" rx="1.5" fill="#7d7f82"/>
-    <path d="M29 22 L29 8 Q29 6 31 6 L40 6 Q42.5 6 44 8.5 L46.5 12.5 L54 13.5 Q57 14 57 17 L57 20 Q57 22 55 22 Z" fill="#939598" stroke="#6e7073" stroke-width="1.5"/>
-    <path d="M32 8.5 L40 8.5 L43 13 L32 13 Z" fill="#CEE2FF" stroke="#6e7073" stroke-width="1"/>
-    <rect x="2" y="19" width="55" height="3" fill="${c}"/>
-    <text x="15" y="18" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="5" fill="#ffffff" letter-spacing=".4">FUSION</text>
-    ${chromeWheel(12,26)}
-    ${chromeWheel(46,26)}
+    <rect x="10.5" y="13.5" width="3.4" height="10" fill="#4a4d52"/>
+    <rect x="43.5" y="13.5" width="3.4" height="10" fill="#4a4d52"/>
+    <rect x="8" y="22.5" width="43" height="2.6" rx="1.3" fill="#3a3d42"/>
+    <rect x="2" y="5" width="27" height="9.5" rx="2" fill="#939598" stroke="#6e7073" stroke-width="1.5"/>
+    <rect x="4.5" y="6.6" width="22" height="2.6" rx="1.3" fill="#7d7f82"/>
+    <path d="M29 14.5 L29 3.5 Q29 1.5 31 1.5 L40 1.5 Q42.5 1.5 44 4 L46.5 7.5 L54 8.5 Q57 9 57 12 L57 12.7 Q57 14.5 55 14.5 Z" fill="#939598" stroke="#6e7073" stroke-width="1.5"/>
+    <path d="M32 3.8 L40 3.8 L43 8 L32 8 Z" fill="#CEE2FF" stroke="#6e7073" stroke-width="1"/>
+    <rect x="2" y="12" width="55" height="3" fill="#ffffff"/>
+    <text x="15" y="11.5" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="4.6" fill="#ffffff" letter-spacing=".4">FUSION</text>
+    ${monsterWheel(12,25)}
+    ${monsterWheel(46,25)}
   </svg>`;
   /* standard van body ("small" is the same body rendered smaller via CSS)
      — ladder rack on top, no side window, chrome wheels */
@@ -1096,15 +1520,43 @@ function vehSVG(type, stripColor){
     <rect x="2" y="6" width="44" height="18" rx="4" fill="#939598" stroke="#6e7073" stroke-width="1.5"/>
     <path d="M46 10 L56 14 L57 22 Q57 24 55 24 L46 24 Z" fill="#939598" stroke="#6e7073" stroke-width="1.5"/>
     <rect x="47.5" y="12.5" width="7" height="6" rx="1" fill="#CEE2FF" stroke="#6e7073"/>
-    <rect x="2" y="19" width="55" height="3" fill="${c}"/>
+    <rect x="2" y="19" width="55" height="3" fill="#ffffff"/>
     <text x="24" y="15.5" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="6.5" fill="#ffffff" letter-spacing=".5">FUSION</text>
     ${chromeWheel(13,26)}
     ${chromeWheel(45,26)}
   </svg>`;
 }
 /* rear view — used for vans driving toward the horizon */
-function rearSVG(type, stripColor){
+/* driver name on the glass — windshield (front view) or back window (rear view) */
+function glassName(nm, gx, gy, gw, gs){
+  if(!nm) return "";
+  const up=String(nm).toUpperCase();
+  const fit = up.length*gs*0.62 > gw ? `textLength="${gw}" lengthAdjust="spacingAndGlyphs"` : "";
+  return `<text x="${gx}" y="${gy}" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="${gs}" fill="#414042" ${fit}>${esc(up)}</text>`;
+}
+function rearSVG(type, stripColor, name){
   const c = stripColor || STRIP.none;
+  /* lifted monster pickup from behind — body way up over huge tires */
+  if (type === "pickup") return `<svg viewBox="0 0 44 46">
+    <ellipse cx="22" cy="43.5" rx="20" ry="2.6" fill="rgba(0,0,0,.18)"/>
+    <rect x=".5" y="26" width="13" height="17" rx="5" fill="#1d1d1f"/>
+    <rect x="3.6" y="29.5" width="6.8" height="10" rx="2.5" fill="#3a3a3e"/>
+    <g stroke="#0c0c0d" stroke-width="1.1"><line x1="2" y1="30" x2="12.5" y2="30"/><line x1="2" y1="34.5" x2="12.5" y2="34.5"/><line x1="2" y1="39" x2="12.5" y2="39"/></g>
+    <rect x="30.5" y="26" width="13" height="17" rx="5" fill="#1d1d1f"/>
+    <rect x="33.6" y="29.5" width="6.8" height="10" rx="2.5" fill="#3a3a3e"/>
+    <g stroke="#0c0c0d" stroke-width="1.1"><line x1="32" y1="30" x2="42.5" y2="30"/><line x1="32" y1="34.5" x2="42.5" y2="34.5"/><line x1="32" y1="39" x2="42.5" y2="39"/></g>
+    <rect x="12" y="31.5" width="20" height="3.4" rx="1.7" fill="#4a4d52"/>
+    <rect x="17" y="27.5" width="2.6" height="6" fill="#4a4d52"/>
+    <rect x="24.4" y="27.5" width="2.6" height="6" fill="#4a4d52"/>
+    <rect x="8.5" y="3" width="27" height="25.5" rx="3.5" fill="#939598" stroke="#6e7073" stroke-width="1.5"/>
+    <rect x="12" y="6" width="20" height="8" rx="1.5" fill="#CEE2FF" stroke="#6e7073" stroke-width="1"/>
+    <line x1="9" y1="16" x2="35" y2="16" stroke="#6e7073" stroke-width="1.2"/>
+    <rect x="8.5" y="17" width="27" height="6.5" fill="#ffffff" stroke="#d8d9db" stroke-width=".4"/>
+    ${glassName(name, 22, 22.3, 25, 5.6)}
+    <text x="22" y="27.2" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="3.4" fill="#ffffff" letter-spacing=".4">FUSION</text>
+    <rect x="10" y="24.4" width="5" height="2.8" rx="1" fill="#C1272D"/>
+    <rect x="29" y="24.4" width="5" height="2.8" rx="1" fill="#C1272D"/>
+  </svg>`;
   return `<svg viewBox="0 0 44 46">
     <ellipse cx="22" cy="43" rx="17" ry="2.5" fill="rgba(0,0,0,.18)"/>
     <rect x="4.5" y="33" width="10" height="9" rx="2.5" fill="#2c2c2e"/>
@@ -1117,15 +1569,38 @@ function rearSVG(type, stripColor){
     <rect x="7" y="4" width="30" height="34" rx="4" fill="#939598" stroke="#6e7073" stroke-width="1.5"/>
     <rect x="11" y="8" width="22" height="9" rx="1.5" fill="#CEE2FF" stroke="#6e7073" stroke-width="1"/>
     <line x1="22" y1="19" x2="22" y2="37" stroke="#6e7073" stroke-width="1.2"/>
-    <rect x="7" y="24" width="30" height="4" fill="${c}"/>
+    <rect x="7" y="22" width="30" height="7" fill="#ffffff" stroke="#d8d9db" stroke-width=".4"/>
+    ${glassName(name, 22, 27.6, 28, 6.2)}
     <text x="22" y="35" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="5" fill="#ffffff" letter-spacing=".4">FUSION</text>
     <rect x="8.5" y="30" width="5" height="3" rx="1" fill="#C1272D"/>
     <rect x="30.5" y="30" width="5" height="3" rx="1" fill="#C1272D"/>
   </svg>`;
 }
 /* front view — parked at Fusion facing out, or driving toward Fusion */
-function frontSVG(type, stripColor){
+function frontSVG(type, stripColor, name){
   const c = stripColor || STRIP.none;
+  /* lifted monster pickup head-on — bull bar, high beams, monster rubber */
+  if (type === "pickup") return `<svg viewBox="0 0 44 46">
+    <ellipse cx="22" cy="43.5" rx="20" ry="2.6" fill="rgba(0,0,0,.18)"/>
+    <rect x=".5" y="26" width="13" height="17" rx="5" fill="#1d1d1f"/>
+    <rect x="3.6" y="29.5" width="6.8" height="10" rx="2.5" fill="#3a3a3e"/>
+    <g stroke="#0c0c0d" stroke-width="1.1"><line x1="2" y1="30" x2="12.5" y2="30"/><line x1="2" y1="34.5" x2="12.5" y2="34.5"/><line x1="2" y1="39" x2="12.5" y2="39"/></g>
+    <rect x="30.5" y="26" width="13" height="17" rx="5" fill="#1d1d1f"/>
+    <rect x="33.6" y="29.5" width="6.8" height="10" rx="2.5" fill="#3a3a3e"/>
+    <g stroke="#0c0c0d" stroke-width="1.1"><line x1="32" y1="30" x2="42.5" y2="30"/><line x1="32" y1="34.5" x2="42.5" y2="34.5"/><line x1="32" y1="39" x2="42.5" y2="39"/></g>
+    <rect x="12" y="31.5" width="20" height="3.4" rx="1.7" fill="#4a4d52"/>
+    <rect x="17" y="27.5" width="2.6" height="6" fill="#4a4d52"/>
+    <rect x="24.4" y="27.5" width="2.6" height="6" fill="#4a4d52"/>
+    <rect x="8.5" y="3" width="27" height="25.5" rx="3.5" fill="#939598" stroke="#6e7073" stroke-width="1.5"/>
+    <rect x="11" y="6" width="22" height="9.5" rx="2" fill="#CEE2FF" stroke="#6e7073" stroke-width="1"/>
+    <text x="22" y="9.6" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="3.2" fill="#C1272D" letter-spacing=".6">FUSION</text>
+    <rect x="8.5" y="16.5" width="27" height="6" fill="#ffffff" stroke="#d8d9db" stroke-width=".4"/>
+    ${glassName(name, 22, 21.4, 25, 5.4)}
+    <rect x="10" y="22.5" width="6" height="3.4" rx="1" fill="#fff8d8" stroke="#c9b96a" stroke-width=".5"/>
+    <rect x="28" y="22.5" width="6" height="3.4" rx="1" fill="#fff8d8" stroke="#c9b96a" stroke-width=".5"/>
+    <rect x="17.5" y="22.8" width="9" height="2.8" rx="1" fill="#6e7073"/>
+    <rect x="7.5" y="27" width="29" height="2.4" rx="1.2" fill="#2c2c2e"/>
+  </svg>`;
   return `<svg viewBox="0 0 44 46">
     <ellipse cx="22" cy="43" rx="17" ry="2.5" fill="rgba(0,0,0,.18)"/>
     <rect x="4.5" y="33" width="10" height="9" rx="2.5" fill="#2c2c2e"/>
@@ -1137,8 +1612,9 @@ function frontSVG(type, stripColor){
     <line x1="8" y1="1.5" x2="36" y2="1.5" stroke="#d8d9db" stroke-width="1.7"/>
     <rect x="7" y="4" width="30" height="34" rx="4" fill="#939598" stroke="#6e7073" stroke-width="1.5"/>
     <rect x="10" y="7" width="24" height="11" rx="2" fill="#CEE2FF" stroke="#6e7073" stroke-width="1"/>
-    <rect x="7" y="24" width="30" height="4" fill="${c}"/>
-    <text x="22" y="22.5" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="5" fill="#ffffff" letter-spacing=".4">FUSION</text>
+    <text x="22" y="10.8" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="3.4" fill="#C1272D" letter-spacing=".6">FUSION</text>
+    <rect x="7" y="20" width="30" height="7.5" fill="#ffffff" stroke="#d8d9db" stroke-width=".4"/>
+    ${glassName(name, 22, 25.9, 28, 6.2)}
     <rect x="8.5" y="29.5" width="6" height="3.5" rx="1" fill="#fff8d8" stroke="#c9b96a" stroke-width=".5"/>
     <rect x="29.5" y="29.5" width="6" height="3.5" rx="1" fill="#fff8d8" stroke="#c9b96a" stroke-width=".5"/>
     <rect x="16.5" y="30" width="11" height="2.6" rx="1" fill="#6e7073"/>
@@ -1213,6 +1689,167 @@ function waldoSVG(){
     <path d="M7.8 11 Q10 12.4 12.2 11" stroke="#1b1b1d" stroke-width=".6" fill="none"/>
   </svg>`;
 }
+/* Waldo on his bike — side view, facing right; wheels/legs animate via CSS */
+function waldoBikeSVG(){
+  return `<svg viewBox="0 0 46 41">
+    <g class="wwB">
+      <circle cx="11" cy="32" r="7" fill="none" stroke="#26282b" stroke-width="2.2"/>
+      <line x1="11" y1="25.6" x2="11" y2="38.4" stroke="#8a8d90" stroke-width="1"/>
+      <line x1="4.6" y1="32" x2="17.4" y2="32" stroke="#8a8d90" stroke-width="1"/>
+      <line x1="6.6" y1="27.6" x2="15.4" y2="36.4" stroke="#8a8d90" stroke-width="1"/>
+      <line x1="6.6" y1="36.4" x2="15.4" y2="27.6" stroke="#8a8d90" stroke-width="1"/>
+    </g>
+    <g class="wwF">
+      <circle cx="35" cy="32" r="7" fill="none" stroke="#26282b" stroke-width="2.2"/>
+      <line x1="35" y1="25.6" x2="35" y2="38.4" stroke="#8a8d90" stroke-width="1"/>
+      <line x1="28.6" y1="32" x2="41.4" y2="32" stroke="#8a8d90" stroke-width="1"/>
+      <line x1="30.6" y1="27.6" x2="39.4" y2="36.4" stroke="#8a8d90" stroke-width="1"/>
+      <line x1="30.6" y1="36.4" x2="39.4" y2="27.6" stroke="#8a8d90" stroke-width="1"/>
+    </g>
+    <path d="M11 32 L23 32 L19 20 L11 32 M23 32 L31 20 M31 20 L35 32 M19 20 L30.5 20" fill="none" stroke="#C1272D" stroke-width="2"/>
+    <circle cx="23" cy="32" r="2.4" fill="#26282b"/>
+    <path d="M31 20 L31 16.5 M28.5 16.5 L33.5 16.5" stroke="#26282b" stroke-width="1.6"/>
+    <path d="M17.5 19.5 L20.5 19.5 L20.5 15" stroke="#26282b" stroke-width="1.8" fill="none"/>
+    <path class="wlL" d="M18.5 19.5 L20 26 L20.5 31.5" stroke="#2b5fb8" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+    <path class="wlR" d="M19.5 19.5 L23.5 26 L25.5 31.5" stroke="#2b5fb8" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+    <rect x="15.5" y="10" width="9" height="10" rx="2" fill="#fff"/>
+    <rect x="15.5" y="11.5" width="9" height="1.8" fill="#C1272D"/>
+    <rect x="15.5" y="15" width="9" height="1.8" fill="#C1272D"/>
+    <rect x="15.5" y="18.4" width="9" height="1.6" fill="#C1272D"/>
+    <path d="M23 12.5 Q28 14 30.5 17.5" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <circle cx="20" cy="7" r="4" fill="#f2c9a0"/>
+    <rect x="15.7" y="2.2" width="8.6" height="2.8" rx="1.4" fill="#fff"/>
+    <rect x="15.7" y="3.7" width="8.6" height="1.3" fill="#C1272D"/>
+    <circle cx="20" cy="1.2" r="1.4" fill="#C1272D"/>
+    <circle cx="18.2" cy="7" r="1.3" fill="none" stroke="#1b1b1d" stroke-width=".7"/>
+    <circle cx="21.8" cy="7" r="1.3" fill="none" stroke="#1b1b1d" stroke-width=".7"/>
+    <line x1="19.5" y1="7" x2="20.5" y2="7" stroke="#1b1b1d" stroke-width=".7"/>
+    <path d="M18 9.8 Q20 11 22 9.8" stroke="#1b1b1d" stroke-width=".6" fill="none"/>
+  </svg>`;
+}
+/* the bike by itself — for when Waldo parks it outside Fusion */
+function bikeOnlySVG(){
+  return `<svg viewBox="0 0 46 41">
+    <g><circle cx="11" cy="32" r="7" fill="none" stroke="#26282b" stroke-width="2.2"/>
+      <line x1="11" y1="25.6" x2="11" y2="38.4" stroke="#8a8d90" stroke-width="1"/>
+      <line x1="4.6" y1="32" x2="17.4" y2="32" stroke="#8a8d90" stroke-width="1"/></g>
+    <g><circle cx="35" cy="32" r="7" fill="none" stroke="#26282b" stroke-width="2.2"/>
+      <line x1="35" y1="25.6" x2="35" y2="38.4" stroke="#8a8d90" stroke-width="1"/>
+      <line x1="28.6" y1="32" x2="41.4" y2="32" stroke="#8a8d90" stroke-width="1"/></g>
+    <path d="M11 32 L23 32 L19 20 L11 32 M23 32 L31 20 M31 20 L35 32 M19 20 L30.5 20" fill="none" stroke="#C1272D" stroke-width="2"/>
+    <circle cx="23" cy="32" r="2.4" fill="#26282b"/>
+    <path d="M31 20 L31 16.5 M28.5 16.5 L33.5 16.5" stroke="#26282b" stroke-width="1.6"/>
+    <path d="M17.5 19.5 L20.5 19.5 L20.5 15" stroke="#26282b" stroke-width="1.8" fill="none"/>
+  </svg>`;
+}
+/* Waldo from BEHIND — for walking up to a door, away from the viewer */
+function waldoRearSVG(){
+  return `<svg viewBox="0 0 20 34">
+    <rect class="wlL" x="6" y="24" width="2.6" height="9" rx="1.2" fill="#24509c"/>
+    <rect class="wlR" x="11" y="24" width="2.6" height="9" rx="1.2" fill="#24509c"/>
+    <rect x="4.5" y="13" width="11" height="12" rx="2" fill="#f2f2f2"/>
+    <rect x="4.5" y="15" width="11" height="2" fill="#a92025"/>
+    <rect x="4.5" y="19" width="11" height="2" fill="#a92025"/>
+    <rect x="4.5" y="23" width="11" height="2" fill="#a92025"/>
+    <circle cx="10" cy="8" r="4.2" fill="#8a5f33"/>
+    <path d="M6 9.8 Q10 11.6 14 9.8 L14 7 L6 7 Z" fill="#7a5229"/>
+    <rect x="5.5" y="3" width="9" height="3" rx="1.5" fill="#f2f2f2"/>
+    <rect x="5.5" y="4.6" width="9" height="1.4" fill="#a92025"/>
+    <circle cx="10" cy="1.8" r="1.5" fill="#a92025"/>
+    <path d="M5.9 8 L4.9 7.4 M14.1 8 L15.1 7.4" stroke="#1b1b1d" stroke-width=".6"/>
+  </svg>`;
+}
+/* the bear from BEHIND — big rump, stubby tail, ears */
+function bearRearSVG(){
+  return `<svg viewBox="0 0 62 40">
+    <path class="bl1" d="M23 26 q-1 5.5 -1.4 8.5 q-.1 2 1.9 2 l3.1 0 q1.7 0 1.2-2 l-.7-8.5 Z" fill="#59391f"/>
+    <path class="bl2" d="M35 26 q-1 5.5 -1.4 8.5 q-.1 2 1.9 2 l3.1 0 q1.7 0 1.2-2 l-.7-8.5 Z" fill="#59391f"/>
+    <ellipse cx="31" cy="19" rx="13" ry="11.5" fill="#6b4a2f"/>
+    <ellipse cx="31" cy="23.5" rx="9.5" ry="6.5" fill="#5d3f27" opacity=".55"/>
+    <circle cx="31" cy="27.5" r="2.6" fill="#8a6a48"/>
+    <circle cx="31" cy="9.5" r="6.2" fill="#6b4a2f"/>
+    <circle cx="26.4" cy="5.2" r="2.2" fill="#5d3f27"/>
+    <circle cx="35.6" cy="5.2" r="2.2" fill="#5d3f27"/>
+  </svg>`;
+}
+/* the bear head-on — for walking OUT of a door, toward the viewer */
+function bearFrontSVG(){
+  return `<svg viewBox="0 0 62 40">
+    <path class="bl1" d="M23 25 q-1 6 -1.4 9 q-.1 2 1.9 2 l3.1 0 q1.7 0 1.2-2 l-.7-9 Z" fill="#59391f"/>
+    <path class="bl2" d="M35 25 q-1 6 -1.4 9 q-.1 2 1.9 2 l3.1 0 q1.7 0 1.2-2 l-.7-9 Z" fill="#59391f"/>
+    <ellipse cx="31" cy="21" rx="12" ry="10" fill="#6b4a2f"/>
+    <path d="M25 15 Q31 19 37 15 L37 26 Q31 30 25 26 Z" fill="#7d5a3a" opacity=".5"/>
+    <circle cx="31" cy="10" r="7" fill="#6b4a2f"/>
+    <circle cx="25.8" cy="4.6" r="2.4" fill="#5d3f27"/><circle cx="25.8" cy="5" r="1.1" fill="#8a6a48"/>
+    <circle cx="36.2" cy="4.6" r="2.4" fill="#5d3f27"/><circle cx="36.2" cy="5" r="1.1" fill="#8a6a48"/>
+    <ellipse cx="31" cy="12.6" rx="3.4" ry="2.6" fill="#8a6a48"/>
+    <ellipse cx="31" cy="11.8" rx="1.3" ry="1" fill="#241a12"/>
+    <path d="M31 13 L31 14.4 M29.6 15 Q31 16 32.4 15" stroke="#3a281a" stroke-width=".7" fill="none" stroke-linecap="round"/>
+    <circle cx="28.2" cy="9" r=".9" fill="#1b1b1d"/><circle cx="33.8" cy="9" r=".9" fill="#1b1b1d"/>
+    <path d="M21.5 34.5 l.9 1.6 M23.3 34.6 l.7 1.6 M25 34.6 l.5 1.6 M35.5 34.5 l.9 1.6 M37.3 34.6 l.7 1.6 M39 34.6 l.5 1.6" stroke="#241a12" stroke-width=".65" stroke-linecap="round"/>
+  </svg>`;
+}
+/* the bear ON THE STOLEN BIKE — hunched over the bars, living his best life */
+function bearBikeSVG(){
+  return `<svg viewBox="0 0 56 46">
+    <g class="wwB"><circle cx="14" cy="36" r="8" fill="none" stroke="#26282b" stroke-width="2.4"/>
+      <line x1="14" y1="28.6" x2="14" y2="43.4" stroke="#8a8d90" stroke-width="1"/>
+      <line x1="6.6" y1="36" x2="21.4" y2="36" stroke="#8a8d90" stroke-width="1"/></g>
+    <g class="wwF"><circle cx="42" cy="36" r="8" fill="none" stroke="#26282b" stroke-width="2.4"/>
+      <line x1="42" y1="28.6" x2="42" y2="43.4" stroke="#8a8d90" stroke-width="1"/>
+      <line x1="34.6" y1="36" x2="49.4" y2="36" stroke="#8a8d90" stroke-width="1"/></g>
+    <path d="M14 36 L27 36 L23 23 L14 36 M27 36 L36 23 M36 23 L42 36 M23 23 L35.5 23" fill="none" stroke="#C1272D" stroke-width="2.2"/>
+    <circle cx="27" cy="36" r="2.6" fill="#26282b"/>
+    <path d="M36 23 L36 19 M33 19 L39 19" stroke="#26282b" stroke-width="1.8"/>
+    <circle cx="10" cy="16.5" r="2.4" fill="#5d3f27"/>
+    <ellipse cx="24" cy="15" rx="11" ry="8.5" fill="#6b4a2f"/>
+    <path d="M20 20 q-1.5 6 .5 10 l3.4 0 q.4-5 -.4-9 Z" fill="#59391f"/>
+    <path d="M28 20 q1.5 6 3.5 9 l3.2 -1 q-1.5 -4.5 -3.4 -8 Z" fill="#59391f"/>
+    <path d="M30 12 Q34 15 36.5 19.5" stroke="#59391f" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <circle cx="36" cy="10" r="6" fill="#6b4a2f"/>
+    <circle cx="32.4" cy="5.2" r="2" fill="#5d3f27"/>
+    <circle cx="39.2" cy="4.6" r="1.9" fill="#5d3f27"/>
+    <path d="M40.5 11 Q44 10.6 45.2 12.6 Q45.8 14.2 44.2 14.9 Q41.8 15.8 39.8 15 Z" fill="#8a6a48"/>
+    <circle cx="44.6" cy="12.9" r="1.1" fill="#241a12"/>
+    <circle cx="38.6" cy="9" r="1" fill="#1b1b1d"/>
+  </svg>`;
+}
+/* CHUCK NORRIS — paper-cutout cowboy: hat, mustache, olive shirt, jeans, boots */
+function chuckSVG(){
+  return `<svg viewBox="0 0 34 56">
+    <g class="clL"><rect x="10.5" y="37.5" width="5.2" height="12.5" rx="1.8" fill="#3d6cb3"/>
+      <path d="M10 48.5 h6.2 v3.6 q0 1.7 -2 1.7 h-5.6 q-1.7 0 -1.1 -1.9 Z" fill="#8a5a2b"/>
+      <path d="M8.6 50.6 h7.4" stroke="#6e4620" stroke-width=".8"/></g>
+    <g class="clR"><rect x="18.3" y="37.5" width="5.2" height="12.5" rx="1.8" fill="#3d6cb3"/>
+      <path d="M17.8 48.5 h6.2 v3.6 q0 1.7 2 1.7 h-5.6 q-2.6 0 -2.6 -1.9 Z" transform="translate(0,0) scale(-1,1) translate(-41.8,0)" fill="#8a5a2b"/>
+      <path d="M18 50.6 h7.4" stroke="#6e4620" stroke-width=".8"/></g>
+    <path d="M8.2 22.5 q8.8 -4 17.6 0 l1.6 13.8 q-10.4 4.2 -20.8 0 Z" fill="#7d8a5c"/>
+    <path d="M13.2 22 L17 28.4 L20.8 22 Z" fill="#e8c39a"/>
+    <path d="M12.6 21.4 L17 28.8 L21.4 21.4" stroke="#66744a" stroke-width="1.4" fill="none"/>
+    <path d="M15.3 23.4 q.8 .8 1.7 0 M14.9 25 q.9 .9 2 .1 M15.8 26.4 q.7 .6 1.5 0" stroke="#4a3a28" stroke-width=".55" fill="none"/>
+    <path d="M8.6 24 q-3.6 3.2 -3 8.4" stroke="#7d8a5c" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+    <circle cx="5.8" cy="33.2" r="1.9" fill="#e8c39a"/>
+    <circle cx="17" cy="12.5" r="7.2" fill="#e8c39a"/>
+    <path d="M10 11.5 q-1.6 5.2 1.6 8 l1.6 -1.4 q-1.8 -3 -1 -6.2 Z" fill="#3a2c20"/>
+    <path d="M24 11.5 q1.6 5.2 -1.6 8 l-1.6 -1.4 q1.8 -3 1 -6.2 Z" fill="#3a2c20"/>
+    <ellipse cx="14.3" cy="12" rx="2.9" ry="3.2" fill="#fff"/><ellipse cx="19.7" cy="12" rx="2.9" ry="3.2" fill="#fff"/>
+    <circle cx="15.2" cy="12.5" r="1.05" fill="#1b1b1d"/><circle cx="18.8" cy="12.5" r="1.05" fill="#1b1b1d"/>
+    <path d="M11.4 8.7 q2.9 -1.5 5.1 -.2 M17.5 8.5 q2.2 -1.3 5.1 .2" stroke="#241a12" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+    <path d="M11.6 15.4 q5.4 2.8 10.8 0 l-1 3.7 q-4.4 2.7 -8.8 0 Z" fill="#4a3423"/>
+    <path d="M14.4 20.1 q2.6 1.3 5.2 0" stroke="#c99d72" stroke-width=".7" fill="none"/>
+    <ellipse cx="17" cy="6.9" rx="12" ry="3.2" fill="#7a5c3d"/>
+    <path d="M10.6 6.6 q0 -6.2 6.4 -6.2 q6.4 0 6.4 6.2 Z" fill="#8a6a45"/>
+    <path d="M12.4 3.4 q4.6 -2.2 9.2 0" stroke="#6e5236" stroke-width=".9" fill="none"/>
+    <ellipse cx="17" cy="6.9" rx="12" ry="3.2" fill="none" stroke="#6e5236" stroke-width=".7"/>
+    <g class="armR"><path d="M25.4 24 q4.2 1.8 5.8 7.3" stroke="#7d8a5c" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+      <path d="M30.6 30.4 l3.2 3.4" stroke="#e8c39a" stroke-width="3" stroke-linecap="round"/></g>
+    <g class="gArm"><path d="M25.4 24 L32.4 17.2" stroke="#7d8a5c" stroke-width="3.4" stroke-linecap="round"/>
+      <circle cx="32.6" cy="17" r="1.9" fill="#e8c39a"/>
+      <rect x="32.6" y="13.2" width="6.6" height="2.5" rx="1" fill="#5b6068" transform="rotate(-38 32.6 15.2)"/>
+      <rect x="33.6" y="15.4" width="2" height="3" fill="#5b6068" transform="rotate(-38 32.6 15.2)"/>
+      <g class="mflash"><polygon points="38.6,8.4 44,5.6 41.2,9.2 46,10 41.4,11.2 43.6,14.6 38.9,11.6" fill="#ffd23f" stroke="#ff8a00" stroke-width=".6"/></g></g>
+  </svg>`;
+}
 /* hide Waldo in a random spot — new spot on every refresh */
 function placeWaldo(){
   const scene = document.getElementById("scene");
@@ -1264,11 +1901,12 @@ function startFlyer(row, stripColor){
   if(!bear||!scene) return;
   const sleepB = ms=>new Promise(r=>setTimeout(r,ms));
   const traffic = ()=>!!document.querySelector("#roadLane .rv, #roadLane .pw");
-  let x=2, y=60, flip=false, hit=false;
+  let x=2, y=60, flip=false, hit=false, sit=false;
+  let crossings=0; /* the bear only crosses the street ONCE between refreshes */
   const CROSS_Y = 76; /* bear-top y% that puts his paws on the crosswalk stripes */
   bear.style.animation="none"; /* JS drives him now, not the CSS wander */
   const scaleFor = yy => (.55 + Math.min(Math.max((yy-20)/62,0),1)*.75);
-  const setT = ()=>{ bear.style.transform="scaleX("+(flip?-1:1)+") scale("+scaleFor(y).toFixed(2)+")"; };
+  const setT = ()=>{ bear.style.transform="scaleX("+(flip?-1:1)+") scale("+scaleFor(y).toFixed(2)+")"+(sit?" rotate(-42deg)":""); };
   function jumpTo(){ bear.style.transition="none"; bear.style.left=x+"%"; bear.style.top=y+"%"; setT(); }
   jumpTo();
   /* road trapezoid half-width (in % of scene) at a given bear-top y% */
@@ -1277,10 +1915,10 @@ function startFlyer(row, stripColor){
     const f=Math.min(Math.max((yy+6-58)/42,0),1);
     return (38+202*f)/W*100;
   }
-  async function walkTo(tx,ty){
+  async function walkTo(tx,ty,vel,minD){
     bear.style.transition="none";
     flip = tx < x; setT(); void bear.offsetWidth; /* face the right way instantly */
-    const dur=Math.max(1.6, Math.hypot(tx-x,(ty-y)*1.2)/2.4);
+    const dur=Math.max(minD||3.2, Math.hypot(tx-x,(ty-y)*1.2)/(vel||1.2)); /* lazy amble by default — quicker when chasing */
     x=tx; y=ty;
     bear.style.transition="left "+dur+"s linear, top "+dur+"s linear, transform "+dur+"s linear";
     bear.style.left=x+"%"; bear.style.top=y+"%"; setT();
@@ -1296,6 +1934,7 @@ function startFlyer(row, stripColor){
      animation loops them back around they queue up at the line like everyone else */
   let stopTimer=null; const stoppedVans=[];
   function beginStopping(){
+    if(stopTimer) return; /* already holding traffic (bear + Waldo can cross together) */
     const check=()=>{
       const s=scene.getBoundingClientRect(), h=s.height;
       const crossTop=s.bottom-0.235*h, crossBot=s.bottom-0.14*h, band=0.07*h;
@@ -1327,28 +1966,40 @@ function startFlyer(row, stripColor){
       const w=el.querySelector(".weave"); if(w) w.style.animationPlayState="";
     });
   }
-  /* every road crossing happens at the BEAR CROSSWALK — traffic stops at the flashing red */
-  async function travelTo(tx,ty){
+  /* shared red-light control — the bear and Waldo can both be at the crosswalk */
+  const lampEl = document.getElementById("bsLamp");
+  let crossers=0;
+  function lampRed(){ crossers++; if(lampEl) lampEl.classList.add("red"); beginStopping(); }
+  function lampGreen(){ crossers=Math.max(0,crossers-1); if(!crossers){ if(lampEl) lampEl.classList.remove("red"); releaseTraffic(); } }
+  /* every road crossing happens at the BEAR CROSSWALK — traffic stops at the flashing red.
+     Lazing around he only crosses ONCE per refresh; during a Waldo chase all bets are off
+     (the bear still uses the crosswalk — Waldo just jumps the whole street on his ramps). */
+  let chaseMode=false;
+  async function travelTo(tx,ty,vel,minD){
+    if(sideOf(tx)!==sideOf(x) && !chaseMode && !visitMode && crossings>=1){
+      const t=spot(sideOf(x)); /* too lazy to cross again — pick a spot on this side */
+      return walkTo(t.x, t.y);
+    }
     if(sideOf(tx)!==sideOf(x)){
+      crossings++;
       const h=halfPct(CROSS_Y);
       const nearEdge = sideOf(x)==="L" ? 50-h-4.5 : 50+h+0.5;
       const farEdge  = sideOf(x)==="L" ? 50+h+0.5 : 50-h-4.5;
-      await walkTo(nearEdge, CROSS_Y);        /* amble to the crosswalk */
-      await sleepB(500);                      /* look both ways */
-      const lamp = document.getElementById("bsLamp");
+      await walkTo(nearEdge, CROSS_Y, vel, minD); /* amble (or hustle) to the crosswalk */
+      await sleepB(chaseMode?250:500);            /* look both ways */
+      /* Waldo around? when these two meet at the crosswalk, it turns into a RODEO */
+      if(!rodeoDone && !chaseMode && wd && !wBusy && !wVisiting && !wInside && wd.el.style.display!=="none"){
+        await rodeo(h);
+      }
       const mustStop = traffic();
-      if(mustStop && lamp){
-        lamp.classList.add("red");            /* flashing red — vans queue at the stop line */
-        beginStopping();
+      if(mustStop){
+        lampRed();                            /* flashing red — vans queue at the stop line */
         await sleepB(1400);                   /* let anyone on the stripes clear them */
       }
-      await walkTo(farEdge, CROSS_Y);         /* crosses on the stripes */
-      if(mustStop && lamp){
-        lamp.classList.remove("red");         /* green — traffic rolls on */
-        releaseTraffic();
-      }
+      await walkTo(farEdge, CROSS_Y, vel, minD);  /* crosses on the stripes */
+      if(mustStop) lampGreen();               /* green — traffic rolls on */
     }
-    return walkTo(tx,ty);
+    return walkTo(tx,ty,vel,minD);
   }
   /* lunch-box raid: pick a parked van (optionally on one side of the road),
      open the door, help himself, close it up */
@@ -1389,22 +2040,377 @@ function startFlyer(row, stripColor){
     bear.style.zIndex="";
     await sleepB(400);
   }
-  async function loop(){
-    await sleepB(1500);
-    while(true){
-      /* the routine: raid a van on this side → cross at the BEAR CROSSWALK →
-         raid a van on the other side → then wander around for a while */
-      await raidVan("L");                     /* lunch stop #1 — Fusion side */
-      await sleepB(600);
-      await raidVan("R");                     /* travelTo crosses the crosswalk on the way */
-      await sleepB(600);
-      const strolls = 2+Math.floor(Math.random()*3);
-      for(let i=0;i<strolls;i++){
-        if(Math.random()<.18) await travelTo(76+Math.random()*12, 30+Math.random()*9); /* mountain hike */
-        else { const t=spot(Math.random()<.5?"L":"R"); await travelTo(t.x, t.y); }
-        await sleepB(400+Math.random()*1800);
-      }
+  /* lazy time: plops down under a big tree and eats a whole tub of honey */
+  const TREES = {L:{x:25.5, y:77.5}, R:{x:70, y:77}}; /* beside the two big foreground trees */
+  async function honeyBreak(){
+    const t = TREES[sideOf(x)];
+    await travelTo(t.x, t.y);
+    bear.style.transition="transform .9s ease";
+    sit=true; bear.classList.add("sitting"); setT();
+    await sleepB(950);
+    const h=document.createElement("div"); h.className="bearLunch honey";
+    h.innerHTML='<div class="lbox">🍯</div><div class="chomp">slurp slurp…</div>';
+    bear.appendChild(h);
+    await sleepB(11000);
+    h.querySelector(".chomp").textContent="😴 food coma";
+    h.querySelector(".lbox").style.opacity=".25";
+    await sleepB(7000);
+    h.remove();
+    bear.style.transition="transform .9s ease";
+    sit=false; bear.classList.remove("sitting"); setT();
+    await sleepB(1000);
+  }
+  /* ================= BEAR vs WALDO ================= */
+  const rnd=(a,b)=>a+Math.random()*(b-a);
+  const CH_LO=40, CH_HI=84; /* chase stays out of the top third of the screen */
+  /* keep a target off the road pavement at its depth */
+  function offRoad(tx,ty){
+    const h=halfPct(ty);
+    return sideOf(tx)==="L" ? Math.min(tx, 50-h-4.5) : Math.max(tx, 50+h+1);
+  }
+  let wd=null, wBusy=false, wVisiting=false, wInside=false, visitedFusion=false; /* Waldo state */
+  const wSet =()=>{ wd.el.style.transform="scaleX("+(wd.flip?-1:1)+") scale("+scaleFor(wd.y).toFixed(2)+")"; };
+  const wJump=()=>{ wd.el.style.transition="none"; wd.el.style.left=wd.x+"%"; wd.el.style.top=wd.y+"%"; wSet(); };
+  async function wWalk(tx,ty,vel){
+    wd.el.style.transition="none"; wd.flip = tx<wd.x; wSet(); void wd.el.offsetWidth;
+    const dur=Math.max(.5, Math.hypot(tx-wd.x,(ty-wd.y)*1.2)/(vel||3.4));
+    wd.x=tx; wd.y=ty;
+    wd.el.style.transition="left "+dur+"s linear, top "+dur+"s linear, transform "+dur+"s linear";
+    wd.el.style.left=tx+"%"; wd.el.style.top=ty+"%"; wSet();
+    await sleepB(dur*1000);
+  }
+  /* Waldo crosses the honest way now — pedals over the BEAR CROSSWALK, no jumping */
+  async function wTravel(tx,ty,vel){
+    if(sideOf(tx)!==sideOf(wd.x)){
+      const h=halfPct(CROSS_Y);
+      const nearEdge = sideOf(wd.x)==="L" ? 50-h-3 : 50+h+0.5;
+      const farEdge  = sideOf(wd.x)==="L" ? 50+h+0.5 : 50-h-3;
+      await wWalk(nearEdge, CROSS_Y, vel);
+      const mustStop = traffic();
+      if(mustStop){ lampRed(); await sleepB(900); }
+      await wWalk(farEdge, CROSS_Y, vel);
+      if(mustStop) lampGreen();
     }
+    return wWalk(tx,ty,vel);
+  }
+  /* the bear spots Waldo — chase him all over the lower 2/3 of the screen,
+     catch him at a random moment, shake him silly, launch him like a ragdoll,
+     and the chase is on again */
+  async function chaseWaldo(){
+    if(!wd || wVisiting || wInside || bearOnBike) return; /* busy elsewhere */
+    chaseMode=true; wBusy=true;
+    const w=wd.el;
+    const tripAt=Date.now()+rnd(8000,16000);  /* Waldo slips at a random moment — that's the catch */
+    let fleeing=true, dash=true; /* the chase opens with a dash across the street (crosswalk, of course) */
+    const flee=(async()=>{
+      while(fleeing){
+        if(Date.now()>tripAt){ await sleepB(300); continue; } /* wobbled — scrambling, going nowhere */
+        let tx;
+        if(dash){ dash=false; tx = wd.x<50 ? rnd(58,90) : rnd(6,38); } /* bolts for the far side */
+        else tx = wd.x + (wd.x>=x ? rnd(10,28) : -rnd(10,28));         /* ride AWAY from the bear */
+        if(tx<3 || tx>93) tx=100-wd.x+rnd(-18,18);                     /* cornered — dart across */
+        tx=Math.min(Math.max(tx,3),93);
+        const ty=rnd(CH_LO,CH_HI);
+        await wTravel(offRoad(tx,ty), ty);
+      }
+    })();
+    /* the bear barrels after him, re-aiming at every stride */
+    while(true){
+      await travelTo(offRoad(wd.x,Math.min(Math.max(wd.y,CH_LO),CH_HI)), Math.min(Math.max(wd.y,CH_LO),CH_HI), 2.6, 1.1);
+      if(Date.now()>tripAt && sideOf(wd.x)===sideOf(x) &&
+         Math.abs(wd.x-x)<7.5 && Math.abs(wd.y-y)<10) break;   /* GOTCHA */
+    }
+    fleeing=false; await flee;
+    /* CAUGHT — but the bear doesn't want Waldo. he wants the BIKE. */
+    w.classList.remove("biking"); w.innerHTML=waldoSVG();  /* Waldo tumbles off... */
+    bear.classList.add("onbike"); bear.innerHTML=bearBikeSVG(); bearOnBike=true;
+    await sleepB(700);
+    await reverseChase(12000);   /* ...and now WALDO chases the BEAR */
+    dropBike();                  /* the bear gets bored and ditches it */
+    await reclaimBike(3.2);      /* Waldo gets his wheels back */
+    chaseMode=false; wBusy=false;
+  }
+  /* the bear's day: something different every time */
+  async function loop(){
+    await sleepB(500);
+    await raidVan(sideOf(x));                 /* always opens with a lunch raid */
+    await sleepB(200);
+    await chaseWaldo();                       /* the bear spots the guy on the bike right away — guaranteed chase every open */
+    await sleepB(300);
+    while(true){ /* NEVER stops moving while he's outside */
+      if(!bearVisited && Math.random()<.3){ await bearVisit(); continue; } /* clocking in */
+      if(pBike && wInside && !bearOnBike && Math.random()<.5){ await stealBike(); continue; } /* an unattended bike?! */
+      const r=Math.random();
+      if(r<.30)      await chaseWaldo();      /* spots Waldo — the chase is ON */
+      else if(r<.62) await raidVan(sideOf(x));/* another lunch box bites the dust */
+      else {                                  /* just moseying (mountain hike from the right side) */
+        const n=1+Math.floor(Math.random()*2);
+        for(let i=0;i<n;i++){
+          if(sideOf(x)==="R" && Math.random()<.22) await travelTo(76+Math.random()*12, 30+Math.random()*9);
+          else { const t=spot(sideOf(x)); await travelTo(t.x, t.y); }
+          await sleepB(120);
+        }
+      }
+      await sleepB(100);
+    }
+  }
+  /* ================= WALDO'S DAY =================
+     Waldo lives on screen now: cruises around on his bike all day, and ONCE per
+     refresh he parks it, opens the Fusion front door, and puts in a desk shift */
+  function wSpawn(){
+    const w=document.createElement("div");
+    w.className="waldo biking running"; w.innerHTML=waldoBikeSVG();
+    w.style.zIndex="1";
+    scene.appendChild(w);
+    wd={el:w, x:60+Math.random()*30, y:56+Math.random()*22, flip:false};
+    wd.x=offRoad(wd.x, wd.y); wJump();
+  }
+  async function wIdle(){
+    await sleepB(800);
+    while(true){ /* NEVER stops moving while he's outside */
+      if(wBusy){ await sleepB(300); continue; }
+      if(!visitedFusion && Math.random()<.35){ await visitFusion(); continue; }
+      const t=spot(Math.random()<.5?"L":"R");
+      if(!wBusy) await wTravel(offRoad(t.x,t.y), t.y, 2.6);
+      await sleepB(60);
+    }
+  }
+  async function visitFusion(){
+    wVisiting=true; visitedFusion=true; /* one office trip + one trip home per refresh */
+    const W=scene.clientWidth||1500, H=scene.clientHeight||800;
+    const doorX=(W*0.025+121.5)/W*100 - 0.7;   /* Fusion front-door center */
+    const homeX=(W*0.985-119)/W*100 - 0.6;     /* HOME front-door center */
+    const walkY=62 - 3400/H;                    /* feet on a doorstep */
+    const midY=(80+walkY)/2;                    /* halfway up the sidewalk */
+    const bikeY=62 - 4100/H;
+    await wTravel(doorX, 80, 2.8);              /* ride to the foot of the sidewalk */
+    await wWalk(doorX, midY, 2.2);              /* pedal halfway up it... */
+    pBike=document.createElement("div");        /* ...bike stays right there (bears take note) */
+    pBike.className="parkedBike"; pBike.innerHTML=bikeOnlySVG();
+    pBike.style.left=(wd.x-0.4)+"%"; pBike.style.top=(wd.y+0.8)+"%";
+    scene.appendChild(pBike);
+    wd.el.classList.remove("biking"); wd.el.innerHTML=waldoRearSVG(); /* walking AWAY from us */
+    await wWalk(doorX, walkY, 1.5);             /* up the sidewalk, seen from behind */
+    const door=document.getElementById("fusionDoor"), way=document.getElementById("fusionDoorway");
+    if(way) way.style.opacity="1";
+    if(door) door.classList.add("open");        /* opens the front door... */
+    await sleepB(700);
+    wd.el.style.display="none"; wInside=true;   /* ...and in he goes */
+    if(door) door.classList.remove("open");
+    await sleepB(500); if(way) way.style.opacity="0";
+    await sleepB(2500);                         /* 3 seconds later: there he is at a desk */
+    const desk=document.getElementById("waldoDesk");
+    if(desk) desk.style.display="block";
+    await sleepB(54500);                        /* a full ONE-MINUTE shift */
+    if(desk) desk.style.display="none";         /* leaves the desk... */
+    await sleepB(3000);                         /* ...and heads for the door */
+    if(way) way.style.opacity="1";
+    if(door) door.classList.add("open");
+    await sleepB(500);
+    wd.el.innerHTML=waldoSVG();                 /* comes out FACING us */
+    wd.el.style.display=""; wInside=false;
+    await sleepB(300);
+    if(door) door.classList.remove("open");
+    await sleepB(400); if(way) way.style.opacity="0";
+    if(pBike){                                  /* bike still where he left it? */
+      await wWalk(parseFloat(pBike.style.left)+0.4, parseFloat(pBike.style.top)-0.8, 1.5);
+      pBike.remove(); pBike=null;
+      wd.el.classList.add("biking"); wd.el.innerHTML=waldoBikeSVG();
+    } else if(bearOnBike){                      /* the BEAR took it — GET HIM */
+      while(bearOnBike){
+        const cy=Math.min(Math.max(y,CH_LO),CH_HI);
+        await wWalk(offRoad(Math.min(Math.max(x,4),93),cy), cy, 3.0);
+      }
+      await reclaimBike(3.2);
+    }
+    /* ...and heads straight HOME — long day */
+    await wTravel(homeX, 78, 2.8);              /* across town (crosswalk, naturally) */
+    await wWalk(homeX, bikeY+1.2, 2.0);         /* rolls right up to the house */
+    pBike=document.createElement("div");        /* bike left at the HOME front door */
+    pBike.className="parkedBike"; pBike.innerHTML=bikeOnlySVG();
+    pBike.style.left=(homeX-2.6)+"%"; pBike.style.top=(bikeY+1.2)+"%";
+    scene.appendChild(pBike);
+    wd.el.classList.remove("biking"); wd.el.innerHTML=waldoRearSVG(); /* rear view up to the door */
+    await wWalk(homeX, walkY, 1.5);             /* one step up to the door */
+    await sleepB(500);
+    wd.el.style.display="none"; wInside=true;   /* lets himself in */
+    await sleepB(2000);
+    const bed=document.getElementById("waldoBed");
+    if(bed) bed.style.display="block";          /* there he is — flat out in bed */
+    await sleepB(56000);
+    if(bed) bed.style.display="none";           /* up he gets... */
+    await sleepB(2000);                         /* ...a full minute door to door */
+    wd.el.innerHTML=waldoSVG();                 /* out the door, facing us */
+    wd.el.style.display=""; wInside=false;
+    if(pBike){
+      await wWalk(parseFloat(pBike.style.left)+0.4, parseFloat(pBike.style.top), 1.5);
+      pBike.remove(); pBike=null;
+      wd.el.classList.add("biking"); wd.el.innerHTML=waldoBikeSVG();
+    } else if(bearOnBike){                      /* stolen AGAIN?! */
+      while(bearOnBike){
+        const cy=Math.min(Math.max(y,CH_LO),CH_HI);
+        await wWalk(offRoad(Math.min(Math.max(x,4),93),cy), cy, 3.0);
+      }
+      await reclaimBike(3.2);
+    }
+    const t=spot(Math.random()<.5?"L":"R");
+    await wTravel(offRoad(t.x,t.y), t.y, 2.6);  /* ...and back to cruising */
+    wVisiting=false;
+  }
+  /* ================= BIKE THEFT =================
+     leave a bike unattended and this bear WILL take it. also: catching Waldo
+     now means stealing his ride — and the chase flips around */
+  let bearOnBike=false, pBike=null;
+  const bearSideHTML=bear.innerHTML;
+  function dropBike(){
+    bear.classList.remove("onbike"); bear.innerHTML=bearSideHTML; bearOnBike=false;
+    pBike=document.createElement("div");
+    pBike.className="parkedBike"; pBike.innerHTML=bikeOnlySVG();
+    pBike.style.left=(x+1)+"%"; pBike.style.top=(y+1)+"%";
+    scene.appendChild(pBike);
+  }
+  async function reclaimBike(vel){
+    if(!pBike) return;
+    await wWalk(parseFloat(pBike.style.left)+0.3, parseFloat(pBike.style.top)-0.6, vel||3);
+    pBike.remove(); pBike=null;
+    wd.el.classList.add("biking"); wd.el.innerHTML=waldoBikeSVG();
+  }
+  /* the tables turned: bear pedals for his life, Waldo chases on foot */
+  async function reverseChase(ms){
+    const t0=Date.now();
+    let going=true;
+    const bearRun=(async()=>{
+      while(going){
+        let tx = x + (x>=wd.x ? rnd(12,30) : -rnd(12,30));
+        if(tx<3||tx>93) tx=100-x+rnd(-15,15);
+        tx=Math.min(Math.max(tx,3),93);
+        const ty=rnd(CH_LO,CH_HI);
+        await travelTo(offRoad(tx,ty), ty, 3.4, .8);
+      }
+    })();
+    while(Date.now()-t0<ms){
+      const cy=Math.min(Math.max(y,CH_LO),CH_HI);
+      await wWalk(offRoad(Math.min(Math.max(x,4),93),cy), cy, 3.0);
+    }
+    going=false; await bearRun;
+  }
+  /* Waldo's inside and the bike is just... sitting there */
+  async function stealBike(){
+    if(!pBike || !wInside) return;
+    const bx=parseFloat(pBike.style.left), by=parseFloat(pBike.style.top);
+    await travelTo(bx-1.5, by-1, 1.9, 1.5);      /* pads over, all casual */
+    if(!pBike || !wInside) return;               /* moment's gone */
+    pBike.remove(); pBike=null;
+    bear.classList.add("onbike"); bear.innerHTML=bearBikeSVG(); bearOnBike=true;
+    chaseMode=true;                              /* joyride! (crosswalk manners still apply) */
+    while(wInside){
+      const t=spot(Math.random()<.5?"L":"R");
+      await travelTo(offRoad(t.x,t.y), t.y, 3.0, .9);
+    }
+    const t0=Date.now();                         /* Waldo's out — 12 seconds of keep-away */
+    while(Date.now()-t0<12000){
+      let tx = x + (x>=wd.x ? rnd(12,30) : -rnd(12,30));
+      if(tx<3||tx>93) tx=100-x+rnd(-15,15);
+      tx=Math.min(Math.max(tx,3),93);
+      const ty=rnd(CH_LO,CH_HI);
+      await travelTo(offRoad(tx,ty), ty, 3.4, .8);
+    }
+    dropBike();                                  /* bored now. */
+    chaseMode=false;
+  }
+  /* ================= THE BEAR'S DAY =================
+     same routine as Waldo now: once per refresh he clocks in at Fusion for a
+     minute (his own window), then heads home for a minute in the other bedroom */
+  let bVisiting=false, bearVisited=false, visitMode=false;
+  async function bearVisit(){
+    bVisiting=true; bearVisited=true; visitMode=true;
+    const W=scene.clientWidth||1500, H=scene.clientHeight||800;
+    const bDoorX=(W*0.025+121.5)/W*100 - 1.6;   /* Fusion front door */
+    const bHomeX=(W*0.985-119)/W*100 - 1.8;     /* HOME front door */
+    const bWalkY=62 - 4900/H;                    /* paws on the doorstep */
+    const door=document.getElementById("fusionDoor"), way=document.getElementById("fusionDoorway");
+    await travelTo(bDoorX, 80, 1.7, 2);
+    bear.innerHTML=bearRearSVG();                /* seen from behind on the way up */
+    await walkTo(bDoorX, bWalkY, 1.7, 2);        /* lumbers up the sidewalk */
+    if(way) way.style.opacity="1";
+    if(door) door.classList.add("open");
+    await sleepB(800);
+    bear.style.visibility="hidden";              /* squeezes in — big fella */
+    if(door) door.classList.remove("open");
+    await sleepB(500); if(way) way.style.opacity="0";
+    await sleepB(2200);                          /* and there he is, hard at work */
+    const bd=document.getElementById("bearDesk");
+    if(bd) bd.style.display="block";
+    await sleepB(54500);                         /* a full ONE-MINUTE shift */
+    if(bd) bd.style.display="none";
+    await sleepB(3000);
+    if(way) way.style.opacity="1";
+    if(door) door.classList.add("open");
+    await sleepB(500);
+    bear.innerHTML=bearFrontSVG();               /* comes out FACE FIRST */
+    bear.style.visibility="";                    /* back out the front door */
+    await sleepB(300);
+    if(door) door.classList.remove("open");
+    await sleepB(400); if(way) way.style.opacity="0";
+    await walkTo(bDoorX, 80, 1.7, 2);            /* down the sidewalk, head-on */
+    bear.innerHTML=bearSideHTML;                 /* back in profile */
+    await travelTo(bHomeX, 76, 1.7, 2);          /* then straight home — Waldo's home, apparently */
+    bear.innerHTML=bearRearSVG();                /* from behind again on the approach */
+    await walkTo(bHomeX, bWalkY, 1.7, 2);
+    await sleepB(600);
+    bear.style.visibility="hidden";              /* nobody locks their doors around here */
+    await sleepB(2000);
+    const bb=document.getElementById("bearBed");
+    if(bb) bb.style.display="block";             /* out cold in the OTHER bedroom */
+    await sleepB(56000);                         /* a full minute's nap */
+    if(bb) bb.style.display="none";
+    await sleepB(2000);
+    bear.innerHTML=bearFrontSVG();               /* out the door face first... */
+    bear.style.visibility="";
+    await walkTo(bHomeX-3, 78, 1.7, 2);
+    bear.innerHTML=bearSideHTML;                 /* ...and on with his day */
+    visitMode=false; bVisiting=false;
+  }
+  /* ================= CROSSWALK RODEO =================
+     bear and Waldo meet at the crosswalk: Waldo hops on for a 5-second ride,
+     gets bucked clean off the screen, and rolls back in from the other side */
+  let rodeoDone=false;
+  async function rodeo(h){
+    rodeoDone=true; wBusy=true;
+    await wWalk(x+(sideOf(x)==="L"?2.2:-1.2), CROSS_Y+0.6, 4.5); /* Waldo pedals over to say hi */
+    await sleepB(300);
+    wd.el.style.display="none";                  /* ...and climbs on. bad idea. */
+    const rider=document.createElement("div");
+    rider.className="bearRider"; rider.innerHTML=waldoSVG();
+    bear.appendChild(rider);
+    bear.classList.add("bucking");
+    const t0=Date.now();                         /* five seconds of rodeo on the stripes */
+    while(Date.now()-t0<5000){
+      await walkTo(50-h+2+Math.random()*(2*h-4), CROSS_Y+(Math.random()*4-2), 3.6, .6);
+    }
+    bear.classList.remove("bucking");
+    rider.remove();                              /* BUCKED! */
+    const flyRight = x<50;                       /* launched toward the far edge */
+    const edge = flyRight ? 108 : -10;
+    wd.x=x; wd.y=y; wd.el.style.display="";
+    wd.el.classList.add("ragdoll");
+    const zK=wd.el.style.zIndex; wd.el.style.zIndex="6";
+    wJump(); void wd.el.offsetWidth;
+    wd.el.style.transition="left .9s linear, top .9s cubic-bezier(.3,.8,.55,1)";
+    wd.x=(x+edge)/2; wd.y=26;
+    wd.el.style.left=wd.x+"%"; wd.el.style.top=wd.y+"%";
+    await sleepB(900);
+    wd.el.style.transition="left .9s linear, top .9s cubic-bezier(.5,0,.8,.4)";
+    wd.x=edge; wd.y=CROSS_Y-12;
+    wd.el.style.left=wd.x+"%"; wd.el.style.top=wd.y+"%"; /* clean off the screen... */
+    await sleepB(1100);
+    wd.el.classList.remove("ragdoll");
+    wd.el.style.zIndex=zK;
+    wd.x = flyRight ? -6 : 106; wd.y=62; wJump(); /* ...and back in from the OTHER side */
+    await sleepB(500);
+    const t=spot(flyRight?"L":"R");
+    await wWalk(offRoad(t.x,t.y), t.y, 3.4);
+    wBusy=false;
   }
   /* watcher: keep him visible while he's on the Fusion parking lot */
   setInterval(function(){
@@ -1412,8 +2418,200 @@ function startFlyer(row, stripColor){
     const s=scene.getBoundingClientRect(), b=bear.getBoundingClientRect();
     const px=((b.left+b.right)/2-s.left)/s.width*100;
     const py=(b.bottom-s.top)/s.height*100;
-    bear.style.zIndex = (px<26.5 && py>77) ? 3 : "";
+    const onWalk = (px>6.8 && px<13 && py>56); /* on the Fusion sidewalk — he covers it, not vice versa */
+    bear.style.zIndex = ((px<26.5 && py>77) || onWalk) ? 3 : "";
   }, 400);
+  wSpawn();
+  wIdle();
+  loop();
+})();
+
+/* ================= CHUCK NORRIS =================
+   He doesn't use the crosswalk. He doesn't wait for anything. He roams the
+   scene destroying it with karate: chops trees clean over, HI-YAs van
+   windshields into spiderwebs, crumples a whole van inside a cloud of smoke,
+   and if that early bird dares fly over — he shoots it right out of the sky.
+   Everything he breaks fixes itself a minute later, out of pure fear. */
+(function(){
+  const scene=document.getElementById("scene"); if(!scene) return;
+  const zz=ms=>new Promise(r=>setTimeout(r,ms));
+  const rnd=(a,b)=>a+Math.random()*(b-a);
+  const ch=document.createElement("div");
+  ch.className="chuck running"; ch.innerHTML=chuckSVG(); ch.title="Chuck Norris";
+  scene.appendChild(ch);
+  let x=94, y=58, flip=true;
+  const scaleFor=yy=>(.6+Math.min(Math.max((yy-20)/62,0),1)*.75);
+  const setT=()=>{ ch.style.transform="scaleX("+(flip?-1:1)+") scale("+scaleFor(y).toFixed(2)+")"; };
+  ch.style.left=x+"%"; ch.style.top=y+"%"; setT();
+  function halfPct(yy){ const W=scene.clientWidth||1400; const f=Math.min(Math.max((yy+6-58)/42,0),1); return (38+202*f)/W*100; }
+  const offRoad=(tx,ty)=>{ const h=halfPct(ty); return tx<50 ? Math.min(tx,50-h-4.5) : Math.max(tx,50+h+1); };
+  async function walkTo(tx,ty,vel){
+    ch.style.transition="none"; flip=tx<x; setT(); void ch.offsetWidth;
+    const dur=Math.max(.9, Math.hypot(tx-x,(ty-y)*1.2)/(vel||2.2));
+    x=tx; y=ty;
+    ch.style.transition="left "+dur+"s linear, top "+dur+"s linear, transform "+dur+"s linear";
+    ch.style.left=x+"%"; ch.style.top=y+"%"; setT();
+    await zz(dur*1000);
+  }
+  /* speech bubble — counter-mirrored so the text reads right when he's flipped */
+  function bub(txt){
+    const b=document.createElement("div"); b.className="chBub"; b.textContent=txt;
+    b.style.transform="translateX(-50%)"+(flip?" scaleX(-1)":"");
+    ch.appendChild(b); return b;
+  }
+  function pctOf(el){
+    const s=scene.getBoundingClientRect(), r=el.getBoundingClientRect();
+    return {x:((r.left+r.right)/2-s.left)/s.width*100, y:(r.bottom-s.top)/s.height*100, w:r.width};
+  }
+  const lotVans=()=>[...document.querySelectorAll("#fusionLot .van, #jobLot .van, #homeLot .van")];
+  /* ---- TIMBER: karate-chops a tree over; it sheepishly regrows later ---- */
+  async function chopTree(){
+    const trees=[...document.querySelectorAll(".structure.tree")].filter(t=>!t.classList.contains("felled"));
+    if(!trees.length) return;
+    const t=trees[Math.floor(Math.random()*trees.length)];
+    const p=pctOf(t); if(!p.w) return;
+    const side = p.x>88 ? -1 : 1; /* stand beside it (left of it only at the screen edge) */
+    await walkTo(Math.min(Math.max(p.x+side*3.4,1),96), Math.min(Math.max(p.y+1.2,42),86));
+    flip = p.x < x; setT();
+    ch.style.zIndex="3";
+    const b=bub("HI-YAAA!");
+    ch.classList.add("chopping"); ch.classList.remove("running");
+    await zz(1900);
+    if(side>0) t.classList.add("fL");   /* falls AWAY from Chuck. obviously. */
+    t.classList.add("felled");
+    await zz(1400);
+    ch.classList.remove("chopping"); ch.classList.add("running"); b.remove();
+    ch.style.zIndex="";
+    setTimeout(function(){
+      t.classList.add("regrow"); t.classList.remove("felled","fL");
+      requestAnimationFrame(()=>requestAnimationFrame(()=>t.classList.remove("regrow")));
+    }, 50000);
+    await zz(300);
+  }
+  /* ---- one chop, one spiderwebbed windshield ---- */
+  function crackSVG(){
+    return `<svg viewBox="0 0 40 22"><g stroke="#eef4fb" stroke-width="1.1" fill="none" stroke-linecap="round" opacity=".95">
+      <path d="M20 11 L8 4 M20 11 L5 13 M20 11 L12 20 M20 11 L27 2 M20 11 L34 7 M20 11 L33 17 M20 11 L23 21"/>
+      <circle cx="20" cy="11" r="2.2" stroke-width="1.3"/>
+      <path d="M13 7.5 L11 11.5 M27.5 5 L30.5 10 M15.5 15.5 L20.5 16.5" stroke-width=".8"/></g></svg>`;
+  }
+  async function smashVan(){
+    const vans=lotVans().filter(v=>!v.querySelector(".crackOl") && !v.classList.contains("crumpled"));
+    if(!vans.length) return;
+    const v=vans[Math.floor(Math.random()*vans.length)];
+    const p=pctOf(v); if(!p.w) return;
+    const fromRight=p.x>50;
+    await walkTo(Math.min(Math.max(p.x+(fromRight?3.4:-3.4),1),96), Math.min(Math.max(p.y-4,42),86));
+    flip=fromRight; setT();
+    ch.style.zIndex="4";
+    const b=bub("HI-YA!");
+    ch.classList.add("chopping"); ch.classList.remove("running");
+    await zz(1200);
+    const c=document.createElement("div"); c.className="crackOl"; c.innerHTML=crackSVG(); v.appendChild(c);
+    v.classList.add("jolt"); setTimeout(()=>v.classList.remove("jolt"),600);
+    await zz(700);
+    ch.classList.remove("chopping"); ch.classList.add("running"); b.remove(); ch.style.zIndex="";
+    setTimeout(function(){ c.style.transition="opacity 1s"; c.style.opacity="0"; setTimeout(()=>c.remove(),1100); }, 60000);
+    await zz(300);
+  }
+  /* ---- full crumple: a flurry of chops inside a cloud of smoke ---- */
+  function smokeOn(v){
+    const s=document.createElement("div"); s.className="chuckSmoke";
+    for(let i=0;i<9;i++){
+      const p=document.createElement("i");
+      p.style.setProperty("--dx", rnd(-32,32).toFixed(0)+"px");
+      p.style.setProperty("--dy", rnd(-54,-16).toFixed(0)+"px");
+      p.style.setProperty("--s",  rnd(1.1,2.4).toFixed(2));
+      p.style.animationDelay=(i*.21).toFixed(2)+"s";
+      s.appendChild(p);
+    }
+    v.appendChild(s); return s;
+  }
+  async function crumpleVan(){
+    const vans=lotVans().filter(v=>!v.classList.contains("crumpled"));
+    if(!vans.length) return;
+    const v=vans[Math.floor(Math.random()*vans.length)];
+    const p=pctOf(v); if(!p.w) return;
+    const fromRight=p.x>50;
+    await walkTo(Math.min(Math.max(p.x+(fromRight?3.4:-3.4),1),96), Math.min(Math.max(p.y-4,42),86));
+    flip=fromRight; setT();
+    ch.style.zIndex="4";
+    const b=bub("HOO-WAAAH!");
+    ch.classList.add("chopping","frenzy"); ch.classList.remove("running");
+    const smoke=smokeOn(v);
+    await zz(1400);
+    v.classList.add("jolt");
+    await zz(500); v.classList.remove("jolt");
+    v.classList.add("crumpled");
+    await zz(2600);
+    smoke.remove(); b.remove();
+    ch.classList.remove("chopping","frenzy"); ch.classList.add("running"); ch.style.zIndex="";
+    setTimeout(()=>v.classList.remove("crumpled"), 75000);
+    await zz(300);
+  }
+  /* ---- the early bird learns about the second amendment ---- */
+  let birdShot=false;
+  async function shootBird(){
+    const f=document.querySelector(".flyer");
+    if(!f || birdShot || f.style.display==="none") return false;
+    birdShot=true;
+    const s=scene.getBoundingClientRect();
+    let r=f.getBoundingClientRect();
+    let bx=Math.min(Math.max(((r.left+r.right)/2-s.left)/s.width*100, 6), 90);
+    await walkTo(offRoad(bx,58), 58, 3.4);
+    r=f.getBoundingClientRect();
+    flip = ((r.left+r.right)/2-s.left)/s.width*100 < x; setT(); /* face the bird */
+    ch.classList.add("aiming"); ch.classList.remove("running");
+    const b=bub("BANG! BANG!");
+    await zz(900);
+    f.style.animationPlayState="paused";
+    f.classList.add("shot");
+    const rb=f.getBoundingClientRect();
+    for(let i=0;i<6;i++){
+      const ft=document.createElement("div"); ft.className="feather"; ft.textContent="🪶";
+      ft.style.left=(((rb.left+rb.width*.5)-s.left)/s.width*100+rnd(-2.5,2.5)).toFixed(1)+"%";
+      ft.style.top=(Math.max((rb.top-s.top)/s.height*100,1)+rnd(0,3)).toFixed(1)+"%";
+      ft.style.animationDelay=(i*.13).toFixed(2)+"s";
+      scene.appendChild(ft); setTimeout(()=>ft.remove(),3900);
+    }
+    await zz(1600);
+    b.remove(); ch.classList.remove("aiming"); ch.classList.add("running");
+    setTimeout(function(){
+      f.style.display="none"; /* thud. */
+      setTimeout(function(){  /* ...and the bird respawns — it's a cartoon */
+        f.classList.remove("shot"); f.style.display=""; f.style.animationPlayState="";
+        birdShot=false;
+      }, 40000);
+    }, 2300);
+    return true;
+  }
+  /* ---- Chuck's day: he only exists in the 🤠 Chuck Norris theme. Every time
+     the theme comes on he opens with a guaranteed rampage, then freelances ---- */
+  const inTheme=()=>document.body.classList.contains("theme-chuck");
+  async function loop(){
+    await zz(3000);
+    let opened=false;
+    while(true){
+      if(!inTheme()){ opened=false; await zz(700); continue; } /* off duty — waits behind the theme button */
+      if(!opened){       /* fresh theme switch: ride in from the edge, then rampage */
+        opened=true;
+        ch.style.transition="none"; x=94; y=58; flip=true;
+        ch.style.left=x+"%"; ch.style.top=y+"%"; setT(); void ch.offsetWidth;
+        await chopTree();  if(!inTheme()) continue;
+        await smashVan();  if(!inTheme()) continue;
+        await crumpleVan();
+        continue;
+      }
+      await zz(rnd(400,1200));
+      if(!inTheme()) continue;
+      if(await shootBird()) continue;  /* the bird takes priority the moment it appears */
+      const r=Math.random();
+      if(r<.30)      await chopTree();
+      else if(r<.55) await smashVan();
+      else if(r<.72) await crumpleVan();
+      else { const ty=rnd(44,86); await walkTo(offRoad(rnd(4,92),ty), ty); }
+    }
+  }
   loop();
 })();
 
@@ -1432,16 +2630,14 @@ setInterval(function(){
   if (!loginUp && !settingsUp) location.reload();
 }, 5*60*1000);
 
-/* road dashes */
+/* solid double-yellow center line, tapering to the vanishing point */
 (function(){
   const road=document.getElementById("road");
-  for(let i=0;i<6;i++){
-    const d=document.createElement("div"); d.className="dash";
-    const t=i/6;
-    d.style.top=(t*100)+"%"; d.style.height=(8+t*26)+"px"; d.style.width=(4+t*9)+"px"; d.style.marginLeft=-(2+t*4.5)+"px";
-    d.style.animationDelay=(t*1.1)+"s";
-    road.appendChild(d);
-  }
+  road.insertAdjacentHTML("beforeend",
+    '<svg class="centerline" viewBox="0 0 480 252" preserveAspectRatio="none">'+
+    '<polygon points="238.7,0 239.6,0 236.5,252 229.5,252" fill="#ffe27a"/>'+
+    '<polygon points="240.4,0 241.3,0 250.5,252 243.5,252" fill="#ffe27a"/>'+
+    '</svg>');
 })();
 
 /* ================= SETTINGS UI ================= */
@@ -1650,9 +2846,7 @@ function startPursuit(row, stripColor, lane){
   vanW.className = "pw";
   vanW.title = row.name + " — today's speeding leader";
   vanW.innerHTML = `<div class="weave"><div class="off">
-      <div class="van driving">${rearSVG(type, stripColor)}<span class="vanTag">🚨 ${esc(firstNameTag(row))}</span></div>
-      <div class="miniOfficer">${officerSVG()}</div>
-      <div class="miniBubble">🎫 TICKET</div>
+      <div class="van driving">${rearSVG(type, stripColor, firstNameTag(row))}<span class="vanTag">🚨</span></div>
     </div></div>`;
   const copW = document.createElement("div");
   copW.className = "pw";
@@ -1664,8 +2858,46 @@ function startPursuit(row, stripColor, lane){
   const sleep = ms=>new Promise(r=>setTimeout(r,ms));
   const vOff=vanW.querySelector(".off"), cOff=copW.querySelector(".off");
   const vWv=vanW.querySelector(".weave"), cWv=copW.querySelector(".weave");
-  const officer=vanW.querySelector(".miniOfficer"), bub=vanW.querySelector(".miniBubble");
   const tag=copW.querySelector(".copTag"), vanBody=vanW.querySelector(".van");
+  const sceneEl=document.getElementById("scene");
+  /* foot-chase runner helpers */
+  const setR=r=>{ r.el.style.transform="scaleX("+(r.flip?-1:1)+") scale("+(.55+Math.min(Math.max((r.y-20)/62,0),1)*.75).toFixed(2)+")"; };
+  const jumpR=(r,x,y)=>{ r.x=x; r.y=y; r.el.style.transition="none"; r.el.style.left=x+"%"; r.el.style.top=y+"%"; setR(r); void r.el.offsetWidth; };
+  const runR=async(r,x,y,vel)=>{
+    r.flip = x<r.x; setR(r); void r.el.offsetWidth;
+    const d=Math.max(.4, Math.hypot(x-r.x,(y-r.y)*1.2)/vel);
+    r.el.style.transition="left "+d+"s linear, top "+d+"s linear, transform "+d+"s linear";
+    r.x=x; r.y=y; r.el.style.left=x+"%"; r.el.style.top=y+"%"; setR(r);
+    await sleep(d*1000);
+  };
+  const mkRunner=html=>{ const el=document.createElement("div"); el.className="footRun running"; el.innerHTML=html; sceneEl.appendChild(el); return {el:el,x:0,y:0,flip:false}; };
+  /* both of them bail out: down to the crosswalk, across the ENTIRE screen,
+     back in from the other side, and they dive into their vehicles again */
+  async function footChase(){
+    const sr=sceneEl.getBoundingClientRect();
+    const vr=vanBody.getBoundingClientRect(), cb=copW.querySelector(".copr").getBoundingClientRect();
+    if(!sr.height||!vr.height) return;
+    const vx=((vr.left+vr.right)/2-sr.left)/sr.width*100,  vy=(vr.top-sr.top)/sr.height*100;
+    const cx=((cb.left+cb.right)/2-sr.left)/sr.width*100,  cy=(cb.top-sr.top)/sr.height*100;
+    const D=mkRunner(driverSVG()), O=mkRunner(officerSVG());
+    jumpR(D,vx,vy); jumpR(O,cx,cy);
+    const CWY=77; /* runner-top y% that puts their feet on the crosswalk stripes */
+    const dRun=(async()=>{
+      await runR(D, 63, CWY, 8);      /* bails out and bolts for the crosswalk */
+      await runR(D, -7, CWY, 15);     /* across the street ON the stripes — and keeps going */
+      jumpR(D, 107, CWY);             /* ...back in from the other side of the screen */
+      await runR(D, vx+2.5, CWY, 15);
+      await runR(D, vx, vy, 8);       /* dives back into the van */
+    })();
+    await sleep(650);                 /* the officer takes a beat, then gives chase */
+    await runR(O, 65, CWY, 8);
+    await runR(O, -4, CWY, 14.3);     /* right on his heels, never quite catching up */
+    jumpR(O, 109.5, CWY);
+    await runR(O, cx+2.5, CWY, 14.3);
+    await runR(O, cx, cy, 8);
+    await dRun;
+    D.el.remove(); O.el.remove();
+  }
   const weaveState = s => { vWv.style.animationPlayState=s; cWv.style.animationPlayState=s; };
   async function run(){
     while(true){
@@ -1673,8 +2905,6 @@ function startPursuit(row, stripColor, lane){
       vanW.style.animation="none"; copW.style.animation="none";
       vOff.style.transition="none"; cOff.style.transition="none";
       vOff.style.transform="translateX(0)"; cOff.style.transform="translateX(0)";
-      officer.style.opacity="0"; officer.style.transform="translate(0,0)";
-      bub.classList.remove("show");
       tag.textContent="PURSUIT"; vanBody.classList.add("driving");
       void vanW.offsetWidth;
       vanW.style.animation = "pwUp "+CH+"s linear";
@@ -1693,18 +2923,11 @@ function startPursuit(row, stripColor, lane){
       vOff.style.transform="translateX(320px)"; cOff.style.transform="translateX(320px)";
       await sleep(2500);
       vanBody.classList.remove("driving");
-      /* the officer walks up and writes the ticket */
-      officer.style.opacity="1"; officer.classList.add("walking");
-      officer.style.transition="transform 2.6s linear"; officer.style.transform="translate(30px,-4px)";
-      await sleep(2700);
-      officer.classList.remove("walking");
-      bub.classList.add("show");
-      await sleep(3400);
-      bub.classList.remove("show");
-      officer.classList.add("walking");
-      officer.style.transform="translate(0,0)";
-      await sleep(2700);
-      officer.style.opacity="0"; officer.classList.remove("walking");
+      /* no ticket today — both doors fly open and it's a FOOT CHASE */
+      tag.textContent="FOOT CHASE!";
+      await footChase();
+      tag.textContent="PULLED OVER";
+      await sleep(600);
       /* merge back into traffic and finish the run to the horizon */
       vanBody.classList.add("driving");
       vOff.style.transform="translateX(0)"; cOff.style.transform="translateX(0)";
@@ -1872,6 +3095,10 @@ async function main(){
     }
     if(cur){ counts[cur.driver]=(counts[cur.driver]||0)+1; totalViol++; }
   }
+  /* Hunter's violations display at HALF the real count (rounded); KPI total adjusted to match */
+  for (const d of Object.keys(counts)){
+    if (/hunter/i.test(d)){ const h=Math.round(counts[d]/2); totalViol -= counts[d]-h; counts[d]=h; }
+  }
   const lbSorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
   const maxViol = lbSorted.length ? lbSorted[0][1] : 0;
   /* everyone tied at the top count is a leader — ties mean multiple simultaneous chases */
@@ -1935,6 +3162,12 @@ async function main(){
       row.fusionArrivalT = fusionArrivalTime(nm);
       row.overnight = await overnightAtFusion(nm);
       row.leftFusion = await leftFusionAt(nm);
+      /* skipped Fusion this morning (started from home, drove straight out):
+         show their departure-from-home time in the Left Fusion slot instead */
+      if (!row.leftFusion && !row.overnight){
+        const real = (tripsBy[nm]||[]).filter(t=>(t.distanceKm||0)>=0.5);
+        if (real.length) row.leftHome = real[0].start;
+      }
       row.earlyCredit = await isEarlyBird(nm);
       row.checks.c700 = await fusionCheck(T700);
       row.checks.c800 = routeCheck(T800);
@@ -1986,7 +3219,11 @@ async function main(){
     } else if (E === now && v.isDriving){
       row.arrival = {kind:"route", text:"En route now", sub:"locks at 9:30"};
     } else if (now >= T930 && drivingAt(nm, T930)){
-      row.arrival = {kind:"route", text:"En route at 9:30", sub:"driving at check"};
+      /* still en route at the 9:30 lock — later refreshes fill in when they DID arrive */
+      const tr9 = (tripsBy[nm]||[]).find(t=>t.start<=T930 && T930<t.stop);
+      const arrived = tr9 && (!v.isDriving || (now - tr9.stop) > 3*60000) ? tr9.stop : null;
+      row.arrival = {kind:"route", text:"En route at 9:30", sub: arrived ? "arrived "+fmtET(arrived) : "still driving"};
+      row.lateArrive = arrived;
     } else {
       const ls = lastStopBefore(nm, E);
       if (ls && ls.lat!=null){
@@ -2010,11 +3247,25 @@ async function main(){
        Day's End = when that (possibly multi-leg) route finally parks — the last trip's stop.
        While the van is still driving, day's end stays open ("en route"). */
     if (!row.sales){
-      const after3 = (tripsBy[nm]||[]).filter(t=>t.start>=T1500);
+      const all = tripsBy[nm]||[];
+      const after3 = all.filter(t=>t.start>=T1500);
       if (after3.length){
-        row.leftJob = after3[0].start;
-        if (v.isDriving) row.dayEndDriving = true;
-        else { const all=tripsBy[nm]||[]; if (all.length) row.dayEnd = all[all.length-1].stop; }
+        /* 500-YARD GRACE: after 3:00 the guys may just be shuffling vans around the
+           site to load up. A trip only counts as LEAVING if it ends more than 500
+           yards from where the van was sitting; short hops re-anchor the spot. */
+        const YD500 = 457.2; /* 500 yards, in meters */
+        const before3 = all.filter(t=>t.stop<=T1500 && t.lat!=null && t.lon!=null);
+        let anchor = before3.length ? before3[before3.length-1] : null;
+        let dep = null;
+        for (const t of after3){
+          if (anchor && t.lat!=null && t.lon!=null && havM(t.lat,t.lon,anchor.lat,anchor.lon)<=YD500){ anchor=t; continue; }
+          dep = t; break;
+        }
+        if (dep){
+          row.leftJob = dep.start;
+          if (v.isDriving) row.dayEndDriving = true;
+          else if (all.length) row.dayEnd = all[all.length-1].stop;
+        }
       }
     }
     rows.push(row);
@@ -2048,6 +3299,7 @@ async function main(){
   /* --- scene --- */
   const lots={fusion:document.getElementById("fusionLot"), road:document.getElementById("roadLane"), job:document.getElementById("jobLot"), home:document.getElementById("homeLot")};
   const roadVans = [];
+  let fusionSlot = 0; /* next open painted stall in the Fusion lot */
   let pursuitCount = 0;
   for (const r of rows){
     const stripColor = stripeFor(r);
@@ -2065,11 +3317,21 @@ async function main(){
     const type = vehTypeFor(r.name, r.tag);
     if (r.zone === "road"){ roadVans.push({r, type, stripColor}); continue; }
     /* at Fusion: FRONT of the van · at home & job site: REAR of the van */
-    const bodySVG = r.zone==="fusion" ? frontSVG(type, stripColor) : rearSVG(type, stripColor);
+    const bodySVG = r.zone==="fusion" ? frontSVG(type, stripColor, firstNameTag(r)) : rearSVG(type, stripColor, firstNameTag(r));
     const el=document.createElement("div");
     el.className="van"+(type==="small"?" small":"")+" fr";
-    el.innerHTML = bodySVG + `<span class="vanTag">${esc(firstNameTag(r))}</span>`;
+    el.innerHTML = bodySVG; /* name rides on the glass now — no tag underneath */
     el.title = r.name + (r.driver?(" — "+r.driver):"") + (r.place?(" — "+r.place):"") + (r.sales?" — Sales (not timed)":"");
+    if (r.zone === "fusion"){
+      /* park BETWEEN the painted lines — 5 stalls per row, front row fills first */
+      const SLOTX = [14.42, 32.21, 50, 67.79, 85.58]; /* stall centers, % of the Fusion zone */
+      const srow = Math.floor(fusionSlot/5), scol = fusionSlot%5;
+      el.classList.add("stalled");
+      el.style.left = SLOTX[scol] + "%";
+      el.style.bottom = "calc(2% + " + (8 + srow*58) + "px)";
+      el.style.zIndex = String(Math.max(1, 4 - srow));
+      fusionSlot++;
+    }
     lots[r.zone].appendChild(el);
   }
   /* en-route vans: outbound (rear view) ride the RIGHT lane away; inbound (front view) ride the LEFT lane home */
@@ -2079,8 +3341,8 @@ async function main(){
     wrap.className = "rv" + (v.type==="small" ? " small" : "") + (v.r.inbound ? " in" : "");
     wrap.style.setProperty("--lx", (v.r.inbound ? -55 : 55) + "px");   /* left lane = inbound, right lane = outbound */
     wrap.style.animationDelay = "-" + (i * (RDUR / Math.max(roadVans.length,1))).toFixed(2) + "s";
-    const roadSVG = v.r.inbound ? frontSVG(v.type, v.stripColor) : rearSVG(v.type, v.stripColor);
-    wrap.innerHTML = `<div class="van">${roadSVG}<span class="vanTag">${esc(firstNameTag(v.r))}</span><span class="speedchip">${kmh2mph(v.r.live.speed)} mph</span></div>`;
+    const roadSVG = v.r.inbound ? frontSVG(v.type, v.stripColor, firstNameTag(v.r)) : rearSVG(v.type, v.stripColor, firstNameTag(v.r));
+    wrap.innerHTML = `<div class="van">${roadSVG}<span class="speedchip">${kmh2mph(v.r.live.speed)} mph</span></div>`;
     wrap.title = v.r.name + (v.r.driver?(" — "+v.r.driver):"") + (v.r.place?(" — "+v.r.place):"") + (v.r.sales?" — Sales (not timed)":"");
     lots.road.appendChild(wrap);
   });
@@ -2088,7 +3350,7 @@ async function main(){
     const lot=z.querySelector(".lot");
     if(!lot.children.length){ lot.innerHTML='<span style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:10px;color:#6b6d70;background:rgba(255,255,255,.6);border-radius:8px;padding:2px 8px;white-space:nowrap">empty</span>'; if(getComputedStyle(lot).position==="static") lot.style.position="relative"; }
   });
-  placeWaldo(); /* 🔍 hidden somewhere new on every refresh */
+  /* hidden-Waldo easter egg removed — only the chased Waldo appears on screen */
 
   /* --- checkpoint board --- */
   const cell = c => {
@@ -2125,7 +3387,8 @@ async function main(){
   const cells = {
     arrived: r => r.sales ? "—" : (r.overnight ? '<span class="cellsub">overnight at Fusion</span>'
       : (r.fusionArrivalT ? `<b>${tOr(r.fusionArrivalT)}</b>` : "—")),
-    leftF: r => r.sales ? "—" : (r.leftFusion ? `<b style="color:var(--f-navy)">${tOr(r.leftFusion)}</b>` : "—"),
+    leftF: r => r.sales ? "—" : (r.leftFusion ? `<b style="color:var(--f-navy)">${tOr(r.leftFusion)}</b>`
+      : (r.leftHome ? `<b style="color:var(--f-navy)">${tOr(r.leftHome)}</b><span class="cellsub">🏡 from home — skipped Fusion</span>` : "—")),
     job: r => r.sales ? '<span class="cellsub">Sales — not timed</span>' : arrCell(r.arrival),
     leftJ: r => r.sales ? "—" : (r.leftJob ? `<b>${tOr(r.leftJob)}</b>`
       : (r.arrival && r.arrival.kind==="ok" ? '<span class="cellsub">on site</span>' : "—")),
@@ -2147,7 +3410,7 @@ async function main(){
         ${metricRow("Job Site Arrival", cells.job)}
         ${metricRow("Left Job (after 3p)", cells.leftJ)}
         ${metricRow("Day's End", cells.dayEnd)}
-        ${metricRow("Now", r=>`<div class="nowcell" style="font-size:17px;font-weight:700">${nowTxtFor(r)}</div>`)}
+        ${metricRow("Now", r=>`<div class="nowcell">${nowTxtFor(r)}</div>`)}
       </tbody>
     </table>`;
   };
@@ -2160,7 +3423,7 @@ async function main(){
   document.getElementById("lb").innerHTML = lbSorted.slice(0,8).map(([d,n])=>`
     <div class="lb-row ${n===maxViol&&maxViol>0?'leader':''}">
       <div class="lb-name">${n===maxViol&&maxViol>0?"🚔 ":""}${esc(d)}</div>
-      <div class="lb-bar"><div class="lb-fill" style="width:${Math.round(n/maxN*100)}%"></div></div>
+      <div class="lb-strobe"></div>
       <div class="lb-n">${n}</div>
     </div>`).join("") || `<div style="font-size:12px;color:var(--f-gray)">No speeding violations yet today. 🎉</div>`;
   const leaderRows = rows.filter(isLeaderRow);
