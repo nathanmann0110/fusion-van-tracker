@@ -480,6 +480,20 @@ body.theme-southpark .spKids{display:block}
 .spKid.k2 svg{animation-delay:-.8s}
 .spKid.k3 svg{animation-delay:-1.6s}
 @keyframes kidBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2.5px)}}
+/* ---------------- THEME: "Boring" — just the vans, nothing else ---------------- */
+body.theme-boring .bear,body.theme-boring .waldo,body.theme-boring .flyer,
+body.theme-boring #pursuit,body.theme-boring .pw,body.theme-boring .footRun,
+body.theme-boring .parkedBike,body.theme-boring .vanDoor,body.theme-boring .bearLunch,
+body.theme-boring .heldWaldo,body.theme-boring .bearRider,body.theme-boring #bearSignPost,
+body.theme-boring #waldoDesk,body.theme-boring #bearDesk,body.theme-boring #waldoBed,
+body.theme-boring #bearBed,body.theme-boring .tbubble,body.theme-boring .feather{display:none!important}
+/* ---------------- THEME: "Waldo" — Waldo and nobody else ---------------- */
+body.theme-waldo .bear,body.theme-waldo .flyer,
+body.theme-waldo #pursuit,body.theme-waldo .pw,body.theme-waldo .footRun,
+body.theme-waldo .vanDoor,body.theme-waldo .bearLunch,
+body.theme-waldo .heldWaldo,body.theme-waldo .bearRider,
+body.theme-waldo #bearDesk,body.theme-waldo #bearBed,
+body.theme-waldo .tbubble,body.theme-waldo .feather{display:none!important}
 /* ---------------- THEME: "Chuck Norris" — sun-baked western desert ---------------- */
 body.theme-chuck .ground{background:linear-gradient(#e9c98d,#dcb271 45%,#c99a54)}
 body.theme-chuck .mtns polygon[fill="#2A4562"]{fill:#a5643f}
@@ -1012,7 +1026,8 @@ body:not(.theme-chuck) .flyer.shot .inner{animation:flyBob 3.2s ease-in-out infi
   <span>🚲 once per refresh Waldo ditches the bike halfway up the sidewalk, puts in a one-minute desk shift at Fusion, then rides home for a one-minute lie-down — watch the windows</span>
   <span>🤠 and if those two meet at the crosswalk: Waldo rides the bear for about five seconds, gets bucked clear off the screen, and rolls back in from the other side</span>
   <span>🚴 leave a bike unattended and the bear WILL steal it and joyride — and if he catches Waldo mid-chase he takes the bike instead, and Waldo does the chasing until he gets it back</span>
-  <span>🤠 CHUCK NORRIS theme (theme button: Classic → South Park → Simpsons → Chuck Norris): the whole scene turns western desert — cacti, tumbleweeds, red-rock mesas — and Chuck roams it karate-chopping trees clean over, HI-YAing windshields into spiderwebs, crumpling whole vans in a cloud of smoke, and shooting the early bird right out of the sky (everything he breaks fixes itself a minute later, out of pure fear)</span>
+  <span>😴 BORING theme = vans only (no bear, Waldo, chases, or early bird) · 🔍 WALDO theme = Waldo and nobody else</span>
+  <span>🤠 CHUCK NORRIS theme (theme button: Classic → South Park → Simpsons → Chuck Norris → Boring → Waldo): the whole scene turns western desert — cacti, tumbleweeds, red-rock mesas — and Chuck roams it karate-chopping trees clean over, HI-YAing windshields into spiderwebs, crumpling whole vans in a cloud of smoke, and shooting the early bird right out of the sky (everything he breaks fixes itself a minute later, out of pure fear)</span>
   <span>Sales vans (Bill Bacon, Michael Santana) show location only — no morning timing</span>
 </div>
 
@@ -1067,17 +1082,19 @@ try { const s = localStorage.getItem("vanTrackerCfg"); if (s) CFG = JSON.parse(s
 
 /* ================= DARK MODE ================= */
 /* ---------------- THEMES ---------------- */
-const THEMES=["classic","southpark","simpsons","chuck"]; /* room for more later */
+const THEMES=["classic","southpark","simpsons","chuck","boring","waldo"]; /* room for more later */
 function applyTheme(){
   const th = localStorage.getItem("vanTrackerTheme")||"classic";
   const sp = th==="southpark";
   document.body.classList.toggle("theme-southpark", sp);
   document.body.classList.toggle("theme-simpsons", th==="simpsons");
   document.body.classList.toggle("theme-chuck", th==="chuck");
+  document.body.classList.toggle("theme-boring", th==="boring");
+  document.body.classList.toggle("theme-waldo", th==="waldo");
   const btn=document.getElementById("themeBtn");
   if(btn){
     const next=THEMES[(THEMES.indexOf(th)+1)%THEMES.length];
-    const LBL={classic:"🎨 Classic", southpark:"🏔️ South Park", simpsons:"🍩 Simpsons", chuck:"🤠 Chuck Norris"};
+    const LBL={classic:"🎨 Classic", southpark:"🏔️ South Park", simpsons:"🍩 Simpsons", chuck:"🤠 Chuck Norris", boring:"😴 Boring", waldo:"🔍 Waldo"};
     btn.textContent = LBL[next] || "🎨 Theme"; /* button shows what you switch TO */
   }
   const scene=document.getElementById("scene");
@@ -1901,6 +1918,9 @@ function startFlyer(row, stripColor){
   if(!bear||!scene) return;
   const sleepB = ms=>new Promise(r=>setTimeout(r,ms));
   const traffic = ()=>!!document.querySelector("#roadLane .rv, #roadLane .pw");
+  /* quiet themes: "boring" benches EVERYBODY, "waldo" benches just the bear */
+  const bearOff  = ()=>document.body.classList.contains("theme-boring")||document.body.classList.contains("theme-waldo");
+  const waldoOff = ()=>document.body.classList.contains("theme-boring");
   let x=2, y=60, flip=false, hit=false, sit=false;
   let crossings=0; /* the bear only crosses the street ONCE between refreshes */
   const CROSS_Y = 76; /* bear-top y% that puts his paws on the crosswalk stripes */
@@ -2133,11 +2153,17 @@ function startFlyer(row, stripColor){
   /* the bear's day: something different every time */
   async function loop(){
     await sleepB(500);
-    await raidVan(sideOf(x));                 /* always opens with a lunch raid */
-    await sleepB(200);
-    await chaseWaldo();                       /* the bear spots the guy on the bike right away — guaranteed chase every open */
-    await sleepB(300);
-    while(true){ /* NEVER stops moving while he's outside */
+    let bOpened=false;
+    while(true){ /* NEVER stops moving while he's outside — unless the theme benches him */
+      if(bearOff()){ bOpened=false; await sleepB(900); continue; }
+      if(!bOpened){                             /* fresh start: lunch raid, then the guaranteed chase */
+        bOpened=true;
+        await raidVan(sideOf(x));
+        await sleepB(200);
+        await chaseWaldo();
+        await sleepB(300);
+        continue;
+      }
       if(!bearVisited && Math.random()<.3){ await bearVisit(); continue; } /* clocking in */
       if(pBike && wInside && !bearOnBike && Math.random()<.5){ await stealBike(); continue; } /* an unattended bike?! */
       const r=Math.random();
@@ -2168,6 +2194,7 @@ function startFlyer(row, stripColor){
   async function wIdle(){
     await sleepB(800);
     while(true){ /* NEVER stops moving while he's outside */
+      if(waldoOff()){ await sleepB(900); continue; } /* "boring" theme — Waldo waits in the wings */
       if(wBusy){ await sleepB(300); continue; }
       if(!visitedFusion && Math.random()<.35){ await visitFusion(); continue; }
       const t=spot(Math.random()<.5?"L":"R");
