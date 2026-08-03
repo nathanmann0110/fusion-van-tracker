@@ -312,6 +312,7 @@ table.board tr:hover{background:#fafbfc}
 table.tboard{table-layout:fixed;width:100%}
 table.tboard th{font-size:12px;padding:3px 4px}
 table.tboard th .vhead{font-size:17px;font-weight:800;color:var(--f-dark);letter-spacing:.02em}
+table.tboard th .vhead .vviol{color:var(--f-red)} /* today's speeding count — same size as the name, in red */
 table.tboard th .drivername{font-size:12px}
 table.tboard td{font-size:16px;padding:3px 4px;line-height:1.12;white-space:normal;overflow-wrap:anywhere;font-weight:400}
 table.tboard td.mlab,table.tboard th.mlab{width:125px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--f-gray);text-align:left;font-weight:700;overflow-wrap:normal}
@@ -346,8 +347,6 @@ body.dark table.tboard th .vhead{color:#e8e9ea}
 .sched-time{width:60px;font-weight:800;font-size:12px;color:var(--f-navy);font-variant-numeric:tabular-nums;flex-shrink:0;background:#fff;z-index:1}
 .sched-txt{font-size:11.5px;color:var(--f-dark);font-family:'Noto Serif',Georgia,serif;letter-spacing:.025em}
 .sched-txt b{font-family:'League Spartan',Arial,Helvetica,sans-serif;letter-spacing:.01em}
-.legend{display:flex;gap:14px;font-size:10.5px;color:var(--f-gray);margin-top:8px;flex-wrap:wrap}
-.legend span{display:flex;align-items:center;gap:4px}
 .stripchip{display:inline-block;width:18px;height:5px;border-radius:2px}
 .foot{margin-top:12px;font-size:10.5px;color:var(--f-gray);display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
 .gear{cursor:pointer;background:none;border:1px solid var(--f-light);border-radius:8px;padding:3px 10px;font-size:11px;color:var(--f-dark)}
@@ -421,7 +420,6 @@ body.dark .errbanner{background:#33171a;color:#f2b8bd}
 body.dark .gear{color:#d8dadd;border-color:#3a3f47;background:#22262d}
 body.dark .foot{color:#9aa0a8}
 body.dark .scene{border-color:#2b2f37}
-body.dark .legend{color:#9aa0a8}
 body.dark #settings .box,body.dark #login .box{background:#1c1f25;color:#d8dadd}
 body.dark #settings input,body.dark #login input{background:#14161a;border-color:#3a3f47;color:#e8e9ea}
 body.dark #login{background:linear-gradient(#14161a,#1c1f25)}
@@ -1028,23 +1026,6 @@ svg.structure.tree.flungTree{animation:treeFly 1.5s cubic-bezier(.3,.5,.55,1) fo
     <div class="kpi"><div class="n" id="kSpeed" style="color:var(--f-red)">–</div><div class="l" id="kSpeedLbl">Speeding Today</div></div>
   </div>
 </div>
-<div class="legend">
-  <span><span class="stripchip" style="background:var(--ok)"></span> green stripe = on time / good</span>
-  <span><span class="stripchip" style="background:var(--bad)"></span> red stripe = late / not where they should be</span>
-  <span><span class="stripchip" style="background:var(--f-light)"></span> gray stripe = checkpoint hasn't happened yet</span>
-  <span><span class="stripchip" style="background:#fff;border:1px solid var(--f-light)"></span> white stripe = never left Fusion after 8:00 / overnight</span>
-  <span>🚔 = today's speeding leader — pulled onto the shoulder, then BOTH bail out for a foot chase across the whole screen (and back) before they take off again</span>
-  <span>🐦 = THE early bird — first van at Fusion this morning, carried across the sky</span>
-  <span>🏡 Home = parked where the van started its day · 🏠 Job Site = parked anywhere else</span>
-  <span>🐻 the bear crosses only at the crosswalk — en-route vans stop at the flashing red — and between lunch raids and Waldo chases he now works a shift and takes a nap, same as Waldo (they get separate windows)</span>
-  <span>🚲 once per refresh Waldo ditches the bike halfway up the sidewalk, puts in a one-minute desk shift at Fusion, then rides home for a one-minute lie-down — watch the windows</span>
-  <span>🤠 and if those two meet at the crosswalk: Waldo rides the bear for about five seconds, gets bucked clear off the screen, and rolls back in from the other side</span>
-  <span>🚴 leave a bike unattended and the bear WILL steal it and joyride — and if he catches Waldo mid-chase he takes the bike instead, and Waldo does the chasing until he gets it back</span>
-  <span>😴 BORING theme = vans only (no bear, Waldo, chases, or early bird) · 🔍 WALDO theme = Waldo and nobody else</span>
-  <span>🤠 CHUCK NORRIS theme (theme button: Classic → South Park → Simpsons → Chuck Norris → Boring → Waldo): the whole scene turns western desert — cacti, tumbleweeds, red-rock mesas — and blonde Chuck roams it sending everything he hits FLYING clean off the screen: trees, cracked-windshield vans, whole crumpled wrecks (it all sheepishly comes back a minute later, out of pure fear), plus he shoots the early bird right out of the sky. And if he crosses paths with the bear it's a full karate brawl — spinning jump kicks vs. grizzly haymakers — Chuck wins, rides the bear for five glorious seconds, and gets bucked into next week</span>
-  <span>Sales vans (Bill Bacon, Michael Santana) show location only — no morning timing</span>
-</div>
-
 <div id="loading" style="display:none"><span class="spin"></span>Pulling live Geotab data — vans, trips, and violations…</div>
 
 <div class="cols" id="mainCols" style="display:none">
@@ -1096,19 +1077,23 @@ try { const s = localStorage.getItem("vanTrackerCfg"); if (s) CFG = JSON.parse(s
 
 /* ================= DARK MODE ================= */
 /* ---------------- THEMES ---------------- */
-const THEMES=["classic","southpark","simpsons","chuck","boring","waldo"]; /* room for more later */
+const THEMES=["classic","southpark","simpsons","chuck","boring","waldo","random"]; /* room for more later */
+const SCENES=THEMES.slice(0,-1); /* real scenes "random" can land on */
+let RANDOM_PICK=null; /* scene rolled for this page load while theme = random */
 function applyTheme(){
   const th = localStorage.getItem("vanTrackerTheme")||"classic";
-  const sp = th==="southpark";
+  if(th==="random" && !RANDOM_PICK) RANDOM_PICK=SCENES[Math.floor(Math.random()*SCENES.length)];
+  const eff = th==="random" ? RANDOM_PICK : th; /* the scene actually shown */
+  const sp = eff==="southpark";
   document.body.classList.toggle("theme-southpark", sp);
-  document.body.classList.toggle("theme-simpsons", th==="simpsons");
-  document.body.classList.toggle("theme-chuck", th==="chuck");
-  document.body.classList.toggle("theme-boring", th==="boring");
-  document.body.classList.toggle("theme-waldo", th==="waldo");
+  document.body.classList.toggle("theme-simpsons", eff==="simpsons");
+  document.body.classList.toggle("theme-chuck", eff==="chuck");
+  document.body.classList.toggle("theme-boring", eff==="boring");
+  document.body.classList.toggle("theme-waldo", eff==="waldo");
   const btn=document.getElementById("themeBtn");
   if(btn){
     const next=THEMES[(THEMES.indexOf(th)+1)%THEMES.length];
-    const LBL={classic:"🎨 Classic", southpark:"🏔️ South Park", simpsons:"🍩 Simpsons", chuck:"🤠 Chuck Norris", boring:"😴 Boring", waldo:"🔍 Waldo"};
+    const LBL={classic:"🎨 Classic", southpark:"🏔️ South Park", simpsons:"🍩 Simpsons", chuck:"🤠 Chuck Norris", boring:"😴 Boring", waldo:"🔍 Waldo", random:"🎲 Random"};
     btn.textContent = LBL[next] || "🎨 Theme"; /* button shows what you switch TO */
   }
   const scene=document.getElementById("scene");
@@ -1132,15 +1117,11 @@ function applyTheme(){
 function cycleTheme(){
   const cur=localStorage.getItem("vanTrackerTheme")||"classic";
   const next=THEMES[(THEMES.indexOf(cur)+1)%THEMES.length];
+  RANDOM_PICK=null; /* entering Random re-rolls the scene */
   try{ localStorage.setItem("vanTrackerTheme", next); }catch(e){}
   applyTheme();
 }
-/* Cycle to the next scene on every page load (refresh button + 5-min auto-reload) */
-try{
-  const cur=localStorage.getItem("vanTrackerTheme")||"classic";
-  const next=THEMES[(THEMES.indexOf(cur)+1)%THEMES.length];
-  localStorage.setItem("vanTrackerTheme", next);
-}catch(e){}
+/* Random theme rolls a fresh scene on every page load (refresh button + 5-min auto-reload) */
 setTimeout(applyTheme, 0);
 function toggleDark(){
   const on = document.body.classList.toggle("dark");
@@ -2503,13 +2484,15 @@ function startFlyer(row, stripColor){
     face:d=>{ flip=d; setT(); },
     cls:bear.classList
   };
+  /* shared crosswalk controls — Chuck has to use the crosswalk too now */
+  window.__xwalk={ red:lampRed, green:lampGreen, traffic:traffic, Y:CROSS_Y };
   wSpawn();
   wIdle();
   loop();
 })();
 
 /* ================= CHUCK NORRIS =================
-   He doesn't use the crosswalk. He doesn't wait for anything. He roams the
+   He uses the crosswalk now (per management). He roams the
    scene destroying it with karate: chops trees clean over, HI-YAs van
    windshields into spiderwebs, crumples a whole van inside a cloud of smoke,
    and if that early bird dares fly over — he shoots it right out of the sky.
@@ -2527,13 +2510,34 @@ function startFlyer(row, stripColor){
   ch.style.left=x+"%"; ch.style.top=y+"%"; setT();
   function halfPct(yy){ const W=scene.clientWidth||1400; const f=Math.min(Math.max((yy+6-58)/42,0),1); return (38+202*f)/W*100; }
   const offRoad=(tx,ty)=>{ const h=halfPct(ty); return tx<50 ? Math.min(tx,50-h-4.5) : Math.max(tx,50+h+1); };
-  async function walkTo(tx,ty,vel){
+  async function walkRaw(tx,ty,vel){
     ch.style.transition="none"; flip=tx<x; setT(); void ch.offsetWidth;
     const dur=Math.max(.9, Math.hypot(tx-x,(ty-y)*1.2)/(vel||2.2));
     x=tx; y=ty;
     ch.style.transition="left "+dur+"s linear, top "+dur+"s linear, transform "+dur+"s linear";
     ch.style.left=x+"%"; ch.style.top=y+"%"; setT();
     await zz(dur*1000);
+  }
+  /* even Chuck Norris uses the crosswalk now (per management). the road appreciates it */
+  const sideOfC=v=>v<50?"L":"R";
+  let crossingC=false;
+  async function walkTo(tx,ty,vel){
+    const XW=window.__xwalk;
+    if(XW && !crossingC && sideOfC(tx)!==sideOfC(x)){
+      crossingC=true;
+      try{
+        const CY=XW.Y, h=halfPct(CY);
+        const nearEdge = sideOfC(x)==="L" ? 50-h-4.5 : 50+h+0.5;
+        const farEdge  = sideOfC(x)==="L" ? 50+h+0.5 : 50-h-4.5;
+        await walkRaw(nearEdge, CY, vel);   /* strolls to the stripes */
+        await zz(400);                      /* looks both ways. begrudgingly */
+        const mustStop=XW.traffic();
+        if(mustStop){ XW.red(); await zz(1200); } /* flashing red — vans queue at the line */
+        await walkRaw(farEdge, CY, vel);    /* crosses ON the stripes */
+        if(mustStop) XW.green();
+      } finally{ crossingC=false; }
+    }
+    return walkRaw(tx,ty,vel);
   }
   /* speech bubble — counter-mirrored so the text reads right when he's flipped */
   function bub(txt){
@@ -2696,7 +2700,7 @@ function startFlyer(row, stripColor){
     const cy=Math.min(Math.max((bp.y+y)/2,46),84);
     const mx=Math.min(Math.max((bp.x+x)/2,8),90);
     const chuckLeft=x<=bp.x;
-    await Promise.all([ walkTo(chuckLeft?mx-4:mx+3.5, cy, 3.4), B.walk(chuckLeft?mx+3.5:mx-4, cy-0.4, 3.4) ]);
+    await Promise.all([ walkRaw(chuckLeft?mx-4:mx+3.5, cy, 3.4), B.walk(chuckLeft?mx+3.5:mx-4, cy-0.4, 3.4) ]); /* brawl choreography — no crosswalk detours mid-fight */
     flip=!chuckLeft; setT(); B.face(chuckLeft);
     let b=bub("YOU WANT SOME?!"); await zz(1000); b.remove();
     if(!inTheme()){ ch.style.zIndex=""; B.el.style.zIndex=""; B.release(); return true; }
@@ -2707,7 +2711,7 @@ function startFlyer(row, stripColor){
     for(let i=0;i<3;i++){
       b=bub(yells[i]);
       const cx0=x, bx0=B.pos().x;
-      await Promise.all([ walkTo(bx0, cy+rnd(-1.5,1.5), 7), B.walk(cx0, cy+rnd(-1.5,1.5), 7) ]);
+      await Promise.all([ walkRaw(bx0, cy+rnd(-1.5,1.5), 7), B.walk(cx0, cy+rnd(-1.5,1.5), 7) ]);
       b.remove();
     }
     /* the finisher */
@@ -3279,6 +3283,8 @@ async function main(){
   /* everyone tied at the top count is a leader — ties mean multiple simultaneous chases */
   const leaders = maxViol>0 ? lbSorted.filter(e=>e[1]===maxViol).map(e=>e[0]) : [];
   const isLeaderRow = r => leaders.some(d=>r.driver===d || r.name.includes(d));
+  /* today's violation count for a row — shown in red beside the driver's name */
+  const violFor = r => { for(const [d,n] of lbSorted){ if(r.driver===d || (r.name&&r.name.includes(d))) return n; } return 0; };
 
   /* --- THE early bird: first van to arrive at Fusion this morning (real drive-in, before 9:30) --- */
   let ebWinner = null, ebTime = null;
@@ -3574,7 +3580,8 @@ async function main(){
   const bandHTML = vans => {
     const heads = vans.map(r=>{
       const marks = (isLeaderRow(r)?" 🚔":"") + (r.earlyBird?" 🐦":"");
-      return `<th><div class="vhead">${esc(firstNameTag(r))}${marks}</div><span class="drivername">${esc(r.tag)}${r.sales?" · SALES":""}</span></th>`;
+      const nv = violFor(r);
+      return `<th><div class="vhead">${esc(firstNameTag(r))}${nv?` <span class="vviol">${nv}</span>`:""}${marks}</div><span class="drivername">${esc(r.tag)}${r.sales?" · SALES":""}</span></th>`;
     }).join("");
     const metricRow = (label, fn) => `<tr><td class="mlab">${label}</td>${vans.map(r=>`<td>${fn(r)}</td>`).join("")}</tr>`;
     return `<table class="board tboard">
