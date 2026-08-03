@@ -514,6 +514,8 @@ body.theme-chuck .westFolk{display:block}
 body:not(.theme-chuck) .chuck,body:not(.theme-chuck) .chuckSmoke,body:not(.theme-chuck) .crackOl,body:not(.theme-chuck) .feather{display:none!important}
 body:not(.theme-chuck) .van.crumpled > svg{transform:none;filter:none}
 body:not(.theme-chuck) .structure.tree.felled{transform:scale(3)}
+body:not(.theme-chuck) .chuckFlung>svg,body:not(.theme-chuck) .chuckFlung .crackOl,body:not(.theme-chuck) svg.structure.tree.flungTree{animation:none!important}
+body:not(.theme-chuck) .chuckRider{display:none!important}
 body:not(.theme-chuck) .flyer.shot .inner{animation:flyBob 3.2s ease-in-out infinite}
 /* ---------------- CHUCK NORRIS ---------------- */
 .chuck{position:absolute;left:92%;top:60%;width:36px;height:59px;z-index:1;pointer-events:none}
@@ -533,11 +535,23 @@ body:not(.theme-chuck) .flyer.shot .inner{animation:flyBob 3.2s ease-in-out infi
 @keyframes mFlash{from{transform:scale(.5)}to{transform:scale(1.3)}}
 .chBub{position:absolute;left:50%;top:-20px;transform:translateX(-50%);background:#fff;border:2px dashed var(--f-red);color:var(--f-red);
   font-weight:800;font-size:11px;border-radius:9px;padding:2px 8px;white-space:nowrap;z-index:9;pointer-events:none}
-/* trees go DOWN (and quietly regrow later — they know better than to stay dead) */
+/* trees go FLYING clean off the screen (and quietly regrow later — they know better than to stay dead) */
 .structure.tree{transition:transform 1.1s cubic-bezier(.55,-0.35,.7,-0.05),opacity .6s}
 .structure.tree.felled{transform:scale(3) rotate(82deg)}
 .structure.tree.felled.fL{transform:scale(3) rotate(-82deg)}
 .structure.tree.regrow{transition:none}
+svg.structure.tree.flungTree{animation:treeFly 1.5s cubic-bezier(.3,.5,.55,1) forwards}
+@keyframes treeFly{0%{transform:scale(3)}16%{transform:scale(3) rotate(var(--tip,14deg))}100%{transform:scale(3) translate(var(--fx,-300px),-680px) rotate(var(--fr,-620deg));opacity:0}}
+/* anything Chuck hits leaves the screen entirely */
+.chuckFlung>svg,.chuckFlung .crackOl{animation:chuckFly 1.5s cubic-bezier(.3,.5,.55,1) forwards}
+@keyframes chuckFly{0%{transform:none}100%{transform:translate(var(--fx,70vw),-120vh) rotate(var(--fr,880deg));opacity:.9}}
+/* CHUCK vs BEAR — spinning jump kicks vs. grizzly haymakers */
+.chuck.fightSpin svg{animation:cnSpinKick .55s linear infinite}
+@keyframes cnSpinKick{0%{transform:translateY(0) rotate(0)}45%{transform:translateY(-30px) rotate(200deg)}100%{transform:translateY(0) rotate(360deg)}}
+.chuck.fighting .armR{animation:chChop .15s linear infinite}
+.bear.brawl svg{animation:bearBrawl .42s ease-in-out infinite}
+@keyframes bearBrawl{0%,100%{transform:rotate(0) translate(0,0)}30%{transform:rotate(-26deg) translate(-8px,-10px)}65%{transform:rotate(16deg) translate(9px,0)}}
+.chuck.ragdoll svg{animation:ragSpin .45s linear infinite}
 /* karate damage on the vans */
 .van .crackOl{position:absolute;left:16%;top:12%;width:68%;height:40%;z-index:3;pointer-events:none}
 .van .crackOl svg{width:100%;height:100%;overflow:visible;display:block}
@@ -1027,7 +1041,7 @@ body:not(.theme-chuck) .flyer.shot .inner{animation:flyBob 3.2s ease-in-out infi
   <span>🤠 and if those two meet at the crosswalk: Waldo rides the bear for about five seconds, gets bucked clear off the screen, and rolls back in from the other side</span>
   <span>🚴 leave a bike unattended and the bear WILL steal it and joyride — and if he catches Waldo mid-chase he takes the bike instead, and Waldo does the chasing until he gets it back</span>
   <span>😴 BORING theme = vans only (no bear, Waldo, chases, or early bird) · 🔍 WALDO theme = Waldo and nobody else</span>
-  <span>🤠 CHUCK NORRIS theme (theme button: Classic → South Park → Simpsons → Chuck Norris → Boring → Waldo): the whole scene turns western desert — cacti, tumbleweeds, red-rock mesas — and Chuck roams it karate-chopping trees clean over, HI-YAing windshields into spiderwebs, crumpling whole vans in a cloud of smoke, and shooting the early bird right out of the sky (everything he breaks fixes itself a minute later, out of pure fear)</span>
+  <span>🤠 CHUCK NORRIS theme (theme button: Classic → South Park → Simpsons → Chuck Norris → Boring → Waldo): the whole scene turns western desert — cacti, tumbleweeds, red-rock mesas — and blonde Chuck roams it sending everything he hits FLYING clean off the screen: trees, cracked-windshield vans, whole crumpled wrecks (it all sheepishly comes back a minute later, out of pure fear), plus he shoots the early bird right out of the sky. And if he crosses paths with the bear it's a full karate brawl — spinning jump kicks vs. grizzly haymakers — Chuck wins, rides the bear for five glorious seconds, and gets bucked into next week</span>
   <span>Sales vans (Bill Bacon, Michael Santana) show location only — no morning timing</span>
 </div>
 
@@ -1121,6 +1135,12 @@ function cycleTheme(){
   try{ localStorage.setItem("vanTrackerTheme", next); }catch(e){}
   applyTheme();
 }
+/* Cycle to the next scene on every page load (refresh button + 5-min auto-reload) */
+try{
+  const cur=localStorage.getItem("vanTrackerTheme")||"classic";
+  const next=THEMES[(THEMES.indexOf(cur)+1)%THEMES.length];
+  localStorage.setItem("vanTrackerTheme", next);
+}catch(e){}
 setTimeout(applyTheme, 0);
 function toggleDark(){
   const on = document.body.classList.toggle("dark");
@@ -1843,16 +1863,16 @@ function chuckSVG(){
     <path d="M8.2 22.5 q8.8 -4 17.6 0 l1.6 13.8 q-10.4 4.2 -20.8 0 Z" fill="#7d8a5c"/>
     <path d="M13.2 22 L17 28.4 L20.8 22 Z" fill="#e8c39a"/>
     <path d="M12.6 21.4 L17 28.8 L21.4 21.4" stroke="#66744a" stroke-width="1.4" fill="none"/>
-    <path d="M15.3 23.4 q.8 .8 1.7 0 M14.9 25 q.9 .9 2 .1 M15.8 26.4 q.7 .6 1.5 0" stroke="#4a3a28" stroke-width=".55" fill="none"/>
+    <path d="M15.3 23.4 q.8 .8 1.7 0 M14.9 25 q.9 .9 2 .1 M15.8 26.4 q.7 .6 1.5 0" stroke="#c7992f" stroke-width=".55" fill="none"/>
     <path d="M8.6 24 q-3.6 3.2 -3 8.4" stroke="#7d8a5c" stroke-width="3.4" fill="none" stroke-linecap="round"/>
     <circle cx="5.8" cy="33.2" r="1.9" fill="#e8c39a"/>
     <circle cx="17" cy="12.5" r="7.2" fill="#e8c39a"/>
-    <path d="M10 11.5 q-1.6 5.2 1.6 8 l1.6 -1.4 q-1.8 -3 -1 -6.2 Z" fill="#3a2c20"/>
-    <path d="M24 11.5 q1.6 5.2 -1.6 8 l-1.6 -1.4 q1.8 -3 1 -6.2 Z" fill="#3a2c20"/>
+    <path d="M10 11.5 q-1.6 5.2 1.6 8 l1.6 -1.4 q-1.8 -3 -1 -6.2 Z" fill="#e9c34a"/>
+    <path d="M24 11.5 q1.6 5.2 -1.6 8 l-1.6 -1.4 q1.8 -3 1 -6.2 Z" fill="#e9c34a"/>
     <ellipse cx="14.3" cy="12" rx="2.9" ry="3.2" fill="#fff"/><ellipse cx="19.7" cy="12" rx="2.9" ry="3.2" fill="#fff"/>
     <circle cx="15.2" cy="12.5" r="1.05" fill="#1b1b1d"/><circle cx="18.8" cy="12.5" r="1.05" fill="#1b1b1d"/>
-    <path d="M11.4 8.7 q2.9 -1.5 5.1 -.2 M17.5 8.5 q2.2 -1.3 5.1 .2" stroke="#241a12" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-    <path d="M11.6 15.4 q5.4 2.8 10.8 0 l-1 3.7 q-4.4 2.7 -8.8 0 Z" fill="#4a3423"/>
+    <path d="M11.4 8.7 q2.9 -1.5 5.1 -.2 M17.5 8.5 q2.2 -1.3 5.1 .2" stroke="#c9992e" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+    <path d="M11.6 15.4 q5.4 2.8 10.8 0 l-1 3.7 q-4.4 2.7 -8.8 0 Z" fill="#dcae38"/>
     <path d="M14.4 20.1 q2.6 1.3 5.2 0" stroke="#c99d72" stroke-width=".7" fill="none"/>
     <ellipse cx="17" cy="6.9" rx="12" ry="3.2" fill="#7a5c3d"/>
     <path d="M10.6 6.6 q0 -6.2 6.4 -6.2 q6.4 0 6.4 6.2 Z" fill="#8a6a45"/>
@@ -1922,6 +1942,7 @@ function startFlyer(row, stripColor){
   const bearOff  = ()=>document.body.classList.contains("theme-boring")||document.body.classList.contains("theme-waldo");
   const waldoOff = ()=>document.body.classList.contains("theme-boring");
   let x=2, y=60, flip=false, hit=false, sit=false;
+  let fighting=false, raiding=false; /* Chuck Norris business — see the fight API at the bottom */
   let crossings=0; /* the bear only crosses the street ONCE between refreshes */
   const CROSS_Y = 76; /* bear-top y% that puts his paws on the crosswalk stripes */
   bear.style.animation="none"; /* JS drives him now, not the CSS wander */
@@ -1936,6 +1957,7 @@ function startFlyer(row, stripColor){
     return (38+202*f)/W*100;
   }
   async function walkTo(tx,ty,vel,minD){
+    if(fighting) return false; /* Chuck has the bear — nobody else drives him */
     bear.style.transition="none";
     flip = tx < x; setT(); void bear.offsetWidth; /* face the right way instantly */
     const dur=Math.max(minD||3.2, Math.hypot(tx-x,(ty-y)*1.2)/(vel||1.2)); /* lazy amble by default — quicker when chasing */
@@ -2008,7 +2030,7 @@ function startFlyer(row, stripColor){
       await walkTo(nearEdge, CROSS_Y, vel, minD); /* amble (or hustle) to the crosswalk */
       await sleepB(chaseMode?250:500);            /* look both ways */
       /* Waldo around? when these two meet at the crosswalk, it turns into a RODEO */
-      if(!rodeoDone && !chaseMode && wd && !wBusy && !wVisiting && !wInside && wd.el.style.display!=="none"){
+      if(!rodeoDone && !chaseMode && !fighting && wd && !wBusy && !wVisiting && !wInside && wd.el.style.display!=="none"){
         await rodeo(h);
       }
       const mustStop = traffic();
@@ -2024,6 +2046,10 @@ function startFlyer(row, stripColor){
   /* lunch-box raid: pick a parked van (optionally on one side of the road),
      open the door, help himself, close it up */
   async function raidVan(side){
+    raiding=true;
+    try{ await raidVanInner(side); } finally{ raiding=false; }
+  }
+  async function raidVanInner(side){
     const s0=scene.getBoundingClientRect();
     let vans=[...document.querySelectorAll("#fusionLot .van, #jobLot .van, #homeLot .van")];
     if(side) vans=vans.filter(el=>{
@@ -2155,6 +2181,7 @@ function startFlyer(row, stripColor){
     await sleepB(500);
     let bOpened=false;
     while(true){ /* NEVER stops moving while he's outside — unless the theme benches him */
+      if(fighting){ await sleepB(400); continue; } /* currently in a karate fight */
       if(bearOff()){ bOpened=false; await sleepB(900); continue; }
       if(!bOpened){                             /* fresh start: lunch raid, then the guaranteed chase */
         bOpened=true;
@@ -2324,6 +2351,10 @@ function startFlyer(row, stripColor){
   /* Waldo's inside and the bike is just... sitting there */
   async function stealBike(){
     if(!pBike || !wInside) return;
+    raiding=true;                                /* no karate interruptions mid-heist */
+    try{ await stealBikeInner(); } finally{ raiding=false; }
+  }
+  async function stealBikeInner(){
     const bx=parseFloat(pBike.style.left), by=parseFloat(pBike.style.top);
     await travelTo(bx-1.5, by-1, 1.9, 1.5);      /* pads over, all casual */
     if(!pBike || !wInside) return;               /* moment's gone */
@@ -2441,6 +2472,7 @@ function startFlyer(row, stripColor){
   }
   /* watcher: keep him visible while he's on the Fusion parking lot */
   setInterval(function(){
+    if(fighting) return;                /* Chuck's fight sets its own z-index */
     if(bear.style.zIndex==="3") return; /* mid-raid — leave him in front */
     const s=scene.getBoundingClientRect(), b=bear.getBoundingClientRect();
     const px=((b.left+b.right)/2-s.left)/s.width*100;
@@ -2448,6 +2480,29 @@ function startFlyer(row, stripColor){
     const onWalk = (px>6.8 && px<13 && py>56); /* on the Fusion sidewalk — he covers it, not vice versa */
     bear.style.zIndex = ((px<26.5 && py>77) || onWalk) ? 3 : "";
   }, 400);
+  /* ============ CHUCK vs BEAR — the bear's half of the deal ============
+     Chuck's IIFE (further down) referees the whole fight through this API.
+     grab() freezes the bear's own brain; walk() is an uninterruptible mover */
+  async function fWalk(tx,ty,vel){
+    bear.style.transition="none"; flip=tx<x; setT(); void bear.offsetWidth;
+    const dur=Math.max(.45, Math.hypot(tx-x,(ty-y)*1.2)/(vel||3.4));
+    x=tx; y=ty;
+    bear.style.transition="left "+dur+"s linear, top "+dur+"s linear, transform "+dur+"s linear";
+    bear.style.left=x+"%"; bear.style.top=y+"%"; setT();
+    await sleepB(dur*1000);
+  }
+  window.__bearFight={
+    el:bear,
+    pos:()=>({x:x,y:y}),
+    free:()=>!bearOff() && !fighting && !raiding && !wBusy && !bVisiting && !bearOnBike && !sit
+          && bear.style.visibility!=="hidden" && bear.style.zIndex!=="3",
+    grab:()=>{ if(fighting||raiding||wBusy||bVisiting||bearOnBike||sit||bear.style.visibility==="hidden") return false;
+               fighting=true; hit=true; return true; },
+    release:()=>{ hit=false; fighting=false; },
+    walk:fWalk,
+    face:d=>{ flip=d; setT(); },
+    cls:bear.classList
+  };
   wSpawn();
   wIdle();
   loop();
@@ -2493,7 +2548,7 @@ function startFlyer(row, stripColor){
   const lotVans=()=>[...document.querySelectorAll("#fusionLot .van, #jobLot .van, #homeLot .van")];
   /* ---- TIMBER: karate-chops a tree over; it sheepishly regrows later ---- */
   async function chopTree(){
-    const trees=[...document.querySelectorAll(".structure.tree")].filter(t=>!t.classList.contains("felled"));
+    const trees=[...document.querySelectorAll(".structure.tree")].filter(t=>!t.classList.contains("felled")&&!t.classList.contains("flungTree"));
     if(!trees.length) return;
     const t=trees[Math.floor(Math.random()*trees.length)];
     const p=pctOf(t); if(!p.w) return;
@@ -2504,13 +2559,16 @@ function startFlyer(row, stripColor){
     const b=bub("HI-YAAA!");
     ch.classList.add("chopping"); ch.classList.remove("running");
     await zz(1900);
-    if(side>0) t.classList.add("fL");   /* falls AWAY from Chuck. obviously. */
-    t.classList.add("felled");
-    await zz(1400);
+    const d=side>0?-1:1;                /* flies AWAY from Chuck. obviously. */
+    t.style.setProperty("--fx",(d*(260+Math.random()*140)).toFixed(0)+"px");
+    t.style.setProperty("--fr",(d*(560+Math.random()*300)).toFixed(0)+"deg");
+    t.style.setProperty("--tip",(d*14)+"deg");
+    t.classList.add("flungTree");       /* clean off the screen */
+    await zz(1500);
     ch.classList.remove("chopping"); ch.classList.add("running"); b.remove();
     ch.style.zIndex="";
     setTimeout(function(){
-      t.classList.add("regrow"); t.classList.remove("felled","fL");
+      t.classList.add("regrow"); t.classList.remove("flungTree");
       requestAnimationFrame(()=>requestAnimationFrame(()=>t.classList.remove("regrow")));
     }, 50000);
     await zz(300);
@@ -2523,7 +2581,7 @@ function startFlyer(row, stripColor){
       <path d="M13 7.5 L11 11.5 M27.5 5 L30.5 10 M15.5 15.5 L20.5 16.5" stroke-width=".8"/></g></svg>`;
   }
   async function smashVan(){
-    const vans=lotVans().filter(v=>!v.querySelector(".crackOl") && !v.classList.contains("crumpled"));
+    const vans=lotVans().filter(v=>!v.querySelector(".crackOl") && !v.classList.contains("crumpled") && !v.classList.contains("chuckFlung"));
     if(!vans.length) return;
     const v=vans[Math.floor(Math.random()*vans.length)];
     const p=pctOf(v); if(!p.w) return;
@@ -2537,8 +2595,13 @@ function startFlyer(row, stripColor){
     const c=document.createElement("div"); c.className="crackOl"; c.innerHTML=crackSVG(); v.appendChild(c);
     v.classList.add("jolt"); setTimeout(()=>v.classList.remove("jolt"),600);
     await zz(700);
+    const d=fromRight?-1:1;             /* ...and the WHOLE VAN leaves the screen */
+    v.style.setProperty("--fx",(d*(55+Math.random()*25)).toFixed(0)+"vw");
+    v.style.setProperty("--fr",(d*(720+Math.random()*540)).toFixed(0)+"deg");
+    v.classList.add("chuckFlung");
+    await zz(1400);
     ch.classList.remove("chopping"); ch.classList.add("running"); b.remove(); ch.style.zIndex="";
-    setTimeout(function(){ c.style.transition="opacity 1s"; c.style.opacity="0"; setTimeout(()=>c.remove(),1100); }, 60000);
+    setTimeout(function(){ v.classList.remove("chuckFlung"); c.remove(); }, 60000);
     await zz(300);
   }
   /* ---- full crumple: a flurry of chops inside a cloud of smoke ---- */
@@ -2555,7 +2618,7 @@ function startFlyer(row, stripColor){
     v.appendChild(s); return s;
   }
   async function crumpleVan(){
-    const vans=lotVans().filter(v=>!v.classList.contains("crumpled"));
+    const vans=lotVans().filter(v=>!v.classList.contains("crumpled") && !v.classList.contains("chuckFlung"));
     if(!vans.length) return;
     const v=vans[Math.floor(Math.random()*vans.length)];
     const p=pctOf(v); if(!p.w) return;
@@ -2570,10 +2633,15 @@ function startFlyer(row, stripColor){
     v.classList.add("jolt");
     await zz(500); v.classList.remove("jolt");
     v.classList.add("crumpled");
-    await zz(2600);
+    await zz(900);
+    const d=fromRight?-1:1;             /* the wreck exits the county entirely */
+    v.style.setProperty("--fx",(d*(55+Math.random()*25)).toFixed(0)+"vw");
+    v.style.setProperty("--fr",(d*(720+Math.random()*540)).toFixed(0)+"deg");
+    v.classList.add("chuckFlung");
+    await zz(1700);
     smoke.remove(); b.remove();
     ch.classList.remove("chopping","frenzy"); ch.classList.add("running"); ch.style.zIndex="";
-    setTimeout(()=>v.classList.remove("crumpled"), 75000);
+    setTimeout(()=>v.classList.remove("crumpled","chuckFlung"), 75000);
     await zz(300);
   }
   /* ---- the early bird learns about the second amendment ---- */
@@ -2612,6 +2680,85 @@ function startFlyer(row, stripColor){
     }, 2300);
     return true;
   }
+  /* ---- CROSS PATHS WITH THE BEAR? IT'S ON. ----
+     spinning jump kicks vs. grizzly haymakers. Chuck wins (obviously), claims
+     his prize with a 5-second victory ride, and gets bucked into next week */
+  let nextFight=0;
+  async function bearFight(){
+    const B=window.__bearFight;
+    if(!B || Date.now()<nextFight || !B.free()) return false;
+    const bp=B.pos();
+    if(Math.abs(bp.x-x)>17 || Math.abs(bp.y-y)>13) return false; /* paths not crossed yet */
+    if(!B.grab()) return false;
+    nextFight=Date.now()+90000;
+    ch.style.zIndex="6"; B.el.style.zIndex="6";
+    /* square up nose to snout */
+    const cy=Math.min(Math.max((bp.y+y)/2,46),84);
+    const mx=Math.min(Math.max((bp.x+x)/2,8),90);
+    const chuckLeft=x<=bp.x;
+    await Promise.all([ walkTo(chuckLeft?mx-4:mx+3.5, cy, 3.4), B.walk(chuckLeft?mx+3.5:mx-4, cy-0.4, 3.4) ]);
+    flip=!chuckLeft; setT(); B.face(chuckLeft);
+    let b=bub("YOU WANT SOME?!"); await zz(1000); b.remove();
+    if(!inTheme()){ ch.style.zIndex=""; B.el.style.zIndex=""; B.release(); return true; }
+    /* the brawl: flying passes straight through each other, all feet and fur */
+    ch.classList.remove("running"); ch.classList.add("fightSpin","fighting");
+    B.cls.add("brawl");
+    const yells=["POW!","WHA-CHA!","BAM!"];
+    for(let i=0;i<3;i++){
+      b=bub(yells[i]);
+      const cx0=x, bx0=B.pos().x;
+      await Promise.all([ walkTo(bx0, cy+rnd(-1.5,1.5), 7), B.walk(cx0, cy+rnd(-1.5,1.5), 7) ]);
+      b.remove();
+    }
+    /* the finisher */
+    ch.classList.remove("fightSpin");
+    flip = B.pos().x < x; setT();
+    b=bub("HI-YAAAA!");
+    await zz(600);
+    B.cls.remove("brawl");
+    const bsvg=B.el.querySelector("svg");
+    bsvg.style.transition="transform .5s ease"; bsvg.style.transform="rotate(100deg)"; /* down goes the bear */
+    await zz(1400); b.remove();
+    bsvg.style.transform=""; setTimeout(function(){ bsvg.style.transition=""; },600);
+    ch.classList.remove("fighting");
+    await zz(650);
+    /* victory lap: Chuck rides the bear. the bear files a complaint. */
+    ch.style.display="none";
+    const rider=document.createElement("div");
+    rider.className="bearRider chuckRider"; rider.innerHTML=chuckSVG();
+    B.el.appendChild(rider);
+    B.cls.add("bucking");
+    const t0=Date.now();
+    while(Date.now()-t0<5000){                    /* five glorious seconds */
+      const p0=B.pos();
+      await B.walk(Math.min(Math.max(p0.x+rnd(-11,11),6),92), Math.min(Math.max(p0.y+rnd(-4,4),48),84), 4);
+    }
+    B.cls.remove("bucking"); rider.remove();      /* BUCKED. */
+    const p=B.pos();
+    x=p.x; y=p.y;
+    ch.style.display=""; ch.style.transition="none";
+    ch.style.left=x+"%"; ch.style.top=y+"%"; setT(); void ch.offsetWidth;
+    ch.classList.remove("running"); ch.classList.add("ragdoll");
+    const dir=Math.random()<.5?-1:1;              /* launched a good ways, two-phase arc */
+    const ly=Math.min(Math.max(y+rnd(-2,4),46),84);
+    const lx=offRoad(Math.min(Math.max(x+dir*rnd(14,20),4),92), ly);
+    ch.style.transition="left .55s linear, top .55s cubic-bezier(.3,.8,.55,1)";
+    x=(x+lx)/2; y=ly-15; ch.style.left=x+"%"; ch.style.top=y+"%";
+    await zz(550);
+    ch.style.transition="left .55s linear, top .55s cubic-bezier(.5,0,.8,.4)";
+    x=lx; y=ly; ch.style.left=x+"%"; ch.style.top=y+"%";
+    await zz(600);
+    ch.classList.remove("ragdoll");
+    const csvg=ch.querySelector("svg");
+    csvg.style.transition="transform .4s"; csvg.style.transform="rotate(96deg)"; /* seeing stars */
+    b=bub("...NICE BEAR.");
+    await zz(1600); b.remove();
+    csvg.style.transform=""; setTimeout(function(){ csvg.style.transition=""; },500);
+    ch.classList.add("running");
+    ch.style.zIndex=""; B.el.style.zIndex="";
+    B.release();                                  /* the bear storms off to file that complaint */
+    return true;
+  }
   /* ---- Chuck's day: he only exists in the 🤠 Chuck Norris theme. Every time
      the theme comes on he opens with a guaranteed rampage, then freelances ---- */
   const inTheme=()=>document.body.classList.contains("theme-chuck");
@@ -2632,6 +2779,7 @@ function startFlyer(row, stripColor){
       await zz(rnd(400,1200));
       if(!inTheme()) continue;
       if(await shootBird()) continue;  /* the bird takes priority the moment it appears */
+      if(await bearFight()) continue;  /* crossed paths with the bear — FIGHT */
       const r=Math.random();
       if(r<.30)      await chopTree();
       else if(r<.55) await smashVan();
