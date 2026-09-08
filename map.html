@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fusion Van Tracker — Live Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700;800&family=Mona+Sans:wght@700;800&family=Noto+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --f-navy:#1F3B73; --f-red:#C1272D; --f-dark:#414042;
+  --ok:#3fae4c; --warn:#f6a821; --bad:#df3b2f; --gray:#9aa0a6;
+  --sb:430px;
+}
+*{box-sizing:border-box; margin:0; padding:0}
+html,body{height:100%}
+body{font-family:"League Spartan",Helvetica,Arial,sans-serif; letter-spacing:.01em; background:#e9e5dc; overflow:hidden}
+
+/* ============ SIDEBAR ============ */
+#sidebar{position:fixed; left:0; top:0; bottom:0; width:var(--sb); background:var(--f-navy); color:#fff;
+  display:flex; flex-direction:column; z-index:5; box-shadow:4px 0 18px rgba(0,0,0,.25)}
+#sbHead{padding:20px 26px 12px}
+#sbHead .wm{font-family:Helvetica,Arial,sans-serif; font-weight:bold}
+#sbHead .wm .f1{font-size:34px; color:#fff; display:inline}
+#sbHead .wm .f2{font-size:16px; color:#ff6b6b; display:inline; margin-left:10px; letter-spacing:.06em}
+#sbSub{font-size:15px; color:#b8c4de; margin-top:6px; font-family:"Noto Serif",serif}
+#cards{flex:1; overflow-y:auto; padding:4px 18px 10px; scrollbar-width:thin; scrollbar-color:#2a4a86 transparent}
+#cards::-webkit-scrollbar{width:8px}
+#cards::-webkit-scrollbar-thumb{background:#2a4a86; border-radius:4px}
+.card{background:#2a4a86; border-radius:14px; padding:14px 18px; margin:10px 0; cursor:pointer; position:relative;
+  transition:background .15s, transform .15s}
+.card:hover{background:#33569a; transform:translateX(3px)}
+.card.active{outline:3px solid #ff6b6b}
+.card .top{display:flex; align-items:center; gap:10px}
+.card .dot{width:14px; height:14px; border-radius:50%; flex:0 0 auto}
+.card .nm{font-family:"Mona Sans","League Spartan",sans-serif; font-weight:800; font-size:21px; letter-spacing:.025em}
+.card .num{color:#93a7cf; font-weight:800; font-size:19px; width:22px}
+.card .l1{margin-top:8px; font-size:15px; color:#cdd8ee}
+.card .l2{margin-top:5px; font-size:14px; color:#93a7cf}
+.card .viol{position:absolute; right:14px; top:13px; background:var(--f-red); color:#fff; font-weight:800;
+  font-size:13px; padding:4px 11px; border-radius:13px}
+.card .eb{position:absolute; right:14px; top:13px; background:#f6a821; color:#3b2a05; font-weight:800;
+  font-size:13px; padding:4px 11px; border-radius:13px}
+.card .viol + .eb{top:44px}
+#sbFoot{margin:8px 18px 16px; background:#16294f; border-radius:14px; padding:14px 20px; font-size:15px; color:#b8c4de; line-height:1.7}
+#sbFoot b{color:#fff}
+#sbBtns{display:flex; gap:8px; margin:0 18px 16px}
+#sbBtns button{flex:1; background:#2a4a86; border:none; color:#cdd8ee; font-family:inherit; font-weight:700;
+  font-size:14px; padding:9px 0; border-radius:10px; cursor:pointer}
+#sbBtns button:hover{background:#33569a}
+
+/* ============ MAP ============ */
+#map{position:fixed; left:var(--sb); top:0; right:0; bottom:0}
+#legend{position:fixed; right:18px; bottom:24px; z-index:6; background:#fff; border:1px solid #d0cabb; border-radius:10px;
+  padding:8px 14px; font-size:13px; color:var(--f-dark); display:flex; gap:14px; align-items:center;
+  box-shadow:0 2px 8px rgba(0,0,0,.15)}
+#legend i{display:inline-block; width:24px; height:7px; border-radius:4px; margin-right:5px; vertical-align:middle}
+
+/* map pins */
+.vpin{position:absolute; transform:translate(-50%,-100%); text-align:center; cursor:pointer; user-select:none}
+.vpin svg{display:block; margin:0 auto; filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))}
+.vpin .chip{display:inline-flex; align-items:center; gap:6px; background:#fff; border:1.5px solid #d0cabb; border-radius:13px;
+  padding:3px 11px 2px; font-size:14px; font-weight:800; color:var(--f-dark); margin-top:4px; white-space:nowrap}
+.vpin .chip i{width:9px; height:9px; border-radius:50%; display:inline-block}
+.vpin .mph{background:var(--f-navy); color:#fff; border-radius:10px; font-size:12px; font-weight:800;
+  padding:2px 9px; margin-top:3px; display:inline-block}
+.vpin.hl svg{animation:pinPop .5s ease 3}
+@keyframes pinPop{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.hqpin{position:absolute; transform:translate(-50%,-50%); text-align:center; pointer-events:none}
+.hqpin .sq{width:32px; height:32px; margin:0 auto; background:var(--f-navy); border:3px solid #fff; border-radius:7px;
+  color:#fff; font-weight:800; font-size:19px; line-height:28px; box-shadow:0 2px 5px rgba(0,0,0,.3)}
+.hqpin .lbl{background:#fff; border:1.5px solid var(--f-navy); color:var(--f-navy); font-weight:800; font-size:12px;
+  border-radius:6px; padding:2px 8px; margin-top:4px; white-space:nowrap}
+
+/* ============ OVERLAYS ============ */
+#login,#settings{position:fixed; inset:0; z-index:50; display:none; align-items:center; justify-content:center;
+  background:linear-gradient(160deg,#1F3B73,#101c38)}
+#login .box,#settings .box{background:#fff; border-radius:18px; padding:34px 40px; width:430px; max-width:92vw; color:var(--f-dark)}
+.box .wm .f1{font-family:Helvetica,Arial,sans-serif; font-weight:bold; font-size:34px; color:var(--f-navy)}
+.box .wm .f2{font-family:Helvetica,Arial,sans-serif; font-weight:bold; font-size:16px; color:var(--f-red); letter-spacing:.06em}
+.box .wm .f3{font-size:13px; color:#8a8d90; margin-top:2px; font-family:"Noto Serif",serif; font-style:italic}
+.box label{display:block; font-weight:700; font-size:13px; margin:14px 0 5px; color:var(--f-navy)}
+.box input{width:100%; border:1.5px solid #cfd2d8; border-radius:9px; padding:10px 12px; font-size:15px; font-family:inherit}
+.box button{margin-top:20px; width:100%; background:var(--f-red); color:#fff; border:none; border-radius:10px;
+  padding:12px; font-size:16px; font-weight:800; font-family:inherit; cursor:pointer}
+.box .note{font-size:12.5px; color:#8a8d90; margin-top:12px; font-family:"Noto Serif",serif; line-height:1.5}
+#loginErr,#keyErr{display:none; background:#fdecea; color:#b3261e; border-radius:8px; padding:9px 12px; font-size:13.5px; margin-top:12px}
+#loading{position:fixed; z-index:40; left:calc(var(--sb) + 24px); top:20px; display:none; background:#fff; border-radius:12px;
+  padding:10px 18px; font-weight:700; color:var(--f-navy); box-shadow:0 2px 10px rgba(0,0,0,.2)}
+#errBanner{position:fixed; z-index:40; left:calc(var(--sb) + 24px); right:24px; top:20px; display:none; background:#fdecea;
+  color:#b3261e; border-radius:12px; padding:10px 18px; font-weight:700}
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <div id="sbHead">
+    <div class="wm"><span class="f1">Fusion</span><span class="f2">AUDIO VIDEO</span></div>
+    <div id="sbSub">Van Tracker · <span id="sbDate"></span> · <span id="sbClock"></span></div>
+  </div>
+  <div id="cards"></div>
+  <div id="sbFoot">Loading fleet…</div>
+  <div id="sbBtns">
+    <button onclick="loadAll()">↻ Refresh</button>
+    <button onclick="openSettings()">⚙ Settings</button>
+    <button onclick="logout()">Sign out</button>
+  </div>
+</div>
+<div id="map"></div>
+<div id="legend">Traffic: <span><i style="background:#3fae4c"></i>fast</span><span><i style="background:#f6a821"></i>slow</span><span><i style="background:#df3b2f"></i>jam</span></div>
+<div id="loading">Loading Geotab data…</div>
+<div id="errBanner"></div>
+
+<div id="login"><div class="box">
+  <div class="wm"><span class="f1">FUSION</span> <span class="f2">AUDIO+VIDEO</span><div class="f3">Van Tracker — Live Traffic Map</div></div>
+  <div id="loginErr"></div>
+  <form id="loginForm" autocomplete="on">
+    <div id="geoFields">
+      <label>Geotab database</label>
+      <input id="inDb" placeholder="e.g. fusionaudiovideo">
+      <label>Username (email)</label>
+      <input id="inUser" type="email" placeholder="you@fusionaudiovideo.com">
+      <label>Password</label>
+      <input id="inPass" type="password">
+    </div>
+    <div id="keyFields">
+      <label>Google Maps API key</label>
+      <input id="inKey" placeholder="AIza…">
+      <div class="note">Free at console.cloud.google.com → APIs &amp; Services → Credentials.
+        Enable “Maps JavaScript API”. Stored only in this browser.</div>
+    </div>
+    <button id="loginBtn" type="submit">Open the map</button>
+  </form>
+</div></div>
+
+<div id="settings"><div class="box">
+  <div class="wm"><span class="f1">Settings</span></div>
+  <div id="setBody"></div>
+  <button onclick="saveSettings()">Save &amp; reload</button>
+  <button onclick="document.getElementById('settings').style.display='none'" style="background:#8a8d90; margin-top:10px">Cancel</button>
+</div></div>
+
+<script>
+/* ================= CONFIG ================= */
+const DEFAULTS = {
+  radius: 600,
+  centers: [
+    {name:"HQ — 119 N Markley St, Greenville", lat:34.84515, lon:-82.41095},
+    {name:"Mills River Office — 93 School House Rd", lat:35.37760, lon:-82.56527},
+    {name:"Bluffton Office — 115 Persimmon St", lat:32.23060, lon:-80.88150}
+  ]
+};
+let CFG = DEFAULTS;
+try { const s = localStorage.getItem("vanTrackerCfg"); if (s) CFG = JSON.parse(s); } catch(e){}
+const KEY_LS = "vanTrackerMapsKey";
+let MAPS_KEY = "";
+try { MAPS_KEY = localStorage.getItem(KEY_LS) || ""; } catch(e){}
+
+const JUNK = [/geotab to remove/i, /^GA[A-Z0-9]{8,}$/];
+const STALE_DAYS = 7;
+const SALES = [/bill bacon/i, /michael santana/i];
+
+/* ================= GEOTAB API (direct) ================= */
+const AUTH_KEY = "vanTrackerAuth";
+let GEO = null;
+try { const a = localStorage.getItem(AUTH_KEY); if (a) GEO = JSON.parse(a); } catch(e){}
+function isAuthError(err){
+  const n = (err && (err.name || (err.errors && err.errors[0] && err.errors[0].name))) || "";
+  const m = (err && err.message) || "";
+  return /InvalidUserException|OverLimitException.*session|expired/i.test(n + " " + m) || n === "InvalidUserException";
+}
+async function rpc(server, method, params){
+  const res = await fetch("https://" + server + "/apiv1", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({method:method, params:params})
+  });
+  if (!res.ok) throw new Error("Geotab server error (" + res.status + ")");
+  const j = await res.json();
+  if (j.error){ const e = new Error((j.error.message||"Geotab API error").split("\n")[0]); e.geotab = j.error; throw e; }
+  return j.result;
+}
+async function gapi(method, params){
+  if (!GEO) throw new Error("Not signed in");
+  try { return await rpc(GEO.server, method, Object.assign({}, params, {credentials: GEO.credentials})); }
+  catch(e){ if (e.geotab && isAuthError(e.geotab)){ clearAuth(); showLogin("Your Geotab session expired — please sign in again."); } throw e; }
+}
+async function authenticate(database, userName, password){
+  const r = await rpc("my.geotab.com", "Authenticate", {database:database, userName:userName, password:password});
+  const server = (r.path && r.path !== "ThisServer") ? r.path.replace(/^https?:\/\//,"").replace(/\/.*$/,"") : "my.geotab.com";
+  GEO = {server:server, database:database, credentials:r.credentials};
+  try { localStorage.setItem(AUTH_KEY, JSON.stringify(GEO)); } catch(e){}
+}
+function clearAuth(){ GEO = null; try { localStorage.removeItem(AUTH_KEY); } catch(e){} }
+function logout(){ clearAuth(); location.reload(); }
+function showLogin(msg){
+  document.getElementById("loading").style.display = "none";
+  document.getElementById("login").style.display = "flex";
+  document.getElementById("geoFields").style.display = GEO ? "none" : "block";
+  document.getElementById("keyFields").style.display = MAPS_KEY ? "none" : "block";
+  const er = document.getElementById("loginErr");
+  if (msg){ er.textContent = msg; er.style.display = "block"; } else { er.style.display = "none"; }
+}
+
+/* ---- data adapter ---- */
+const deviceIdByName = {};
+function driverNameOf(u){ if(!u) return ""; const n=((u.firstName||"")+" "+(u.lastName||"")).trim(); return n||u.name||""; }
+async function geoLive(){
+  const nowIso = new Date().toISOString();
+  const [devices, status, users] = await Promise.all([
+    gapi("Get", {typeName:"Device", search:{fromDate:nowIso}, resultsLimit:1000}),
+    gapi("Get", {typeName:"DeviceStatusInfo", resultsLimit:1000}),
+    gapi("Get", {typeName:"User", search:{isDriver:true}, resultsLimit:2000}).catch(function(){ return []; })
+  ]);
+  const devById = {};
+  devices.forEach(function(d){ devById[d.id]=d; deviceIdByName[d.name]=d.id; });
+  const usrById = {};
+  users.forEach(function(u){ usrById[u.id]=driverNameOf(u); });
+  window.__usrById = usrById;
+  const out = [];
+  status.forEach(function(s){
+    const dev = devById[s.device && s.device.id];
+    if (!dev) return;
+    out.push({vehicle:dev.name, lastReported:s.dateTime, isDriving:!!s.isDriving,
+      latitude:s.latitude, longitude:s.longitude, bearing:s.bearing, speed:s.speed||0,
+      driver:(s.driver && s.driver.id && usrById[s.driver.id]) || ""});
+  });
+  return out;
+}
+async function geoTrips(fromIso, toIso){
+  const trips = await gapi("Get", {typeName:"Trip", search:{fromDate:fromIso, toDate:toIso}, resultsLimit:5000});
+  const nameById = {};
+  Object.keys(deviceIdByName).forEach(function(n){ nameById[deviceIdByName[n]]=n; });
+  return trips.map(function(t){
+    return {vehicle:nameById[t.device && t.device.id]||"", start:t.start, stop:t.stop,
+      stopPoint:t.stopPoint, maximumSpeed:t.maximumSpeed, distanceKm:t.distance};
+  }).filter(function(t){ return t.vehicle; });
+}
+async function geoExceptions(fromIso, toIso){
+  const rules = await gapi("Get", {typeName:"Rule", resultsLimit:2000});
+  const speedRules = rules.filter(function(r){ return /speed/i.test(r.name||""); });
+  const nameById = {};
+  Object.keys(deviceIdByName).forEach(function(n){ nameById[deviceIdByName[n]]=n; });
+  const usrById = window.__usrById || {};
+  const batches = await Promise.all(speedRules.map(function(r){
+    return gapi("Get", {typeName:"ExceptionEvent", search:{ruleSearch:{id:r.id}, fromDate:fromIso, toDate:toIso}, resultsLimit:5000})
+      .catch(function(){ return []; });
+  }));
+  const out = [];
+  batches.forEach(function(evts){ evts.forEach(function(ex){
+    const vname = nameById[ex.device && ex.device.id];
+    if (!vname) return;
+    out.push({vehicle:vname, driver:(ex.driver && ex.driver.id && usrById[ex.driver.id])||"",
+      activeFrom:ex.activeFrom, activeTo:ex.activeTo});
+  }); });
+  return out;
+}
+async function geoLogRecords(vehicleName, fromIso, toIso, limit){
+  const id = deviceIdByName[vehicleName];
+  if (!id) return [];
+  const recs = await gapi("Get", {typeName:"LogRecord", search:{deviceSearch:{id:id}, fromDate:fromIso, toDate:toIso}, resultsLimit:limit||200});
+  return recs.map(function(p){ return {dateTime:p.dateTime, latitude:p.latitude, longitude:p.longitude}; });
+}
+
+/* ================= HELPERS ================= */
+function parseGeoDate(s){
+  if(!s) return null;
+  let t = String(s).trim().replace(" ","T").replace(/(\.\d{3})\d+/,"$1");
+  if(!/[+Zz]/.test(t.slice(10))) t += "Z";
+  const d = new Date(t);
+  return isNaN(d) ? null : d;
+}
+function havM(lat1,lon1,lat2,lon2){
+  const R=6371000, r=Math.PI/180;
+  const a=Math.sin((lat2-lat1)*r/2)**2 + Math.cos(lat1*r)*Math.cos(lat2*r)*Math.sin((lon2-lon1)*r/2)**2;
+  return 2*R*Math.asin(Math.sqrt(a));
+}
+function atFusion(lat,lon){ return CFG.centers.some(c => havM(lat,lon,c.lat,c.lon) <= CFG.radius); }
+const ET = "America/New_York";
+function etNowParts(){
+  const p = new Intl.DateTimeFormat("en-US",{timeZone:ET,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false,weekday:"short"}).formatToParts(new Date());
+  const o={}; p.forEach(x=>o[x.type]=x.value); return o;
+}
+function etToday(h,m){
+  const o = etNowParts();
+  for (const off of ["-04:00","-05:00"]){
+    const d = new Date(`${o.year}-${o.month}-${o.day}T${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:00${off}`);
+    const c = new Intl.DateTimeFormat("en-US",{timeZone:ET,hour:"2-digit",minute:"2-digit",hour12:false}).format(d);
+    if (c === `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}`) return d;
+  }
+  return new Date(`${o.year}-${o.month}-${o.day}T${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:00-04:00`);
+}
+function fmtET(d){ return d ? new Intl.DateTimeFormat("en-US",{timeZone:ET,hour:"numeric",minute:"2-digit"}).format(d) : "—"; }
+function esc(s){ return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function splitName(n){
+  const m = String(n).match(/^([^-]+?)\s*-\s*(.+)$/);
+  return m ? {tag:m[1].trim(), driver:m[2].trim()} : {tag:String(n).trim(), driver:""};
+}
+const kmh2mph = k => Math.round(k*0.621371);
+function firstNameTag(r){ const d=(r.driver||"").trim(); return d ? d.split(/\s+/)[0] : r.tag; }
+/* reverse geocode → "City, ST" (cached) */
+let GEONAMES = {};
+try { GEONAMES = JSON.parse(localStorage.getItem("vanTrackerGeo")||"{}"); } catch(e){}
+async function cityState(lat, lon){
+  if (lat==null || lon==null) return "";
+  const key = lat.toFixed(3)+","+lon.toFixed(3);
+  if (GEONAMES[key]) return GEONAMES[key];
+  try{
+    const r = await fetch("https://api.bigdatacloud.net/data/reverse-geocode-client?latitude="+lat+"&longitude="+lon+"&localityLanguage=en");
+    const j = await r.json();
+    const city = j.city || j.locality || "";
+    let st = (j.principalSubdivisionCode||"").split("-").pop();
+    if (!st) st = j.principalSubdivision || "";
+    const s = city ? (city+", "+st) : (j.principalSubdivision || "");
+    if (s){ GEONAMES[key]=s; try{ localStorage.setItem("vanTrackerGeo", JSON.stringify(GEONAMES)); }catch(e){} }
+    return s;
+  }catch(e){ return ""; }
+}
+/* street address via OSM Nominatim (cached, throttled) */
+let ADDRS = {};
+try { ADDRS = JSON.parse(localStorage.getItem("vanTrackerAddr")||"{}"); } catch(e){}
+let addrQueue = Promise.resolve();
+async function streetAddr(lat, lon, cityST){
+  if (lat==null || lon==null) return cityST||"";
+  const key = lat.toFixed(4)+","+lon.toFixed(4);
+  if (ADDRS[key]) return ADDRS[key];
+  const run = addrQueue.then(async ()=>{
+    try{
+      const r = await fetch("https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=18&addressdetails=1&lat="+lat+"&lon="+lon);
+      const j = await r.json();
+      const a = j.address||{};
+      const road = a.road || a.pedestrian || a.footway || "";
+      const street = road ? ((a.house_number ? a.house_number+" " : "")+road) : "";
+      const s = street ? (street + (cityST ? ", "+cityST : "")) : (cityST||"");
+      if (street){ ADDRS[key]=s; try{ localStorage.setItem("vanTrackerAddr", JSON.stringify(ADDRS)); }catch(e){} }
+      await new Promise(res=>setTimeout(res,1100));
+      return s;
+    }catch(e){ return cityST||""; }
+  });
+  addrQueue = run.catch(()=>{});
+  return run;
+}
+
+/* ================= GOOGLE MAP ================= */
+let map=null, HtmlMarker=null, markers={}, hqMarkers=[], activeTag=null;
+/* ---- map diagnostics: surface Google's console-only errors on screen ---- */
+function banner(msg){
+  const b = document.getElementById("errBanner");
+  b.textContent = msg; b.style.display = "block";
+}
+const MAPS_ERRS = {
+  BillingNotEnabled: "the Google Cloud project needs BILLING enabled (console.cloud.google.com → Billing). The free monthly credit covers this — you won't be charged for normal use.",
+  ApiNotActivated: "“Maps JavaScript API” is not enabled for this key's project (console.cloud.google.com → APIs & Services → Library → Maps JavaScript API → Enable).",
+  RefererNotAllowed: "the key has WEBSITE RESTRICTIONS that block this page. Edit the key (APIs & Services → Credentials) and set Application restrictions to “None”, or host the page on a website that's on the allowed list.",
+  InvalidKey: "the key itself is invalid — re-copy it from console.cloud.google.com and paste it in Settings.",
+  ExpiredKey: "the key is expired or deleted — make a new one and paste it in Settings."
+};
+const ERRLOG = [];
+(function(){
+  function hook(kind){
+    const orig = console[kind].bind(console);
+    console[kind] = function(){
+      try{
+        const msg = Array.prototype.map.call(arguments, a=>{
+          try{ return (a && a.stack) ? a.stack.split("\n")[0] : String(a); }catch(e){ return "?"; }
+        }).join(" ");
+        ERRLOG.push(kind.toUpperCase()+": "+msg.slice(0,220));
+        const m = msg.match(/(\w+)MapError/);
+        if (m){
+          const why = MAPS_ERRS[m[1]] || ("Google reported: " + m[0] + ". Search that code — it's a key/project setting.");
+          banner("Map problem (" + m[0] + "): " + why);
+        }
+      }catch(e){}
+      return orig.apply(null, arguments);
+    };
+  }
+  hook("error"); hook("warn");
+  window.addEventListener("error", function(ev){
+    ERRLOG.push("SCRIPT ERROR: " + (ev.message||"") + " @ " + (ev.filename||"").split("/").pop() + ":" + (ev.lineno||""));
+  });
+  window.addEventListener("unhandledrejection", function(ev){
+    ERRLOG.push("PROMISE: " + String(ev.reason && (ev.reason.message||ev.reason)).slice(0,220));
+  });
+})();
+/* Google injects its own error dialog into the map div on auth failures — read it out */
+function gmErrText(){
+  const el = document.querySelector("#map .gm-err-message, #map .gm-err-title, .dismissible-dialog-view");
+  return el ? el.textContent.trim() : "";
+}
+window.gm_authFailure = function(){
+  MAPS_KEY = ""; try{ localStorage.removeItem(KEY_LS); }catch(e){}
+  showLogin("Google Maps rejected that API key. Double-check it (and that “Maps JavaScript API” is enabled), then try again.");
+};
+function loadMapsScript(){
+  return new Promise(function(resolve, reject){
+    if (window.google && window.google.maps) return resolve();
+    window.__mapsReady = resolve;
+    const s = document.createElement("script");
+    s.src = "https://maps.googleapis.com/maps/api/js?key=" + encodeURIComponent(MAPS_KEY) + "&callback=__mapsReady";
+    s.onerror = ()=>reject(new Error("Could not load Google Maps"));
+    document.head.appendChild(s);
+  });
+}
+function makeMarkerClass(){
+  return class extends google.maps.OverlayView{
+    constructor(m, pos, el, z){ super(); this.pos=pos; this.el=el; this.z=z||1; this.setMap(m); }
+    onAdd(){ this.getPanes().floatPane.appendChild(this.el); }
+    draw(){
+      const proj = this.getProjection(); if(!proj) return;
+      const p = proj.fromLatLngToDivPixel(new google.maps.LatLng(this.pos.lat, this.pos.lng));
+      if(!p) return;
+      this.el.style.left = p.x+"px"; this.el.style.top = p.y+"px"; this.el.style.zIndex = this.z;
+    }
+    onRemove(){ this.el.remove(); }
+    move(pos){ this.pos = pos; this.draw(); }
+  };
+}
+function initMap(){
+  map = new google.maps.Map(document.getElementById("map"), {
+    center:{lat:CFG.centers[0].lat, lng:CFG.centers[0].lon}, zoom:11,
+    mapTypeControl:false, streetViewControl:false, fullscreenControl:false,
+    renderingType: (google.maps.RenderingType && google.maps.RenderingType.RASTER) || undefined, /* plain image tiles — no WebGL needed */
+    styles:[{featureType:"poi", elementType:"labels", stylers:[{visibility:"off"}]}]
+  });
+  new google.maps.TrafficLayer().setMap(map);
+  /* watchdog: if no tiles draw, the key/project is misconfigured — say so on screen */
+  let tilesOK = false;
+  google.maps.event.addListenerOnce(map, "tilesloaded", function(){
+    tilesOK = true;
+    const b = document.getElementById("errBanner");
+    if (/Map problem|tiles never/.test(b.textContent)) b.style.display = "none";
+  });
+  /* count tile/image downloads that fail inside the map (resource errors don't hit console.error) */
+  let resFails = 0, resOK = 0;
+  window.addEventListener("error", function(ev){
+    const t = ev.target;
+    if (t && t.tagName === "IMG" && /googleapis|gstatic|google\.com/.test(t.src||"")) resFails++;
+  }, true);
+  setTimeout(function(){
+    if (tilesOK) return;
+    /* give it one nudge first — some setups need a resize kick */
+    google.maps.event.trigger(map, "resize");
+    map.setCenter({lat:CFG.centers[0].lat, lng:CFG.centers[0].lon});
+    setTimeout(async function(){
+      if (tilesOK) return;
+      async function probe(url){
+        try{ await fetch(url, {mode:"no-cors", cache:"no-store"}); return "reachable"; }
+        catch(e){ return "BLOCKED"; }
+      }
+      const [pGstatic, pApis, pTiles] = await Promise.all([
+        probe("https://maps.gstatic.com/mapfiles/transparent.png"),
+        probe("https://maps.googleapis.com/maps/api/js/QuotaService.RecordEvent"),
+        probe("https://mts0.googleapis.com/maps/vt?x=0&y=0&z=0")
+      ]);
+      const dv = map.getDiv();
+      const imgs = dv.querySelectorAll("img").length;
+      const gm = gmErrText();
+      const log = ERRLOG.slice(0, 4).join("  •  ");
+      banner("Map never rendered. Diagnostics — Maps v" + (google.maps.version||"?") +
+        " · elements built inside map: " + dv.childElementCount +
+        " · images: " + imgs + " · failed Google image loads: " + resFails +
+        " · maps.gstatic.com: " + pGstatic +
+        " · maps.googleapis.com: " + pApis +
+        " · tile server: " + pTiles +
+        (gm ? " · Google dialog: “" + gm + "”" : "") +
+        (log ? " · Console: " + log : " · no console errors") +
+        ". Send Nathan's favorite AI a screenshot of this.");
+    }, 4000);
+  }, 8000);
+  HtmlMarker = makeMarkerClass();
+  CFG.centers.forEach(function(c){
+    const el = document.createElement("div");
+    el.className = "hqpin";
+    el.innerHTML = '<div class="sq">F</div><div class="lbl">'+esc(c.name.split("—")[0].trim().toUpperCase())+'</div>';
+    hqMarkers.push(new HtmlMarker(map, {lat:c.lat, lng:c.lon}, el, 2));
+  });
+}
+function pinSVG(num){
+  return '<svg width="42" height="52" viewBox="0 0 42 52">'+
+    '<path d="M21 50 L7 28 a17 17 0 1 1 28 0 Z" fill="#C1272D" stroke="#ffffff" stroke-width="3"/>'+
+    '<circle cx="21" cy="19" r="12" fill="#ffffff"/>'+
+    '<text x="21" y="25" font-family="League Spartan,Helvetica,sans-serif" font-size="16" font-weight="800" fill="#C1272D" text-anchor="middle">'+num+'</text></svg>';
+}
+function setPin(r, num){
+  const pos = {lat:r.live.latitude, lng:r.live.longitude};
+  const mph = r.live.isDriving ? kmh2mph(r.live.speed) : 0;
+  let m = markers[r.tag];
+  if (!m){
+    const el = document.createElement("div");
+    el.className = "vpin";
+    el.addEventListener("click", function(){ selectVan(r.tag, true); });
+    m = markers[r.tag] = new HtmlMarker(map, pos, el, 5);
+  } else m.move(pos);
+  m.el.innerHTML = pinSVG(num) +
+    '<br><span class="chip"><i style="background:'+r.dotColor+'"></i>'+esc(firstNameTag(r))+'</span>' +
+    (mph ? '<br><span class="mph">'+mph+' mph</span>' : '');
+  m.row = r;
+}
+function selectVan(tag, fromMap){
+  activeTag = tag;
+  document.querySelectorAll(".card").forEach(c=>c.classList.toggle("active", c.dataset.tag===tag));
+  const m = markers[tag];
+  if (m){
+    map.panTo(m.pos);
+    if (map.getZoom() < 13) map.setZoom(13);
+    m.el.classList.remove("hl"); void m.el.offsetWidth; m.el.classList.add("hl");
+  }
+  if (!fromMap){ /* card click already scrolled */ }
+  else {
+    const c = document.querySelector('.card[data-tag="'+CSS.escape(tag)+'"]');
+    if (c) c.scrollIntoView({behavior:"smooth", block:"nearest"});
+  }
+}
+
+/* ================= DATA → SIDEBAR + PINS ================= */
+let loading = false;
+async function loadAll(){
+  if (loading || !GEO || !map) return;
+  loading = true;
+  document.getElementById("loading").style.display = "block";
+  document.getElementById("errBanner").style.display = "none";
+  try { await buildFleet(); }
+  catch(e){
+    console.error("load failed", e);
+    if (GEO){ const b=document.getElementById("errBanner"); b.textContent="Could not load Geotab data: "+e.message; b.style.display="block"; }
+  }
+  document.getElementById("loading").style.display = "none";
+  loading = false;
+}
+
+async function buildFleet(){
+  const now = new Date();
+  const T630=etToday(6,30), T645=etToday(6,45), T700=etToday(7,0), T715=etToday(7,15),
+        T930=etToday(9,30), T1000=etToday(10,0), T1500=etToday(15,0);
+  const dayStart = etToday(3,0);
+
+  const live = await geoLive();
+  const [trips, exceptions] = await Promise.all([
+    geoTrips(dayStart.toISOString(), now.toISOString()),
+    geoExceptions(dayStart.toISOString(), now.toISOString())
+  ]);
+
+  /* fleet roster */
+  const fleet = live.filter(v=>{
+    if (JUNK.some(rx=>rx.test(v.vehicle))) return false;
+    const lr = parseGeoDate(v.lastReported);
+    if (!lr || (now-lr) > STALE_DAYS*864e5) return false;
+    return true;
+  });
+  fleet.sort((a,b)=>splitName(a.vehicle).tag.localeCompare(splitName(b.vehicle).tag, undefined, {numeric:true}));
+
+  /* trips per vehicle */
+  const tripsBy = {};
+  for (const t of trips){
+    const tr = {start:parseGeoDate(t.start), stop:parseGeoDate(t.stop), lat:t.stopPoint?.y, lon:t.stopPoint?.x, maxSpeed:t.maximumSpeed, distanceKm:t.distanceKm};
+    if(!tr.start||!tr.stop) continue;
+    (tripsBy[t.vehicle] = tripsBy[t.vehicle]||[]).push(tr);
+  }
+  Object.values(tripsBy).forEach(a=>a.sort((x,y)=>x.start-y.start));
+  function drivingAt(v,T){ return (tripsBy[v]||[]).some(t=>t.start<=T && T<t.stop); }
+  function lastStopBefore(v,T){ const a=(tripsBy[v]||[]).filter(t=>t.stop<=T); return a.length? a[a.length-1] : null; }
+
+  /* history helpers */
+  const snapCache = {};
+  async function snapshot(vname){
+    if (snapCache[vname]) return snapCache[vname];
+    try{
+      const pts = await geoLogRecords(vname, new Date(T700.getTime()-2*60000).toISOString(), new Date(T715.getTime()+2*60000).toISOString(), 120);
+      snapCache[vname] = (pts||[]).map(p=>({t:parseGeoDate(p.dateTime), lat:p.latitude, lon:p.longitude})).filter(p=>p.t);
+    }catch(e){ snapCache[vname]=[]; }
+    return snapCache[vname];
+  }
+  async function posAt(vname, T){
+    if (drivingAt(vname,T)) return {driving:true};
+    const ls = lastStopBefore(vname,T);
+    if (ls && ls.lat!=null) return {lat:ls.lat, lon:ls.lon};
+    const pts = await snapshot(vname);
+    let best=null;
+    for(const p of pts){ if(p.t<=T) best=p; }
+    if(!best && pts.length) best=pts[0];
+    return best ? {lat:best.lat, lon:best.lon} : null;
+  }
+  const earlyCache = {};
+  async function earlyPoints(vname){
+    if (earlyCache[vname]) return earlyCache[vname];
+    try{
+      const pts = await geoLogRecords(vname, dayStart.toISOString(), new Date(T715.getTime()+2*60000).toISOString(), 400);
+      earlyCache[vname] = (pts||[]).map(p=>({t:parseGeoDate(p.dateTime), lat:p.latitude, lon:p.longitude})).filter(p=>p.t).sort((a,b)=>a.t-b.t);
+    }catch(e){ earlyCache[vname]=[]; }
+    return earlyCache[vname];
+  }
+  async function wasAtFusionBy(vname, T){
+    if ((tripsBy[vname]||[]).some(t=>t.stop>=dayStart && t.stop<=T && t.lat!=null && atFusion(t.lat,t.lon))) return true;
+    const pts = await earlyPoints(vname);
+    return pts.some(p=>p.t<=T && p.lat!=null && atFusion(p.lat,p.lon));
+  }
+  function fusionArrivalTime(vname){
+    const a=(tripsBy[vname]||[]).filter(t=>t.stop>=dayStart && t.lat!=null && atFusion(t.lat,t.lon) && (t.distanceKm||0)>=0.5);
+    return a.length ? a.reduce((x,y)=>x.stop<y.stop?x:y).stop : null;
+  }
+  async function leftFusionAt(vname){
+    const a=(tripsBy[vname]||[]);
+    if(!a.length) return null;
+    for (let i=a.length-1;i>=0;i--){
+      if (a[i].lat!=null && atFusion(a[i].lat,a[i].lon)) return (i+1<a.length) ? a[i+1].start : null;
+    }
+    const pts = await earlyPoints(vname);
+    if (pts.length && pts[0].lat!=null && atFusion(pts[0].lat,pts[0].lon)) return a[0].start;
+    return null;
+  }
+  async function overnightAtFusion(vname){
+    const pts = await earlyPoints(vname);
+    return !!(pts.length && pts[0].lat!=null && atFusion(pts[0].lat,pts[0].lon));
+  }
+  async function isEarlyCredit(vname){
+    if ((tripsBy[vname]||[]).some(t=>t.stop>=dayStart && t.stop<=T645 && t.lat!=null && atFusion(t.lat,t.lon))) return true;
+    if ((tripsBy[vname]||[]).some(t=>t.start>=dayStart && t.start<=T630 && t.lat!=null && !atFusion(t.lat,t.lon) && (t.distanceKm||0)>=0.5)) return true;
+    const pts = await earlyPoints(vname);
+    let wasAway = false;
+    for (const p of pts){
+      if (p.t > T645) break;
+      if (p.lat == null) continue;
+      if (atFusion(p.lat, p.lon)){ if (wasAway) return true; }
+      else wasAway = true;
+    }
+    return false;
+  }
+
+  /* speeding — merge overlapping events, Hunter shows half */
+  const evBy = {};
+  for (const ex of exceptions){
+    const f=parseGeoDate(ex.activeFrom), t=parseGeoDate(ex.activeTo)||f;
+    if(!f) continue;
+    (evBy[ex.vehicle]=evBy[ex.vehicle]||[]).push({f,t,driver:ex.driver||splitName(ex.vehicle).driver||ex.vehicle});
+  }
+  const counts = {}; let totalViol=0;
+  for (const v of Object.keys(evBy)){
+    const evs = evBy[v].sort((a,b)=>a.f-b.f);
+    let cur=null;
+    for(const e of evs){
+      if(cur && e.f <= new Date(cur.t.getTime()+30000)){ if(e.t>cur.t) cur.t=e.t; }
+      else { if(cur){ counts[cur.driver]=(counts[cur.driver]||0)+1; totalViol++; } cur={f:e.f,t:e.t,driver:e.driver}; }
+    }
+    if(cur){ counts[cur.driver]=(counts[cur.driver]||0)+1; totalViol++; }
+  }
+  for (const d of Object.keys(counts)){
+    if (/hunter/i.test(d)){ const h=Math.round(counts[d]/2); totalViol -= counts[d]-h; counts[d]=h; }
+  }
+  const lbSorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  const violFor = r => { for(const [d,n] of lbSorted){ if(r.driver===d || (r.name&&r.name.includes(d))) return n; } return 0; };
+
+  /* THE early bird */
+  let ebWinner=null, ebTime=null;
+  for (const v of fleet){
+    const nm = v.vehicle;
+    if (SALES.some(rx=>rx.test(nm))) continue;
+    const arrivals = (tripsBy[nm]||[]).filter(t=>t.stop>=dayStart && t.stop<=T930 && t.lat!=null && atFusion(t.lat,t.lon) && (t.distanceKm||0)>=0.5);
+    if (arrivals.length){
+      const first = arrivals.reduce((a,b)=>a.stop<b.stop?a:b).stop;
+      if (!ebTime || first < ebTime){ ebTime=first; ebWinner=nm; }
+    }
+  }
+
+  /* per-van rows */
+  const rows = [];
+  for (const v of fleet){
+    const nm=v.vehicle, sn=splitName(nm);
+    const row = {name:nm, tag:sn.tag, driver:sn.driver||v.driver||"", live:v};
+    row.sales = SALES.some(rx=>rx.test(nm));
+    row.earlyBird = !row.sales && nm===ebWinner;
+    row.ebTime = row.earlyBird ? ebTime : null;
+    row.viol = violFor(row);
+
+    if (!row.sales){
+      row.fusionArrivalT = fusionArrivalTime(nm);
+      row.overnight = await overnightAtFusion(nm);
+      row.leftFusion = await leftFusionAt(nm);
+      if (!row.leftFusion && !row.overnight){
+        const real = (tripsBy[nm]||[]).filter(t=>(t.distanceKm||0)>=0.5);
+        if (real.length) row.leftHome = real[0].start;
+      }
+      row.earlyCredit = await isEarlyCredit(nm);
+      /* 7:00 on-time check (for the fleet summary) */
+      if (now < T700) row.c700 = "pend";
+      else if (row.earlyCredit) row.c700 = "ok";
+      else if (row.fusionArrivalT && row.fusionArrivalT.getTime() <= T700.getTime()+60000) row.c700 = "ok";
+      else {
+        const p = await posAt(nm, T700);
+        if (p && !p.driving && atFusion(p.lat,p.lon)) row.c700 = "ok";
+        else if (await wasAtFusionBy(nm, T700)) row.c700 = "ok";
+        else row.c700 = p ? "late" : "na";
+      }
+    }
+
+    /* live zone */
+    row.zone = v.isDriving ? "road" : (atFusion(v.latitude, v.longitude) ? "fusion" : "job");
+    if (row.zone === "job"){
+      if (!(tripsBy[nm]||[]).length) row.zone = "home";
+      else {
+        try{
+          const first = await geoLogRecords(nm, dayStart.toISOString(), now.toISOString(), 2);
+          if (first.length && first[0].latitude!=null &&
+              !atFusion(first[0].latitude, first[0].longitude) &&
+              havM(v.latitude, v.longitude, first[0].latitude, first[0].longitude) <= 400) row.zone = "home";
+        }catch(e){}
+      }
+    }
+    if (row.zone !== "fusion") row.place = await cityState(v.latitude, v.longitude);
+    if (row.zone === "job" && !v.isDriving) row.addr = await streetAddr(v.latitude, v.longitude, row.place);
+
+    /* job arrival — locks at 9:30 */
+    const E = now < T930 ? now : T930;
+    if (!row.sales){
+      if (E === now && v.isDriving) row.jobArr = null;
+      else if (now >= T930 && drivingAt(nm, T930)){
+        const tr9 = (tripsBy[nm]||[]).find(t=>t.start<=T930 && T930<t.stop);
+        row.jobArr = (tr9 && (!v.isDriving || (now - tr9.stop) > 3*60000)) ? tr9.stop : null;
+        row.lateArrive = true;
+      } else {
+        const ls = lastStopBefore(nm, E);
+        if (ls && ls.lat!=null && !atFusion(ls.lat, ls.lon)) row.jobArr = ls.stop;
+      }
+      /* left job after 3 (500-yard grace) + day's end */
+      const all = tripsBy[nm]||[];
+      const after3 = all.filter(t=>t.start>=T1500);
+      if (after3.length){
+        const YD500 = 457.2;
+        const before3 = all.filter(t=>t.stop<=T1500 && t.lat!=null && t.lon!=null);
+        let anchor = before3.length ? before3[before3.length-1] : null;
+        let dep = null;
+        for (const t of after3){
+          if (anchor && t.lat!=null && t.lon!=null && havM(t.lat,t.lon,anchor.lat,anchor.lon)<=YD500){ anchor=t; continue; }
+          dep = t; break;
+        }
+        if (dep){
+          row.leftJob = dep.start;
+          if (v.isDriving) row.dayEndDriving = true;
+          else if (all.length) row.dayEnd = all[all.length-1].stop;
+        }
+      }
+    }
+
+    /* status dot */
+    row.dotColor = row.sales ? "var(--gray)" :
+      (row.viol>0 && row.viol===(lbSorted.length?lbSorted[0][1]:0)) ? "var(--bad)" :
+      (row.c700==="late" || (row.zone==="home" && !(tripsBy[nm]||[]).length && now>=T700)) ? "var(--warn)" : "var(--ok)";
+    rows.push(row);
+  }
+
+  renderSidebar(rows, totalViol, lbSorted, now, T700);
+  renderPins(rows);
+}
+
+function line1(r){
+  const v = r.live;
+  if (r.sales) return "Sales — not timed";
+  if (v.isDriving) return "Traveling · " + kmh2mph(v.speed) + " mph";
+  if (r.zone === "fusion"){
+    if (r.fusionArrivalT) return "At Fusion · arrived " + fmtET(r.fusionArrivalT);
+    return r.overnight ? "At Fusion · overnight" : "At Fusion";
+  }
+  if (r.zone === "home") return "\u{1F3E1} Home" + ((r.dayEnd||r.leftJob) ? " · day's end "+fmtET(r.dayEnd||null) : " · no trips yet");
+  return "On job site" + (r.jobArr ? " · arr " + fmtET(r.jobArr) : (r.lateArrive ? " · still driving at 9:30" : ""));
+}
+function line2(r){
+  if (r.sales) return r.place || "";
+  if (r.earlyBird) return "\u{1F426} Early Bird · " + fmtET(r.ebTime);
+  if (r.zone === "job" && r.addr) return r.addr;
+  if (r.leftJob) return "Left job " + fmtET(r.leftJob) + (r.dayEndDriving ? " · en route" : "");
+  if (r.live.isDriving){
+    if (r.leftFusion) return "Left Fusion " + fmtET(r.leftFusion);
+    if (r.leftHome) return "\u{1F3E1} from home — skipped Fusion";
+    return r.place || "";
+  }
+  if (r.zone === "fusion") return r.leftFusion ? "Left Fusion " + fmtET(r.leftFusion) + " · back now" : "";
+  return r.place || "";
+}
+function renderSidebar(rows, totalViol, lbSorted, now, T700){
+  const o = etNowParts();
+  const cards = document.getElementById("cards");
+  cards.innerHTML = rows.map((r,i)=>{
+    const badges = (r.viol>0 ? '<span class="viol">'+r.viol+' violation'+(r.viol>1?'s':'')+' \u{1F6A8}</span>' : '') +
+                   (r.earlyBird ? '<span class="eb">\u{1F426} Early Bird</span>' : '');
+    return '<div class="card" data-tag="'+esc(r.tag)+'" onclick="selectVan(\''+esc(r.tag).replace(/'/g,"\\'")+'\')">'+
+      badges +
+      '<div class="top"><span class="dot" style="background:'+r.dotColor+'"></span>'+
+      '<span class="num">'+(i+1)+'</span><span class="nm">'+esc(firstNameTag(r))+'</span></div>'+
+      '<div class="l1">'+esc(line1(r))+'</div>'+
+      '<div class="l2">'+esc(line2(r))+'&nbsp;</div></div>';
+  }).join("");
+  const tracked = rows.filter(r=>!r.sales);
+  const out = rows.filter(r=>r.live.isDriving).length;
+  const onTime = now>=T700 ? tracked.filter(r=>r.c700==="ok").length : null;
+  const late = now>=T700 ? tracked.filter(r=>r.c700==="late").length : null;
+  const leadTxt = lbSorted.length && lbSorted[0][1]>0
+    ? "Top speeding: " + lbSorted.slice(0,3).filter(e=>e[1]>0).map(e=>e[0].split(/\s+/)[0]+" ("+e[1]+")").join(" · ")
+    : "No speeding today \u{1F389}";
+  document.getElementById("sbFoot").innerHTML =
+    "Fleet: <b>"+rows.length+"</b> vans · <b>"+out+"</b> on the road" +
+    (onTime!=null ? " · <b>"+onTime+"</b> on time · <b>"+late+"</b> late" : "") +
+    "<br>Speeding today: <b>"+totalViol+"</b> · "+esc(leadTxt) +
+    "<br><span style='color:#7d90ba;font-size:13px'>Updated "+fmtET(new Date())+" · refreshes every 5 min</span>";
+}
+function renderPins(rows){
+  const seen = {};
+  rows.forEach((r,i)=>{ setPin(r, i+1); seen[r.tag]=1; });
+  Object.keys(markers).forEach(t=>{ if(!seen[t]){ markers[t].setMap(null); delete markers[t]; } });
+  if (!renderPins.fitted && rows.length){
+    const b = new google.maps.LatLngBounds();
+    rows.forEach(r=>b.extend({lat:r.live.latitude, lng:r.live.longitude}));
+    b.extend({lat:CFG.centers[0].lat, lng:CFG.centers[0].lon});
+    map.fitBounds(b, 70);
+    renderPins.fitted = true;
+  }
+}
+
+/* fast position-only tick (every 60 s) */
+async function tickPositions(){
+  if (!GEO || !map || loading) return;
+  try{
+    const live = await geoLive();
+    live.forEach(v=>{
+      const tag = splitName(v.vehicle).tag;
+      const m = markers[tag];
+      if (!m || !m.row) return;
+      m.row.live = v;
+      m.move({lat:v.latitude, lng:v.longitude});
+      const mphEl = m.el.querySelector(".mph");
+      const mph = v.isDriving ? kmh2mph(v.speed) : 0;
+      if (mph && mphEl) mphEl.textContent = mph+" mph";
+      else if (mph && !mphEl) m.el.insertAdjacentHTML("beforeend", '<br><span class="mph">'+mph+' mph</span>');
+      else if (!mph && mphEl){ const br=mphEl.previousSibling; mphEl.remove(); if(br&&br.nodeName==="BR") br.remove(); }
+    });
+  }catch(e){}
+}
+
+/* ================= SETTINGS ================= */
+function openSettings(){
+  const b = document.getElementById("setBody");
+  b.innerHTML = CFG.centers.map((c,i)=>
+    '<label>'+esc(c.name)+'</label>'+
+    '<div style="display:flex;gap:8px"><input id="lat'+i+'" value="'+c.lat+'"><input id="lon'+i+'" value="'+c.lon+'"></div>'
+  ).join("") +
+  '<label>"At Fusion" radius (meters)</label><input id="setRadius" value="'+CFG.radius+'">'+
+  '<label>Google Maps API key</label><input id="setKey" value="'+esc(MAPS_KEY)+'">';
+  document.getElementById("settings").style.display = "flex";
+}
+function saveSettings(){
+  CFG.centers.forEach((c,i)=>{
+    c.lat = parseFloat(document.getElementById("lat"+i).value)||c.lat;
+    c.lon = parseFloat(document.getElementById("lon"+i).value)||c.lon;
+  });
+  CFG.radius = Math.max(100, parseInt(document.getElementById("setRadius").value)||600);
+  const k = document.getElementById("setKey").value.trim();
+  try{
+    localStorage.setItem("vanTrackerCfg", JSON.stringify(CFG));
+    if (k) localStorage.setItem(KEY_LS, k); else localStorage.removeItem(KEY_LS);
+  }catch(e){}
+  location.reload();
+}
+
+/* ================= CLOCK ================= */
+function tickClock(){
+  document.getElementById("sbClock").textContent =
+    new Intl.DateTimeFormat("en-US",{timeZone:ET,hour:"numeric",minute:"2-digit"}).format(new Date());
+}
+document.getElementById("sbDate").textContent =
+  new Intl.DateTimeFormat("en-US",{timeZone:ET,weekday:"short",month:"short",day:"numeric"}).format(new Date());
+tickClock(); setInterval(tickClock, 15000);
+
+/* ================= BOOT / LOGIN ================= */
+document.getElementById("loginForm").addEventListener("submit", async function(ev){
+  ev.preventDefault();
+  const btn = document.getElementById("loginBtn");
+  const er = document.getElementById("loginErr");
+  er.style.display = "none";
+  btn.disabled = true; btn.textContent = "Signing in…";
+  try{
+    if (!GEO){
+      const db = document.getElementById("inDb").value.trim();
+      const us = document.getElementById("inUser").value.trim();
+      const pw = document.getElementById("inPass").value;
+      if (!db || !us || !pw) throw new Error("Please fill in the Geotab fields.");
+      await authenticate(db, us, pw);
+    }
+    if (!MAPS_KEY){
+      const k = document.getElementById("inKey").value.trim();
+      if (!k) throw new Error("Please paste your Google Maps API key.");
+      MAPS_KEY = k;
+      try{ localStorage.setItem(KEY_LS, k); }catch(e){}
+      /* if a (bad) Maps script already loaded once, a fresh key needs a clean page */
+      if (window.google && window.google.maps){ location.reload(); return; }
+    }
+    document.getElementById("login").style.display = "none";
+    await start();
+  }catch(e){
+    er.textContent = e.message || "Sign-in failed.";
+    er.style.display = "block";
+  }
+  btn.disabled = false; btn.textContent = "Open the map";
+});
+
+async function start(){
+  await loadMapsScript();
+  initMap();
+  await loadAll();
+  setInterval(loadAll, 5*60*1000);
+  setInterval(tickPositions, 60*1000);
+}
+(async function boot(){
+  if (!GEO || !MAPS_KEY){ showLogin(); return; }
+  try { await start(); }
+  catch(e){
+    const b=document.getElementById("errBanner");
+    b.textContent = "Startup failed: " + e.message; b.style.display="block";
+  }
+})();
+</script>
+</body>
+</html>
