@@ -121,7 +121,7 @@ h1,h2,h3{font-family:'Mona Sans',Arial,Helvetica,sans-serif;font-weight:700;lett
 .heldWaldo{position:absolute;right:-11px;top:-10px;width:16px;height:27px;transform-origin:top center;animation:shakeW .22s linear infinite;pointer-events:none}
 .heldWaldo svg{width:100%;height:100%;overflow:visible;display:block}
 @keyframes shakeW{0%,100%{transform:rotate(-44deg)}50%{transform:rotate(44deg)}}
-.waldo.ragdoll svg{animation:ragSpin .45s linear infinite}
+.waldo.ragdoll svg,.bear.ragdoll svg{animation:ragSpin .45s linear infinite}
 @keyframes ragSpin{to{transform:rotate(360deg)}}
 .bearLunch.honey .lbox{animation:honeySlurp 1.3s ease-in-out infinite alternate}
 @keyframes honeySlurp{from{transform:translateY(0) rotate(-10deg)}to{transform:translateY(-3px) rotate(12deg)}}
@@ -508,13 +508,148 @@ body.theme-chuck .westFolk{display:block}
 .westFolk .tw svg{animation:twSpin 1.4s linear infinite}
 @keyframes twRoll{0%{left:-60px}25%{bottom:11%}50%{bottom:7%}75%{bottom:10%}100%{left:104%}}
 @keyframes twSpin{to{transform:rotate(360deg)}}
-/* Chuck rides with his theme — he exists nowhere else */
-body:not(.theme-chuck) .chuck,body:not(.theme-chuck) .chuckSmoke,body:not(.theme-chuck) .crackOl,body:not(.theme-chuck) .feather{display:none!important}
+/* Chuck rides in the "Chuck Norris", "Low Country Boil", OR "Halloween" theme — nowhere else */
+body:not(.theme-chuck):not(.theme-lowcountry):not(.theme-halloween) .chuck{display:none!important}
+body:not(.theme-chuck) .chuckSmoke,body:not(.theme-chuck) .crackOl,body:not(.theme-chuck) .feather{display:none!important}
 body:not(.theme-chuck) .van.crumpled > svg{transform:none;filter:none}
 body:not(.theme-chuck) .structure.tree.felled{transform:scale(3)}
 body:not(.theme-chuck) .chuckFlung>svg,body:not(.theme-chuck) .chuckFlung .crackOl,body:not(.theme-chuck) svg.structure.tree.flungTree{animation:none!important}
 body:not(.theme-chuck) .chuckRider{display:none!important}
 body:not(.theme-chuck) .flyer.shot .inner{animation:flyBob 3.2s ease-in-out infinite}
+/* ---------------- THEME: "Low Country Boil" — golden marsh cookout dusk ---------------- */
+body.theme-lowcountry .ground{background:linear-gradient(#dcb877,#c79f5f 45%,#ad8449)}
+body.theme-lowcountry .mtns polygon[fill="#2A4562"]{fill:#6b7d5e}
+body.theme-lowcountry .mtns polygon[fill="#3a5a7d"]{fill:#8a9973}
+body.theme-lowcountry .structure.tree{filter:sepia(.3) saturate(.8) brightness(1) hue-rotate(-8deg)}
+body.theme-lowcountry .cloud{filter:sepia(.25) brightness(1.08)}
+body.theme-lowcountry:not(.dark) .panel{background:#fbeedd}
+body.theme-lowcountry:not(.dark) .scene .hdr .wordmark,body.theme-lowcountry:not(.dark) .scene .hdr-right{background:rgba(251,238,221,.92)}
+/* picnic-table townsfolk, string lights — Low Country Boil theme only */
+.lcbFolk{display:none;position:absolute;inset:0;pointer-events:none;z-index:2}
+body.theme-lowcountry .lcbFolk{display:block}
+.lcbFolk .lf{position:absolute}
+.lcbFolk .lf svg{width:100%;height:100%;display:block;overflow:visible}
+.lcbFolk .lights .bulb{animation:lightsTwinkle 1.8s ease-in-out infinite}
+.lcbFolk .lights .bulb:nth-child(2n){animation-delay:-.6s}
+.lcbFolk .lights .bulb:nth-child(3n){animation-delay:-1.1s}
+@keyframes lightsTwinkle{0%,100%{opacity:.6}50%{opacity:1}}
+/* the boil pot — steams and bobs whether or not Chuck is nearby */
+body:not(.theme-lowcountry) .boilPot,body:not(.theme-lowcountry) .crab{display:none!important}
+.boilPot{position:absolute;z-index:2;pointer-events:none}
+.boilPot svg{width:100%;height:100%;display:block;overflow:visible}
+.boilPot .bob{transform-box:fill-box;transform-origin:center;animation:potBob 2.6s ease-in-out infinite}
+.boilPot .bob.b2{animation-delay:-.7s}.boilPot .bob.b3{animation-delay:-1.4s}.boilPot .bob.b4{animation-delay:-2s}
+@keyframes potBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.6px)}}
+.boilPot .steam{position:absolute;left:50%;top:2px;width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.75);filter:blur(1px);animation:boilSteam 3.4s ease-in infinite}
+.boilPot .steam.s2{left:38%;animation-delay:-1.1s;animation-duration:3.9s}
+.boilPot .steam.s3{left:62%;animation-delay:-2.2s;animation-duration:3.1s}
+.boilPot .steam.s4{left:50%;animation-delay:-.6s;animation-duration:4.4s;width:6px;height:6px}
+@keyframes boilSteam{0%{transform:translate(-50%,0) scale(.5);opacity:0}15%{opacity:.85}100%{transform:translate(-50%,-46px) scale(1.7);opacity:0}}
+.boilPot.roiling .steam{animation-duration:1.4s}
+.boilPot.roiling .bob{animation-duration:1s}
+/* the giant crab — Chuck's Low Country Boil sparring partner */
+.crab{position:absolute;width:34px;height:24px;z-index:3;pointer-events:none}
+.crab svg{width:100%;height:100%;display:block;overflow:visible}
+.crab .clawL{transform-box:fill-box;transform-origin:100% 50%}
+.crab .clawR{transform-box:fill-box;transform-origin:0% 50%}
+.crab.pinching .clawL{animation:crabPinch .3s ease-in-out infinite alternate}
+.crab.pinching .clawR{animation:crabPinch .3s ease-in-out infinite alternate-reverse}
+@keyframes crabPinch{from{transform:rotate(0deg)}to{transform:rotate(-18deg)}}
+/* ---------------- THEME: "Halloween" — haunted midnight, mad-scientist Chuck ---------------- */
+body.theme-halloween .ground{background:linear-gradient(#2e2340,#1c1526)}
+body.theme-halloween .road{background:#241a30}
+body.theme-halloween .mtns polygon[fill="#2A4562"]{fill:#2e1f45}
+body.theme-halloween .mtns polygon[fill="#3a5a7d"]{fill:#4a3166}
+/* a huge harvest moon for the witch to fly past */
+body.theme-halloween .scene.ph-night .sun{width:296px;height:296px;margin-left:-148px;top:10px;box-shadow:0 0 90px 30px rgba(215,225,240,.5)}
+body.theme-halloween .structure.tree{filter:saturate(.6) brightness(.55) hue-rotate(220deg)}
+body.theme-halloween:not(.dark) .panel{background:#241b35;color:#e8e1f2}
+body.theme-halloween:not(.dark) .scene .hdr .wordmark,body.theme-halloween:not(.dark) .scene .hdr-right{background:rgba(36,27,53,.88)}
+/* no police chase in Halloween — the pursuit/footChase loops keep running, just hidden (same approach as the boring/waldo themes) */
+body.theme-halloween #pursuit,body.theme-halloween .pw,body.theme-halloween .footRun{display:none!important}
+/* everybody's size in Halloween (2x, then scaled down 25%) */
+body.theme-halloween .bear{width:112.5px;height:73.5px}
+body.theme-halloween .chuck{width:54px;height:88.5px}
+body.theme-halloween .waldo{width:30px;height:51px}
+body.theme-halloween .waldo.biking{width:30px;height:51px}
+/* no crosswalk or caution tape in Halloween — hidden (the shared crossing/signal logic underneath
+   still runs for every theme, it just isn't drawn here) */
+body.theme-halloween .crosswalk,body.theme-halloween #bearSignPost{display:none}
+/* scream-and-flee when a character crosses paths with Chuck */
+.waldo .hwArmsUp{display:none}
+.waldo.scared .hwArmsUp{display:block}
+.waldo.scared>svg,.bear.scared>svg{animation:hwPanic .18s linear infinite}
+@keyframes hwPanic{0%,100%{transform:translate(0,0) rotate(0)}25%{transform:translate(-2px,-1px) rotate(-4deg)}50%{transform:translate(2px,0) rotate(3deg)}75%{transform:translate(-1px,1px) rotate(-3deg)}}
+/* jack-o-lanterns, bats, cobweb — Halloween theme only */
+.hwProps{display:none;position:absolute;inset:0;pointer-events:none;z-index:2}
+body.theme-halloween .hwProps{display:block}
+.hwProps .hw{position:absolute}
+.hwProps .hw svg{width:100%;height:100%;display:block;overflow:visible}
+.hwProps .pumpkin .glow{animation:pumpkinGlow 2.2s ease-in-out infinite}
+.hwProps .pumpkin.p2 .glow{animation-delay:-1.1s}
+@keyframes pumpkinGlow{0%,100%{opacity:.75}50%{opacity:1}}
+.hwProps .bat{animation:batFly linear infinite}
+@keyframes batFly{0%{left:-40px;top:14%}50%{top:9%}100%{left:104%;top:16%}}
+.hwProps .bat svg{animation:batFlap .35s ease-in-out infinite alternate}
+@keyframes batFlap{from{transform:scaleY(1)}to{transform:scaleY(.6)}}
+/* the lab slab prop was deleted — it sat in the middle of the road and the mad-scientist
+   routine that used it was retired back in v47, so it was pure unvisited clutter */
+body:not(.theme-halloween) .monster{display:none!important}
+/* the monster — Chuck's Halloween sparring partner */
+.monster{position:absolute;width:40px;height:60px;z-index:3;pointer-events:none}
+.monster svg{width:100%;height:100%;display:block;overflow:visible}
+.monster .armL{transform-box:fill-box;transform-origin:100% 20%}
+.monster .armR{transform-box:fill-box;transform-origin:0% 20%}
+.monster.struggling .armL{animation:monsterStruggle .35s ease-in-out infinite alternate}
+.monster.struggling .armR{animation:monsterStruggle .35s ease-in-out infinite alternate-reverse}
+@keyframes monsterStruggle{from{transform:rotate(0deg)}to{transform:rotate(-22deg)}}
+.labBeaker .liquid{transform-box:fill-box;transform-origin:center;animation:potBob 2.4s ease-in-out infinite}
+/* the witch — swoops in front of the (now-giant) moon on a continuous loop */
+.hwProps .witch{position:absolute;top:110px;animation:witchFly 30s linear infinite}
+.hwProps .witch svg{width:100%;height:100%;display:block;overflow:visible}
+@keyframes witchFly{0%{left:-80px;top:230px}40%{top:150px}50%{left:50%;top:108px}60%{top:150px}100%{left:106%;top:230px}}
+/* a "Happy Halloween" banner trails behind her broom — only visible while she's in front of the moon */
+.hwProps .witch .hwBanner{position:absolute;right:100%;top:40%;transform:translateY(-50%);white-space:nowrap;background:#1a1420;color:#ffb347;font-size:9px;font-weight:800;letter-spacing:.02em;padding:2px 7px 2px 9px;border-radius:2px;opacity:0;animation:hwBannerShow 30s linear infinite;pointer-events:none}
+.hwProps .witch .hwBanner::after{content:"";position:absolute;top:0;right:-6px;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:6px solid #1a1420}
+@keyframes hwBannerShow{0%,36%,64%,100%{opacity:0}46%,54%{opacity:1}}
+/* dead trees — Halloween theme only: canopy hidden, bare branches shown */
+.structure.tree .deadBranches{display:none}
+body.theme-halloween .structure.tree .deadBranches{display:block}
+body.theme-halloween .structure.tree circle[fill="#457A3E"],
+body.theme-halloween .structure.tree circle[fill="#529148"],
+body.theme-halloween .structure.tree circle[fill="#3f6f3a"],
+body.theme-halloween .structure.tree polygon[fill="#3f6f3a"],
+body.theme-halloween .structure.tree polygon[fill="#457A3E"]{display:none}
+body.theme-halloween .structure.tree rect[fill="#6b4f35"]{fill:#2a2018}
+/* haunted houses — Halloween theme only */
+body.theme-halloween svg.structure.house{filter:brightness(.6) saturate(.65) contrast(1.1)}
+body.theme-halloween svg.structure.house polygon[fill="#8d4a3a"]{fill:#2a1f1d}
+body.theme-halloween svg.structure.house rect[fill="#e8dcc8"]{fill:#5a5a52}
+body.theme-halloween svg.structure.house rect[fill="#5b4632"]{fill:#17110c}
+body.theme-halloween svg.structure.house rect[fill="#b8c4d6"]{fill:#6b6b72}
+body.theme-halloween svg.structure.house polygon[fill="#5d6b80"]{fill:#242128}
+body.theme-halloween svg.structure.house rect[fill="#4a5568"]{fill:#17141c}
+/* vans and trucks: Fusion gray body → pumpkin orange, every window tinted dark (scoped to .van
+   so it never touches the cop car, the Fusion/house windows, or anything else sharing these hexes) */
+body.theme-halloween .van rect[fill="#939598"],body.theme-halloween .van path[fill="#939598"]{fill:#d9731c}
+body.theme-halloween .van rect[fill="#CEE2FF"],body.theme-halloween .van path[fill="#CEE2FF"]{fill:#1a1420}
+/* only ONE window in the whole scene flickers at a time (Fusion HQ included) — a JS rotator
+   below picks a random one every couple of seconds and toggles .hwFlicker on it briefly */
+body.theme-halloween #jobWinG,body.theme-halloween #homeWinG{fill:#152a18}
+body.theme-halloween #fusionWinMain,body.theme-halloween #fusionWinWing{fill:#16222c}
+body.theme-halloween #jobWinG.hwFlicker,body.theme-halloween #homeWinG.hwFlicker,
+body.theme-halloween #fusionWinMain.hwFlicker,body.theme-halloween #fusionWinWing.hwFlicker{animation:hauntedFlash 1.1s steps(1,end) 1}
+@keyframes hauntedFlash{0%,100%{fill:#f2ffc8}45%{fill:#152a18}55%{fill:#eaffb0}90%{fill:#152a18}}
+/* a skeleton shows up ONLY while its window is the one currently flickering */
+.skelWin{display:none}
+body.theme-halloween .skelWin.active{display:block}
+/* Waldo's mummy costume — Halloween theme only (supersedes the earlier vampire look) */
+.waldo .hwMummy{display:none}
+body.theme-halloween .waldo .hwMummy{display:block}
+/* the bear's ghost costume — Halloween theme only */
+.bear .hwGhost{display:none}
+body.theme-halloween .bear{filter:saturate(.35) brightness(1.3)}
+body.theme-halloween .bear .hwGhost{display:block}
 /* ---------------- CHUCK NORRIS ---------------- */
 .chuck{position:absolute;left:92%;top:60%;width:36px;height:59px;z-index:1;pointer-events:none}
 .chuck svg{width:100%;height:100%;overflow:visible;display:block}
@@ -547,9 +682,54 @@ svg.structure.tree.flungTree{animation:treeFly 1.5s cubic-bezier(.3,.5,.55,1) fo
 .chuck.fightSpin svg{animation:cnSpinKick .55s linear infinite}
 @keyframes cnSpinKick{0%{transform:translateY(0) rotate(0)}45%{transform:translateY(-30px) rotate(200deg)}100%{transform:translateY(0) rotate(360deg)}}
 .chuck.fighting .armR{animation:chChop .15s linear infinite}
+/* MJ CROSSWALK PROTOCOL — white glove ON, spinning jump kick, then a moonwalk so smooth the asphalt blushes */
+.chuck .wg{display:none}
+.chuck.gloved .wg{display:block}
+.chuck .wgSpark{transform-box:fill-box;transform-origin:center;animation:gTwinkle .6s ease-in-out infinite alternate}
+@keyframes gTwinkle{from{opacity:.25;transform:scale(.6) rotate(0)}to{opacity:1;transform:scale(1.3) rotate(24deg)}}
+.chuck.spinKick svg{animation:cnSpinKick .55s linear 2}
+.chuck.spinKick .clL{animation:none}
+.chuck.spinKick .clR{animation:none;transform:rotate(-84deg)}
+.chuck.moonwalking svg{animation:mwLean 1.1s ease-in-out infinite}
+@keyframes mwLean{0%,100%{transform:rotate(-6deg) translateY(0)}50%{transform:rotate(-8deg) translateY(-1.5px)}}
+.chuck.moonwalking .clL{animation:mwSlide .9s ease-in-out infinite}
+.chuck.moonwalking .clR{animation:mwSlide .9s ease-in-out infinite -.45s}
+@keyframes mwSlide{0%,100%{transform:translateX(0) rotate(0)}50%{transform:translateX(-4.5px) rotate(4deg)}}
+/* HALLOWEEN: no more moonwalking — Chuck tries the van doors instead, and never wins */
+/* overflowing candy basket Frankenstein steals from the van (replaces the old door-zap gag) */
+.candyBasket{position:absolute;left:50%;top:-30px;transform:translateX(-50%);text-align:center;z-index:4;pointer-events:none}
+.candyBasket .basket{font-size:22px}
+.candyBasket .spill{font-size:12px;margin-top:-6px}
+/* lightning strikes at random in Halloween, and can electrocute whoever it catches: Frankenstein, the mummy, or the bear */
+.chuck.electrocuted>svg,.waldo.electrocuted>svg,.bear.electrocuted>svg{animation:electroShake .09s linear infinite}
+/* the bolt itself — a real lightning-bolt graphic that drops out of a random cloud, not a screen flash */
+.hwBolt{position:absolute;width:20px;margin-left:-10px;pointer-events:none;z-index:7;opacity:0;filter:drop-shadow(0 0 6px #fff3a0) drop-shadow(0 0 14px #ffe34d)}
+.hwBolt svg{width:100%;height:100%;display:block;overflow:visible}
+.hwBolt.strike{animation:hwBoltFlash .4s steps(1,end) 1}
+@keyframes hwBoltFlash{0%{opacity:0}8%{opacity:1}20%{opacity:.1}32%{opacity:1}48%{opacity:.08}64%{opacity:.9}100%{opacity:0}}
+@keyframes electroShake{0%,100%{transform:translate(0,0) rotate(0)}10%{transform:translate(-2px,1px) rotate(-3deg)}20%{transform:translate(2px,-1px) rotate(3deg)}30%{transform:translate(-2px,-1px) rotate(-2deg)}40%{transform:translate(2px,1px) rotate(2deg)}50%{transform:translate(-1px,1px) rotate(-3deg)}60%{transform:translate(1px,-1px) rotate(3deg)}70%{transform:translate(-2px,0) rotate(-2deg)}80%{transform:translate(2px,0) rotate(2deg)}90%{transform:translate(-1px,-1px) rotate(-1deg)}}
+.chuck .chuckSkel{display:none;filter:drop-shadow(0 0 2.5px #ffe94d) drop-shadow(0 0 5px #ffd21a)}
+.chuck.electrocuted .chuckBody{opacity:0}
+.chuck.electrocuted .chuckSkel{display:block}
+/* the same glowing-yellow skeleton reveal, now on the mummy and the bear too */
+.waldo .waldoSkel{display:none;filter:drop-shadow(0 0 2px #ffe94d) drop-shadow(0 0 4px #ffd21a)}
+.waldo.electrocuted .waldoBody{opacity:0}
+.waldo.electrocuted .waldoSkel{display:block}
+.bear .bearSkel{display:none;filter:drop-shadow(0 0 2.5px #ffe94d) drop-shadow(0 0 5px #ffd21a)}
+.bear.electrocuted .bearBody{opacity:0}
+.bear.electrocuted .bearSkel{display:block}
 .bear.brawl svg{animation:bearBrawl .42s ease-in-out infinite}
 @keyframes bearBrawl{0%,100%{transform:rotate(0) translate(0,0)}30%{transform:rotate(-26deg) translate(-8px,-10px)}65%{transform:rotate(16deg) translate(9px,0)}}
 .chuck.ragdoll svg{animation:ragSpin .45s linear infinite}
+.chuck.onbike{width:52px;height:43px}
+.chuck.onbike svg{transition:transform .35s ease;transform-origin:14% 86%}
+.chuck.onbike .wwF,.chuck.onbike .wwB{transform-box:fill-box;transform-origin:center;animation:wheelSpin .38s linear infinite}
+.chuck.wheelie svg{transform:rotate(-26deg)}
+.chuck.bucking > svg{animation:buckKick .45s ease-in-out infinite}
+.bearRider.onChuck{width:34px;height:22px;left:2%;top:-15px}
+.chuck.bull{width:58px;height:38px}
+.chuck.bull .bearRider{left:28%;top:-19px}
+.chuck.bull .bearRider.onChuck{left:12%;top:-14px}
 /* karate damage on the vans */
 .van .crackOl{position:absolute;left:16%;top:12%;width:68%;height:40%;z-index:3;pointer-events:none}
 .van .crackOl svg{width:100%;height:100%;overflow:visible;display:block}
@@ -598,20 +778,18 @@ svg.structure.tree.flungTree{animation:treeFly 1.5s cubic-bezier(.3,.5,.55,1) fo
   <div class="sun"></div>
   <div class="cloud c1"></div><div class="cloud c2"></div>
   <svg class="mtns" viewBox="0 0 1000 220" preserveAspectRatio="none">
-    <polygon points="0,220 90,90 180,220" fill="#2A4562" opacity=".55"/>
-    <polygon points="120,220 260,40 400,220" fill="#2A4562" opacity=".75"/>
-    <polygon points="230,220 320,110 410,220" fill="#3a5a7d" opacity=".6"/>
-    <polygon points="600,220 740,40 880,220" fill="#2A4562" opacity=".75"/>
-    <polygon points="560,220 660,100 760,220" fill="#3a5a7d" opacity=".6"/>
-    <polygon points="820,220 920,90 1020,220" fill="#2A4562" opacity=".55"/>
-    <polygon points="250,55 260,40 270,55 260,62" fill="#fff" opacity=".9"/>
-    <polygon points="730,55 740,40 750,55 740,62" fill="#fff" opacity=".9"/>
+    <!-- Blue Ridge horizon: layered rolling ridges, hazy in back, receding valley at the road's vanishing point -->
+    <polygon points="0,220 0,105 60,86 140,96 230,76 320,92 420,82 500,94 580,78 660,92 750,72 840,90 930,78 1000,90 1000,220" fill="#3a5a7d" opacity=".28"/>
+    <polygon points="0,220 0,138 80,120 170,132 260,112 350,128 440,118 520,132 610,114 700,130 790,112 880,126 1000,116 1000,220" fill="#3a5a7d" opacity=".45"/>
+    <polygon points="0,220 0,164 70,146 160,158 250,140 340,156 430,146 540,160 640,142 740,158 830,144 920,158 1000,148 1000,220" fill="#2A4562" opacity=".55"/>
+    <polygon points="0,220 0,188 90,168 190,182 290,166 390,180 480,192 560,182 660,166 760,182 860,170 950,184 1000,176 1000,220" fill="#2A4562" opacity=".72"/>
+    <polygon points="0,220 0,206 100,192 200,202 300,190 380,204 470,212 560,204 650,190 750,202 850,190 940,202 1000,196 1000,220" fill="#2A4562" opacity=".85"/>
   </svg>
   <div class="ground"></div>
   <div class="road" id="road"></div>
 
   <!-- BEAR CROSSWALK: stripes on the street + signal post; en-route traffic stops when the bear crosses -->
-  <svg class="structure" style="left:50%;bottom:14.5%;width:340px;height:50px;transform:translateX(-50%)" viewBox="0 0 340 50" preserveAspectRatio="none">
+  <svg class="structure crosswalk" style="left:50%;bottom:14.5%;width:340px;height:50px;transform:translateX(-50%)" viewBox="0 0 340 50" preserveAspectRatio="none">
     <g fill="#ffd23f" opacity=".95">
       <rect x="6" y="17" width="22" height="30" rx="2"/><rect x="40" y="17" width="22" height="30" rx="2"/>
       <rect x="74" y="17" width="22" height="30" rx="2"/><rect x="108" y="17" width="22" height="30" rx="2"/>
@@ -755,8 +933,138 @@ svg.structure.tree.flungTree{animation:treeFly 1.5s cubic-bezier(.3,.5,.55,1) fo
       </g></svg></div>
   </div>
 
+  <!-- low country boil cookout props — only out in the Low Country Boil theme -->
+  <div class="lcbFolk">
+    <div class="lf lights" style="left:9%;bottom:17%;width:210px;height:26px"><svg viewBox="0 0 210 26">
+      <path d="M0 2 Q105 27 210 2" fill="none" stroke="#5a4a35" stroke-width="1.2"/>
+      <g fill="#ffd23f">
+        <circle class="bulb" cx="20" cy="7.5" r="2.3"/><circle class="bulb" cx="52" cy="15.5" r="2.3"/>
+        <circle class="bulb" cx="84" cy="20.5" r="2.3"/><circle class="bulb" cx="116" cy="21.5" r="2.3"/>
+        <circle class="bulb" cx="148" cy="18" r="2.3"/><circle class="bulb" cx="180" cy="11" r="2.3"/>
+      </g>
+    </svg></div>
+    <div class="lf" id="lcbTable" style="left:18.5%;bottom:5%;width:56px;height:32px"><svg viewBox="0 0 56 32">
+      <defs><pattern id="lcbCheck2" width="6" height="6" patternUnits="userSpaceOnUse">
+        <rect width="6" height="6" fill="#fdf6ea"/><rect width="3" height="3" fill="#C1272D"/><rect x="3" y="3" width="3" height="3" fill="#C1272D"/>
+      </pattern></defs>
+      <ellipse cx="28" cy="30.5" rx="24" ry="1.6" fill="rgba(0,0,0,.15)"/>
+      <rect x="7" y="11" width="42" height="4" fill="#8a6a45"/>
+      <rect x="10" y="15" width="3" height="13" fill="#6b4f30"/><rect x="43" y="15" width="3" height="13" fill="#6b4f30"/>
+      <path d="M4 11 L52 11 L49.5 4 Q28 1 6.5 4 Z" fill="#fdf6ea"/>
+      <path d="M4 11 L52 11 L49.5 4 Q28 1 6.5 4 Z" fill="url(#lcbCheck2)" opacity=".85"/>
+      <rect x="13" y="4.8" width="11" height="4.4" fill="#e9e2cf" opacity=".85"/>
+      <ellipse cx="35" cy="7" rx="3.4" ry="2.1" fill="#e7c24a"/><circle cx="41" cy="7.6" r="2.6" fill="#c98a4e"/>
+    </svg></div>
+    <div class="lf" style="left:13.5%;bottom:5.5%;width:28px;height:40px"><svg viewBox="0 0 22 32">
+      <ellipse cx="11" cy="30.6" rx="7.5" ry="1.6" fill="rgba(0,0,0,.14)"/>
+      <rect x="7" y="24" width="3.2" height="6" rx="1.2" fill="#3a5a7d"/><rect x="11.8" y="24" width="3.2" height="6" rx="1.2" fill="#3a5a7d"/>
+      <rect x="5.8" y="14.5" width="10.4" height="10.5" rx="2.5" fill="#fdf6ea"/>
+      <rect x="5.8" y="14.5" width="10.4" height="10.5" rx="2.5" fill="url(#lcbCheck2)" opacity=".9"/>
+      <path d="M5.8 17 L2.8 21.5 M16.2 17 L19.2 21.5" stroke="#fdf6ea" stroke-width="2.6" stroke-linecap="round"/>
+      <ellipse cx="3.9" cy="21" rx="2" ry="1.9" fill="#e7c24a"/><circle cx="19.4" cy="22" r="1.5" fill="#e8c39a"/>
+      <circle cx="11" cy="8.6" r="6" fill="#e8c39a"/>
+      <path d="M5.4 7.6 q0 -5.4 5.6 -5.4 q5.6 0 5.6 5.4 Z" fill="#c9992e"/>
+      <ellipse cx="11" cy="7.8" rx="6.6" ry="1.6" fill="#a97d24"/>
+      <circle cx="8.8" cy="8" r="2" fill="#fff"/><circle cx="13.2" cy="8" r="2" fill="#fff"/>
+      <circle cx="9.3" cy="8.3" r=".55" fill="#1b1b1d"/><circle cx="12.7" cy="8.3" r=".55" fill="#1b1b1d"/>
+      <path d="M8.8 12.6 Q11 14 13.4 12.4" stroke="#1b1b1d" stroke-width=".55" fill="none"/>
+    </svg></div>
+    <div class="lf" style="left:25%;bottom:4.8%;width:28px;height:40px"><svg viewBox="0 0 22 32">
+      <ellipse cx="11" cy="30.6" rx="7.5" ry="1.6" fill="rgba(0,0,0,.14)"/>
+      <rect x="7" y="24" width="3.2" height="6" rx="1.2" fill="#457A3E"/><rect x="11.8" y="24" width="3.2" height="6" rx="1.2" fill="#457A3E"/>
+      <rect x="5.8" y="14.5" width="10.4" height="10.5" rx="2.5" fill="#fdf6ea"/>
+      <rect x="5.8" y="14.5" width="10.4" height="10.5" rx="2.5" fill="url(#lcbCheck2)" opacity=".9"/>
+      <path d="M5.8 17 L2.8 21.5 M16.2 17 L19.2 21.5" stroke="#fdf6ea" stroke-width="2.6" stroke-linecap="round"/>
+      <circle cx="3.4" cy="21" r="2" fill="#c25f36"/><circle cx="19.4" cy="22" r="1.5" fill="#e8c39a"/>
+      <circle cx="11" cy="8.6" r="6" fill="#c98a4e"/>
+      <path d="M5.4 6.8 Q11 3 16.6 6.8" stroke="#5a3a22" stroke-width="1.6" fill="none"/>
+      <circle cx="8.8" cy="8" r="2" fill="#fff"/><circle cx="13.2" cy="8" r="2" fill="#fff"/>
+      <circle cx="9.3" cy="8.3" r=".55" fill="#1b1b1d"/><circle cx="12.7" cy="8.3" r=".55" fill="#1b1b1d"/>
+      <path d="M8.8 12.6 Q11 14 13.4 12.4" stroke="#1b1b1d" stroke-width=".55" fill="none"/>
+    </svg></div>
+  </div>
+
+  <!-- the boil pot — steams and bobs with corn/potatoes/sausage/shrimp; Chuck's stage in the Low Country Boil theme -->
+  <div class="boilPot" id="boilPot" style="left:44%;bottom:7%;width:74px;height:64px">
+    <svg viewBox="0 0 74 64">
+      <ellipse cx="37" cy="60" rx="16" ry="3" fill="rgba(0,0,0,.18)"/>
+      <rect x="30" y="40" width="14" height="20" rx="2" fill="#3a3d42"/>
+      <rect x="26" y="38" width="22" height="4" rx="1" fill="#26282b"/>
+      <ellipse cx="37" cy="24" rx="21" ry="6" fill="#1c1d20"/>
+      <path d="M18 24 q0 20 19 20 q19 0 19 -20 Z" fill="#2b2d30"/>
+      <path d="M18 24 q0 20 19 20 q19 0 19 -20" fill="none" stroke="#101113" stroke-width="1.4"/>
+      <rect x="10" y="21" width="7" height="4" rx="2" fill="#1c1d20"/><rect x="57" y="21" width="7" height="4" rx="2" fill="#1c1d20"/>
+      <ellipse cx="37" cy="22" rx="18.5" ry="5.4" fill="#6b3420"/>
+      <g class="bob b1"><ellipse cx="29" cy="19.5" rx="3.4" ry="2.1" fill="#e7c24a"/><path d="M26.5 18.6 q2.5 -1.6 5 0" stroke="#7a9c4a" stroke-width="1.1" fill="none"/></g>
+      <g class="bob b2"><circle cx="41" cy="20.5" r="2.6" fill="#c98a4e"/></g>
+      <g class="bob b3"><path d="M32 22.6 q3 -2 6 0 q3 2 6 0" stroke="#8a3f33" stroke-width="2.6" fill="none" stroke-linecap="round"/></g>
+      <g class="bob b4"><path d="M46 19 q2 -2.4 4.4 -1 q.6 2 -1.2 3 Z" fill="#e8836f"/></g>
+    </svg>
+    <i class="steam s1"></i><i class="steam s2"></i><i class="steam s3"></i><i class="steam s4"></i>
+  </div>
+
+  <!-- haunted-midnight props — only out in the Halloween theme -->
+  <div class="hwProps">
+    <div class="hw bat" style="left:-40px;top:8%;width:38px;height:17px;animation-duration:21s"><svg viewBox="0 0 26 12">
+      <path d="M13 6 Q9 -2 2 1 Q7 4 8 7 Q4 7 0 10 Q7 10 13 6 Q19 10 26 10 Q22 7 18 7 Q19 4 24 1 Q17 -2 13 6 Z" fill="#1a1420"/>
+    </svg></div>
+    <div class="hw bat" style="left:-40px;top:12%;width:30px;height:14px;animation-duration:27s;animation-delay:-10s"><svg viewBox="0 0 26 12">
+      <path d="M13 6 Q9 -2 2 1 Q7 4 8 7 Q4 7 0 10 Q7 10 13 6 Q19 10 26 10 Q22 7 18 7 Q19 4 24 1 Q17 -2 13 6 Z" fill="#1a1420"/>
+    </svg></div>
+    <div class="hw bat" style="left:-40px;top:15%;width:24px;height:11px;animation-duration:18s;animation-delay:-5s"><svg viewBox="0 0 26 12">
+      <path d="M13 6 Q9 -2 2 1 Q7 4 8 7 Q4 7 0 10 Q7 10 13 6 Q19 10 26 10 Q22 7 18 7 Q19 4 24 1 Q17 -2 13 6 Z" fill="#1a1420"/>
+    </svg></div>
+    <div class="hw bat" style="left:-40px;top:20%;width:33px;height:15px;animation-duration:24s;animation-delay:-17s"><svg viewBox="0 0 26 12">
+      <path d="M13 6 Q9 -2 2 1 Q7 4 8 7 Q4 7 0 10 Q7 10 13 6 Q19 10 26 10 Q22 7 18 7 Q19 4 24 1 Q17 -2 13 6 Z" fill="#1a1420"/>
+    </svg></div>
+    <div class="hw bat" style="left:-40px;top:6%;width:27px;height:12px;animation-duration:31s;animation-delay:-3s"><svg viewBox="0 0 26 12">
+      <path d="M13 6 Q9 -2 2 1 Q7 4 8 7 Q4 7 0 10 Q7 10 13 6 Q19 10 26 10 Q22 7 18 7 Q19 4 24 1 Q17 -2 13 6 Z" fill="#1a1420"/>
+    </svg></div>
+    <div class="hw bat" style="left:-40px;top:23%;width:36px;height:16px;animation-duration:20s;animation-delay:-14s"><svg viewBox="0 0 26 12">
+      <path d="M13 6 Q9 -2 2 1 Q7 4 8 7 Q4 7 0 10 Q7 10 13 6 Q19 10 26 10 Q22 7 18 7 Q19 4 24 1 Q17 -2 13 6 Z" fill="#1a1420"/>
+    </svg></div>
+    <div class="hw bat" style="left:-40px;top:18%;width:22px;height:10px;animation-duration:26s;animation-delay:-21s"><svg viewBox="0 0 26 12">
+      <path d="M13 6 Q9 -2 2 1 Q7 4 8 7 Q4 7 0 10 Q7 10 13 6 Q19 10 26 10 Q22 7 18 7 Q19 4 24 1 Q17 -2 13 6 Z" fill="#1a1420"/>
+    </svg></div>
+    <div class="hw witch" style="width:92px;height:48px"><svg viewBox="0 0 50 26">
+      <path d="M2 20 L34 20" stroke="#1a1420" stroke-width="2"/>
+      <path d="M0 14 L10 20 L0 24 Z" fill="#1a1420"/>
+      <path d="M20 8 Q30 6 34 16 Q30 22 20 20 Q14 18 14 14 Q14 9 20 8 Z" fill="#120a1f"/>
+      <path d="M19 6 L26 2 L23 9 Z" fill="#120a1f"/>
+      <path d="M17 9 Q19 7 22 8" stroke="#120a1f" stroke-width="1.4" fill="none"/>
+    </svg><div class="hwBanner">Happy Halloween</div></div>
+    <div class="hw pumpkin" style="left:8%;bottom:4.5%;width:34px;height:26px"><svg viewBox="0 0 34 26">
+      <ellipse cx="17" cy="24.5" rx="15" ry="1.5" fill="rgba(0,0,0,.2)"/>
+      <path d="M17 3 Q6 3 4 13 Q4 22 17 22 Q30 22 30 13 Q28 3 17 3 Z" fill="#d9731c"/>
+      <path d="M8 13 Q17 10 26 13" stroke="#a6540f" stroke-width="1" fill="none" opacity=".6"/>
+      <rect x="15" y="0" width="4" height="4" rx="1" fill="#4a7a3a"/>
+      <g class="glow" fill="#ffe27a">
+        <polygon points="11,12 14,16 8,16"/><polygon points="23,12 26,16 20,16"/>
+        <path d="M11,19 Q17,23 23,19 Q20,20 17,19 Q14,20 11,19 Z"/>
+      </g>
+    </svg></div>
+    <div class="hw pumpkin p2" style="left:14.5%;bottom:3.8%;width:24px;height:19px"><svg viewBox="0 0 34 26">
+      <ellipse cx="17" cy="24.5" rx="15" ry="1.5" fill="rgba(0,0,0,.2)"/>
+      <path d="M17 3 Q6 3 4 13 Q4 22 17 22 Q30 22 30 13 Q28 3 17 3 Z" fill="#c0630f"/>
+      <rect x="15" y="0" width="4" height="4" rx="1" fill="#4a7a3a"/>
+      <g class="glow" fill="#ffe27a">
+        <polygon points="11,12 14,16 8,16"/><polygon points="23,12 26,16 20,16"/>
+        <path d="M11,19 Q17,23 23,19 Q20,20 17,19 Q14,20 11,19 Z"/>
+      </g>
+    </svg></div>
+    <div class="hw" style="left:1%;bottom:62%;width:46px;height:46px"><svg viewBox="0 0 46 46">
+      <path d="M0 0 Q20 2 22 22 Q2 20 0 0 Z" fill="none" stroke="#9a8fae" stroke-width=".7" opacity=".7"/>
+      <path d="M0 0 Q11 4 12 12 M0 0 Q4 11 12 12 M12 12 Q17 16 22 22" fill="none" stroke="#9a8fae" stroke-width=".6" opacity=".7"/>
+    </svg></div>
+    <div class="hw" id="labBeaker" style="left:38%;bottom:7.5%;width:22px;height:30px"><svg viewBox="0 0 22 30">
+      <rect x="9" y="2" width="4" height="8" fill="#8a8a94"/>
+      <path d="M8 10 L8 18 L2 27 Q0 30 4 30 L18 30 Q22 30 20 27 L14 18 L14 10 Z" fill="none" stroke="#9aa0ac" stroke-width="1.4"/>
+      <path class="liquid" d="M4 20 L18 20 L20 27 Q22 30 18 30 L4 30 Q0 30 2 27 Z" fill="#5fe06a" opacity=".85"/>
+    </svg></div>
+  </div>
+
   <!-- the bear — painted early so he walks BEHIND vans, trees, houses, and Fusion -->
-  <div class="bear"><svg viewBox="0 0 62 40">
+  <div class="bear"><svg viewBox="0 0 62 40"><g class="bearBody">
     <!-- far-side legs -->
     <path class="bl2" d="M15 25 q-1.2 6 -1.6 9 q-.1 2 1.9 2 l3 0 q1.7 0 1.2-2 l-.6-9 Z" fill="#4e3520"/>
     <path class="bl4" d="M35 24.5 q-1 6.5 -1.4 9.5 q-.1 2 1.9 2 l3 0 q1.7 0 1.2-2 l-.6-9.5 Z" fill="#4e3520"/>
@@ -779,24 +1087,108 @@ svg.structure.tree.flungTree{animation:treeFly 1.5s cubic-bezier(.3,.5,.55,1) fo
     <circle cx="51" cy="12.3" r="1.1" fill="#1b1b1d"/><circle cx="51.3" cy="12" r=".35" fill="#fff"/>
     <!-- claws -->
     <path d="M18 36.7 l.9 1.6 M19.8 36.8 l.7 1.6 M21.5 36.8 l.5 1.6 M38.2 36.7 l.9 1.6 M40 36.8 l.7 1.6 M41.7 36.8 l.5 1.6" stroke="#241a12" stroke-width=".65" stroke-linecap="round"/>
+    <path class="hwGhost" d="M4 24 Q2 10 16 6 Q30 1 44 5 Q60 9 60 24 Q60 30 54 29 Q56 34 50 33 Q50 37 45 34 Q40 37 35 33 Q28 37 22 33 Q16 37 11 32 Q13 34 8 32 Q4 29 4 24 Z" fill="#f2f2f2" opacity=".92"/>
+    <ellipse class="hwGhost" cx="47" cy="13" rx="2.6" ry="3.2" fill="#1b1424"/>
+    <ellipse class="hwGhost" cx="54" cy="13" rx="2.6" ry="3.2" fill="#1b1424"/>
+    </g>
+    <g class="bearSkel">
+      <circle cx="50" cy="13" r="5" fill="none" stroke="#ffe24d" stroke-width="1.2"/>
+      <circle cx="48" cy="12" r="1" fill="#ffe24d"/><circle cx="52.4" cy="12.3" r="1" fill="#ffe24d"/>
+      <path d="M47.5 16 Q50 17.6 52.8 16" stroke="#ffe24d" stroke-width="1" fill="none"/>
+      <line x1="45" y1="17" x2="14" y2="20" stroke="#ffe24d" stroke-width="1.6"/>
+      <path d="M16 13 Q27 10 38 13.5 M15 18 Q27 16 40 18.5 M15 23 Q27 22 41 24" stroke="#ffe24d" stroke-width="1.1" fill="none"/>
+      <line x1="19" y1="26" x2="19.5" y2="36" stroke="#ffe24d" stroke-width="1.4"/>
+      <line x1="39.5" y1="25" x2="40" y2="35.5" stroke="#ffe24d" stroke-width="1.4"/>
+      <line x1="16.5" y1="25.5" x2="16" y2="34.5" stroke="#ffe24d" stroke-width="1.4"/>
+      <line x1="36.5" y1="24.5" x2="36" y2="34" stroke="#ffe24d" stroke-width="1.4"/>
+    </g>
   </svg></div>
 
-  <!-- Fusion HQ building -->
+  <!-- Fusion HQ building — new red-brick HQ (matches 2026 building photo) -->
   <svg class="structure" style="left:2.5%;bottom:38%;width:300px;height:195px" viewBox="0 0 200 130">
-    <rect x="10" y="30" width="140" height="100" rx="3" fill="#a9abae"/>
-    <rect x="10" y="30" width="140" height="100" rx="3" fill="url(#bgrad)" opacity=".25"/>
-    <defs><linearGradient id="bgrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#414042"/></linearGradient></defs>
-    <rect x="150" y="60" width="44" height="70" rx="2" fill="#8d8f92"/>
-    <g fill="#CEE2FF" stroke="#75777a" stroke-width="1">
+    <defs>
+      <pattern id="hqBrick" width="14" height="8" patternUnits="userSpaceOnUse">
+        <rect width="14" height="8" fill="#b0492c"/>
+        <path d="M0 0h14 M0 4h14 M0 8h14" stroke="#9c3d22" stroke-width=".45" opacity=".65"/>
+        <path d="M7 0v4 M3.5 4v4 M10.5 4v4" stroke="#9c3d22" stroke-width=".45" opacity=".65"/>
+      </pattern>
+      <linearGradient id="hqShade" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#ffffff" stop-opacity=".16"/><stop offset="1" stop-color="#38130a" stop-opacity=".2"/>
+      </linearGradient>
+    </defs>
+    <!-- right wing (lower brick section) -->
+    <rect x="150" y="52" width="44" height="78" fill="url(#hqBrick)"/>
+    <rect x="150" y="52" width="44" height="78" fill="url(#hqShade)"/>
+    <rect x="148" y="48.5" width="48" height="4" fill="#7c2d18"/>
+    <!-- main block -->
+    <rect x="10" y="30" width="140" height="100" fill="url(#hqBrick)"/>
+    <rect x="10" y="30" width="140" height="100" fill="url(#hqShade)"/>
+    <rect x="8" y="26.5" width="144" height="4" fill="#7c2d18"/>
+    <!-- soldier-course accent band between window rows -->
+    <rect x="10" y="62" width="140" height="1.6" fill="#8d3018" opacity=".85"/>
+    <!-- arched windows: tan lintels + sills, deep-blue glass (positions unchanged) -->
+    <g>
+      <path d="M20.5 42 Q33 33.5 45.5 42 L45.5 44.5 L20.5 44.5 Z" fill="#d9b98a"/><path d="M50.5 42 Q63 33.5 75.5 42 L75.5 44.5 L50.5 44.5 Z" fill="#d9b98a"/><path d="M80.5 42 Q93 33.5 105.5 42 L105.5 44.5 L80.5 44.5 Z" fill="#d9b98a"/><path d="M110.5 42 Q123 33.5 135.5 42 L135.5 44.5 L110.5 44.5 Z" fill="#d9b98a"/>
+      <path d="M20.5 66 Q33 57.5 45.5 66 L45.5 68.5 L20.5 68.5 Z" fill="#d9b98a"/><path d="M50.5 66 Q63 57.5 75.5 66 L75.5 68.5 L50.5 68.5 Z" fill="#d9b98a"/><path d="M80.5 66 Q93 57.5 105.5 66 L105.5 68.5 L80.5 68.5 Z" fill="#d9b98a"/><path d="M110.5 66 Q123 57.5 135.5 66 L135.5 68.5 L110.5 68.5 Z" fill="#d9b98a"/>
+    </g>
+    <g id="fusionWinMain" fill="#2b4a68" stroke="#cfd8e2" stroke-width="1">
       <rect x="22" y="42" width="22" height="16"/><rect x="52" y="42" width="22" height="16"/><rect x="82" y="42" width="22" height="16"/><rect x="112" y="42" width="22" height="16"/>
       <rect x="22" y="66" width="22" height="16"/><rect x="52" y="66" width="22" height="16"/><rect x="82" y="66" width="22" height="16"/><rect x="112" y="66" width="22" height="16"/>
+    </g>
+    <g fill="#d9b98a">
+      <rect x="20.5" y="58" width="25" height="2"/><rect x="50.5" y="58" width="25" height="2"/><rect x="80.5" y="58" width="25" height="2"/><rect x="110.5" y="58" width="25" height="2"/>
+      <rect x="20.5" y="82" width="25" height="2"/><rect x="50.5" y="82" width="25" height="2"/><rect x="80.5" y="82" width="25" height="2"/><rect x="110.5" y="82" width="25" height="2"/>
+    </g>
+    <!-- glass highlights -->
+    <g fill="#ffffff" opacity=".14">
+      <polygon points="24,42 32,42 26,58 22,58"/><polygon points="54,42 62,42 56,58 52,58"/><polygon points="84,42 92,42 86,58 82,58"/><polygon points="114,42 122,42 116,58 112,58"/>
+      <polygon points="24,66 32,66 26,82 22,82"/><polygon points="54,66 62,66 56,82 52,82"/><polygon points="84,66 92,66 86,82 82,82"/><polygon points="114,66 122,66 116,82 112,82"/>
+    </g>
+    <!-- right-wing windows (positions kept) -->
+    <g fill="#d9b98a">
+      <rect x="154.5" y="65.5" width="17" height="2.2"/><rect x="174.5" y="65.5" width="17" height="2.2"/><rect x="154.5" y="85.5" width="17" height="2.2"/><rect x="174.5" y="85.5" width="17" height="2.2"/>
+      <rect x="154.5" y="80" width="17" height="1.6"/><rect x="174.5" y="80" width="17" height="1.6"/><rect x="154.5" y="100" width="17" height="1.6"/><rect x="174.5" y="100" width="17" height="1.6"/>
+    </g>
+    <g id="fusionWinWing" fill="#2b4a68" stroke="#cfd8e2" stroke-width=".9">
       <rect x="156" y="68" width="14" height="12"/><rect x="176" y="68" width="14" height="12"/><rect x="156" y="88" width="14" height="12"/><rect x="176" y="88" width="14" height="12"/>
     </g>
+    <rect x="160" y="114" width="13" height="16" fill="#3a2a20"/>
+    <!-- recessed brick entry with dark canopy -->
+    <rect x="58" y="84" width="46" height="46" fill="#8f3419"/>
+    <path d="M58 84 h46 v3 h-46 Z" fill="#6f2712"/>
+    <rect x="58" y="92" width="46" height="6" fill="#26262b"/>
+    <text x="81" y="96.7" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="4" fill="#ffffff" letter-spacing="1.4">FUSION</text>
     <rect x="64" y="100" width="34" height="30" fill="#414042"/>
     <rect x="67" y="103" width="28" height="27" fill="#CEE2FF" opacity=".8"/>
-    <rect x="10" y="8" width="140" height="26" rx="2" fill="#414042"/>
-    <text x="80" y="20" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="11" fill="#ffffff" letter-spacing="1.5">FUSION</text>
-    <text x="80" y="30" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="6.5" fill="#C1272D" letter-spacing="2">AUDIO+VIDEO</text>
+    <!-- wall sconces -->
+    <g>
+      <rect x="53.5" y="93" width="2.6" height="5" rx=".8" fill="#d9b98a"/><circle cx="54.8" cy="99" r="1.5" fill="#ffe9b0"/>
+      <rect x="105.9" y="93" width="2.6" height="5" rx=".8" fill="#d9b98a"/><circle cx="107.2" cy="99" r="1.5" fill="#ffe9b0"/>
+    </g>
+    <!-- brick planters + bushes along the facade (entry/door path left clear) -->
+    <g>
+      <ellipse cx="20" cy="122" rx="8" ry="5.5" fill="#4a7a3c"/><ellipse cx="32" cy="121" rx="9" ry="6.5" fill="#5f9448"/><ellipse cx="45" cy="122.5" rx="8" ry="5.5" fill="#6fa64f"/><ellipse cx="55" cy="123" rx="6" ry="4.5" fill="#4a7a3c"/>
+      <rect x="11" y="124.5" width="49" height="5.5" fill="#93381f"/><rect x="11" y="124.5" width="49" height="1.2" fill="#c98d64"/>
+      <ellipse cx="110" cy="122.5" rx="7" ry="5" fill="#5f9448"/><ellipse cx="122" cy="121" rx="9" ry="6.5" fill="#6fa64f"/><ellipse cx="135" cy="122" rx="8" ry="5.5" fill="#4a7a3c"/><ellipse cx="146" cy="123" rx="6" ry="4.5" fill="#5f9448"/>
+      <rect x="103" y="124.5" width="47" height="5.5" fill="#93381f"/><rect x="103" y="124.5" width="47" height="1.2" fill="#c98d64"/>
+    </g>
+  </svg>
+
+  <!-- Fusion monument sign at the lot entrance (white panel on brick base, per photo) -->
+  <svg class="structure" style="left:.3%;bottom:35%;width:66px;height:78px;z-index:3" viewBox="0 0 60 70">
+    <defs>
+      <pattern id="msBrick" width="10" height="6" patternUnits="userSpaceOnUse">
+        <rect width="10" height="6" fill="#b0492c"/>
+        <path d="M0 0h10 M0 3h10 M0 6h10" stroke="#9c3d22" stroke-width=".4" opacity=".65"/>
+        <path d="M5 0v3 M2.5 3v3 M7.5 3v3" stroke="#9c3d22" stroke-width=".4" opacity=".65"/>
+      </pattern>
+    </defs>
+    <rect x="20" y="34" width="18" height="32" fill="url(#msBrick)"/>
+    <rect x="15" y="63" width="28" height="7" fill="#8f3419"/>
+    <rect x="14" y="62" width="30" height="2" fill="#c98d64"/>
+    <rect x="2" y="4" width="54" height="33" rx="1.5" fill="#ffffff" stroke="#b9bec4" stroke-width="1"/>
+    <text x="29" y="20" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="13" fill="#1F3B73">Fusion</text>
+    <text x="29" y="31.5" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="7.4" fill="#C1272D">Audio Video</text>
   </svg>
 
   <!-- Fusion front door that actually opens (for Waldo's one office visit) + Waldo at his desk in the window -->
@@ -895,8 +1287,8 @@ svg.structure.tree.flungTree{animation:treeFly 1.5s cubic-bezier(.3,.5,.55,1) fo
     <path d="M13 10 Q13 2 22 4" stroke="#4a4d52" stroke-width="3.5" fill="none"/>
     <ellipse class="glow" cx="22" cy="6" rx="4.5" ry="3" fill="#ffe9a8"/>
   </svg>
-  <svg class="structure tree" style="left:19%;bottom:34%;width:55px;height:80px" viewBox="0 0 40 60"><rect x="17" y="40" width="6" height="20" fill="#6b4f35"/><circle cx="20" cy="26" r="15" fill="#457A3E"/><circle cx="11" cy="33" r="9" fill="#529148"/></svg>
-  <svg class="structure tree" style="left:.2%;bottom:34%;width:50px;height:85px" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/></svg>
+  <svg class="structure tree" style="left:19%;bottom:34%;width:55px;height:80px" viewBox="0 0 40 60"><rect x="17" y="40" width="6" height="20" fill="#6b4f35"/><circle cx="20" cy="26" r="15" fill="#457A3E"/><circle cx="11" cy="33" r="9" fill="#529148"/><g class="deadBranches"><path d="M20,38 L18,24 M18,24 L12,14 M18,24 L23,12 M20,38 L26,22 M26,22 L31,10 M26,22 L22,8" stroke="#2a1f14" stroke-width="1.6" fill="none" stroke-linecap="round"/></g></svg>
+  <svg class="structure tree" style="left:.2%;bottom:34%;width:50px;height:85px" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/><g class="deadBranches"><path d="M20,38 L18,24 M18,24 L12,14 M18,24 L23,12 M20,38 L26,22 M26,22 L31,10 M26,22 L22,8" stroke="#2a1f14" stroke-width="1.6" fill="none" stroke-linecap="round"/></g></svg>
 
   <!-- street lights along the road -->
   <svg class="structure lamp" style="left:calc(50% - 285px);bottom:3%;width:28px;height:125px;z-index:1" viewBox="0 0 26 110">
@@ -921,7 +1313,7 @@ svg.structure.tree.flungTree{animation:treeFly 1.5s cubic-bezier(.3,.5,.55,1) fo
   </svg>
 
   <!-- Job site house -->
-  <svg class="structure" style="right:17%;bottom:38%;width:280px;height:177px" viewBox="0 0 190 120">
+  <svg class="structure house" style="right:17%;bottom:38%;width:280px;height:177px" viewBox="0 0 190 120">
     <polygon points="10,55 85,8 160,55" fill="#8d4a3a"/>
     <rect x="22" y="55" width="126" height="65" fill="#e8dcc8"/>
     <rect x="118" y="14" width="12" height="28" fill="#75777a"/>
@@ -930,31 +1322,53 @@ svg.structure.tree.flungTree{animation:treeFly 1.5s cubic-bezier(.3,.5,.55,1) fo
     <rect x="74" y="83" width="22" height="13" rx="1.5" fill="#ffffff" stroke="#75777a" stroke-width=".6"/>
     <text x="85" y="88.6" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="4.2" fill="#414042">CLIENT'S</text>
     <text x="85" y="93.8" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="4.2" fill="#414042">HOUSE</text>
-    <g fill="#CEE2FF" stroke="#75777a" stroke-width="1.5">
+    <g id="jobWinG" fill="#CEE2FF" stroke="#75777a" stroke-width="1.5">
       <rect x="34" y="66" width="24" height="20"/><rect x="112" y="66" width="24" height="20"/>
     </g>
     <line x1="46" y1="66" x2="46" y2="86" stroke="#75777a" stroke-width="1.5"/><line x1="124" y1="66" x2="124" y2="86" stroke="#75777a" stroke-width="1.5"/>
+    <g class="skelWin" id="skelJob1">
+      <circle cx="46" cy="71" r="2.6" fill="#ece7da"/>
+      <circle cx="44.8" cy="70.6" r=".5" fill="#1b1b1d"/><circle cx="47.2" cy="70.6" r=".5" fill="#1b1b1d"/>
+      <line x1="46" y1="73.5" x2="46" y2="82" stroke="#ece7da" stroke-width="1.3"/>
+      <line x1="43" y1="75.5" x2="49" y2="75.5" stroke="#ece7da" stroke-width=".9"/>
+      <line x1="43.3" y1="77.5" x2="48.7" y2="77.5" stroke="#ece7da" stroke-width=".9"/>
+      <line x1="46" y1="76" x2="41.5" y2="80" stroke="#ece7da" stroke-width="1.1"/>
+      <line x1="46" y1="76" x2="50.5" y2="80" stroke="#ece7da" stroke-width="1.1"/>
+      <line x1="46" y1="82" x2="43.5" y2="86" stroke="#ece7da" stroke-width="1.1"/>
+      <line x1="46" y1="82" x2="48.5" y2="86" stroke="#ece7da" stroke-width="1.1"/>
+    </g>
+    <g class="skelWin" id="skelJob2">
+      <circle cx="124" cy="71" r="2.6" fill="#ece7da"/>
+      <circle cx="122.8" cy="70.6" r=".5" fill="#1b1b1d"/><circle cx="125.2" cy="70.6" r=".5" fill="#1b1b1d"/>
+      <line x1="124" y1="73.5" x2="124" y2="82" stroke="#ece7da" stroke-width="1.3"/>
+      <line x1="121" y1="75.5" x2="127" y2="75.5" stroke="#ece7da" stroke-width=".9"/>
+      <line x1="121.3" y1="77.5" x2="126.7" y2="77.5" stroke="#ece7da" stroke-width=".9"/>
+      <line x1="124" y1="76" x2="119.5" y2="80" stroke="#ece7da" stroke-width="1.1"/>
+      <line x1="124" y1="76" x2="128.5" y2="80" stroke="#ece7da" stroke-width="1.1"/>
+      <line x1="124" y1="82" x2="121.5" y2="86" stroke="#ece7da" stroke-width="1.1"/>
+      <line x1="124" y1="82" x2="126.5" y2="86" stroke="#ece7da" stroke-width="1.1"/>
+    </g>
     <rect x="160" y="70" width="8" height="50" fill="#6b4f35"/>
     <circle cx="164" cy="58" r="22" fill="#457A3E"/>
     <circle cx="152" cy="68" r="14" fill="#529148"/>
   </svg>
 
   <!-- trees at the job site and home -->
-  <svg class="structure tree" style="right:33%;bottom:36%;width:55px;height:85px" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/></svg>
+  <svg class="structure tree" style="right:33%;bottom:36%;width:55px;height:85px" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/><g class="deadBranches"><path d="M20,38 L18,24 M18,24 L12,14 M18,24 L23,12 M20,38 L26,22 M26,22 L31,10 M26,22 L22,8" stroke="#2a1f14" stroke-width="1.6" fill="none" stroke-linecap="round"/></g></svg>
   <!-- more trees everywhere -->
-  <svg class="structure tree" style="left:28%;bottom:39%;width:44px;height:70px" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/></svg>
-  <svg class="structure tree" style="left:34%;bottom:37.5%;width:52px;height:74px" viewBox="0 0 40 60"><rect x="17" y="40" width="6" height="20" fill="#6b4f35"/><circle cx="20" cy="26" r="15" fill="#457A3E"/><circle cx="11" cy="34" r="9" fill="#529148"/></svg>
-  <svg class="structure tree" style="left:14.5%;bottom:38.5%;width:40px;height:62px" viewBox="0 0 40 60"><rect x="17" y="40" width="6" height="20" fill="#6b4f35"/><circle cx="20" cy="26" r="15" fill="#3f6f3a"/></svg>
-  <svg class="structure tree" style="right:38%;bottom:39%;width:46px;height:72px" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/></svg>
-  <svg class="structure tree" style="right:45%;bottom:37.5%;width:40px;height:60px" viewBox="0 0 40 60"><rect x="17" y="40" width="6" height="20" fill="#6b4f35"/><circle cx="20" cy="26" r="15" fill="#529148"/></svg>
-  <svg class="structure tree" style="right:10.5%;bottom:36%;width:44px;height:70px" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/></svg>
-  <svg class="structure tree" style="left:30%;bottom:4%;width:64px;height:98px;z-index:2" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/></svg>
-  <svg class="structure tree" style="right:30%;bottom:6%;width:58px;height:88px;z-index:2" viewBox="0 0 40 60"><rect x="17" y="40" width="6" height="20" fill="#6b4f35"/><circle cx="20" cy="26" r="15" fill="#457A3E"/><circle cx="29" cy="34" r="9" fill="#529148"/></svg>
-  <svg class="structure tree" style="right:15%;bottom:37%;width:60px;height:85px" viewBox="0 0 40 60"><rect x="17" y="40" width="6" height="20" fill="#6b4f35"/><circle cx="20" cy="26" r="15" fill="#457A3E"/><circle cx="29" cy="34" r="9" fill="#529148"/></svg>
-  <svg class="structure tree" style="right:.2%;bottom:37%;width:48px;height:78px" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/></svg>
+  <svg class="structure tree" style="left:28%;bottom:39%;width:44px;height:70px" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/><g class="deadBranches"><path d="M20,38 L18,24 M18,24 L12,14 M18,24 L23,12 M20,38 L26,22 M26,22 L31,10 M26,22 L22,8" stroke="#2a1f14" stroke-width="1.6" fill="none" stroke-linecap="round"/></g></svg>
+  <svg class="structure tree" style="left:34%;bottom:37.5%;width:52px;height:74px" viewBox="0 0 40 60"><rect x="17" y="40" width="6" height="20" fill="#6b4f35"/><circle cx="20" cy="26" r="15" fill="#457A3E"/><circle cx="11" cy="34" r="9" fill="#529148"/><g class="deadBranches"><path d="M20,38 L18,24 M18,24 L12,14 M18,24 L23,12 M20,38 L26,22 M26,22 L31,10 M26,22 L22,8" stroke="#2a1f14" stroke-width="1.6" fill="none" stroke-linecap="round"/></g></svg>
+  <svg class="structure tree" style="left:14.5%;bottom:38.5%;width:40px;height:62px" viewBox="0 0 40 60"><rect x="17" y="40" width="6" height="20" fill="#6b4f35"/><circle cx="20" cy="26" r="15" fill="#3f6f3a"/><g class="deadBranches"><path d="M20,38 L18,24 M18,24 L12,14 M18,24 L23,12 M20,38 L26,22 M26,22 L31,10 M26,22 L22,8" stroke="#2a1f14" stroke-width="1.6" fill="none" stroke-linecap="round"/></g></svg>
+  <svg class="structure tree" style="right:38%;bottom:39%;width:46px;height:72px" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/><g class="deadBranches"><path d="M20,38 L18,24 M18,24 L12,14 M18,24 L23,12 M20,38 L26,22 M26,22 L31,10 M26,22 L22,8" stroke="#2a1f14" stroke-width="1.6" fill="none" stroke-linecap="round"/></g></svg>
+  <svg class="structure tree" style="right:45%;bottom:37.5%;width:40px;height:60px" viewBox="0 0 40 60"><rect x="17" y="40" width="6" height="20" fill="#6b4f35"/><circle cx="20" cy="26" r="15" fill="#529148"/><g class="deadBranches"><path d="M20,38 L18,24 M18,24 L12,14 M18,24 L23,12 M20,38 L26,22 M26,22 L31,10 M26,22 L22,8" stroke="#2a1f14" stroke-width="1.6" fill="none" stroke-linecap="round"/></g></svg>
+  <svg class="structure tree" style="right:10.5%;bottom:36%;width:44px;height:70px" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/><g class="deadBranches"><path d="M20,38 L18,24 M18,24 L12,14 M18,24 L23,12 M20,38 L26,22 M26,22 L31,10 M26,22 L22,8" stroke="#2a1f14" stroke-width="1.6" fill="none" stroke-linecap="round"/></g></svg>
+  <svg class="structure tree" style="left:30%;bottom:4%;width:64px;height:98px;z-index:2" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/><g class="deadBranches"><path d="M20,38 L18,24 M18,24 L12,14 M18,24 L23,12 M20,38 L26,22 M26,22 L31,10 M26,22 L22,8" stroke="#2a1f14" stroke-width="1.6" fill="none" stroke-linecap="round"/></g></svg>
+  <svg class="structure tree" style="right:30%;bottom:6%;width:58px;height:88px;z-index:2" viewBox="0 0 40 60"><rect x="17" y="40" width="6" height="20" fill="#6b4f35"/><circle cx="20" cy="26" r="15" fill="#457A3E"/><circle cx="29" cy="34" r="9" fill="#529148"/><g class="deadBranches"><path d="M20,38 L18,24 M18,24 L12,14 M18,24 L23,12 M20,38 L26,22 M26,22 L31,10 M26,22 L22,8" stroke="#2a1f14" stroke-width="1.6" fill="none" stroke-linecap="round"/></g></svg>
+  <svg class="structure tree" style="right:15%;bottom:37%;width:60px;height:85px" viewBox="0 0 40 60"><rect x="17" y="40" width="6" height="20" fill="#6b4f35"/><circle cx="20" cy="26" r="15" fill="#457A3E"/><circle cx="29" cy="34" r="9" fill="#529148"/><g class="deadBranches"><path d="M20,38 L18,24 M18,24 L12,14 M18,24 L23,12 M20,38 L26,22 M26,22 L31,10 M26,22 L22,8" stroke="#2a1f14" stroke-width="1.6" fill="none" stroke-linecap="round"/></g></svg>
+  <svg class="structure tree" style="right:.2%;bottom:37%;width:48px;height:78px" viewBox="0 0 40 60"><rect x="17" y="38" width="6" height="22" fill="#6b4f35"/><polygon points="20,4 32,26 8,26" fill="#3f6f3a"/><polygon points="20,14 34,40 6,40" fill="#457A3E"/><g class="deadBranches"><path d="M20,38 L18,24 M18,24 L12,14 M18,24 L23,12 M20,38 L26,22 M26,22 L31,10 M26,22 L22,8" stroke="#2a1f14" stroke-width="1.6" fill="none" stroke-linecap="round"/></g></svg>
 
   <!-- Driver's home -->
-  <svg class="structure" style="right:1.5%;bottom:38%;width:210px;height:140px" viewBox="0 0 150 100">
+  <svg class="structure house" style="right:1.5%;bottom:38%;width:210px;height:140px" viewBox="0 0 150 100">
     <rect x="15" y="45" width="105" height="55" fill="#b8c4d6"/>
     <polygon points="8,48 67,12 127,48" fill="#5d6b80"/>
     <rect x="88" y="22" width="9" height="22" fill="#75777a"/>
@@ -962,36 +1376,34 @@ svg.structure.tree.flungTree{animation:treeFly 1.5s cubic-bezier(.3,.5,.55,1) fo
     <circle cx="71" cy="83" r="1.8" fill="#C5A757"/>
     <rect x="57" y="69.5" width="16" height="8.5" rx="1" fill="#ffffff" stroke="#75777a" stroke-width=".5"/>
     <text x="65" y="75.6" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="4.6" fill="#414042">HOME</text>
-    <g fill="#fff3c4" stroke="#75777a" stroke-width="1.2">
+    <g id="homeWinG" fill="#fff3c4" stroke="#75777a" stroke-width="1.2">
       <rect x="26" y="56" width="18" height="15"/><rect x="90" y="56" width="18" height="15"/>
+    </g>
+    <g class="skelWin" id="skelHome1">
+      <circle cx="35" cy="60" r="2" fill="#ece7da"/>
+      <circle cx="34.1" cy="59.7" r=".4" fill="#1b1b1d"/><circle cx="35.9" cy="59.7" r=".4" fill="#1b1b1d"/>
+      <line x1="35" y1="62" x2="35" y2="68" stroke="#ece7da" stroke-width="1"/>
+      <line x1="32.8" y1="63.3" x2="37.2" y2="63.3" stroke="#ece7da" stroke-width=".7"/>
+      <line x1="33" y1="64.8" x2="37" y2="64.8" stroke="#ece7da" stroke-width=".7"/>
+      <line x1="35" y1="65" x2="31.8" y2="67.8" stroke="#ece7da" stroke-width=".85"/>
+      <line x1="35" y1="65" x2="38.2" y2="67.8" stroke="#ece7da" stroke-width=".85"/>
+      <line x1="35" y1="68" x2="33.2" y2="70.8" stroke="#ece7da" stroke-width=".85"/>
+      <line x1="35" y1="68" x2="36.8" y2="70.8" stroke="#ece7da" stroke-width=".85"/>
+    </g>
+    <g class="skelWin" id="skelHome2">
+      <circle cx="99" cy="60" r="2" fill="#ece7da"/>
+      <circle cx="98.1" cy="59.7" r=".4" fill="#1b1b1d"/><circle cx="99.9" cy="59.7" r=".4" fill="#1b1b1d"/>
+      <line x1="99" y1="62" x2="99" y2="68" stroke="#ece7da" stroke-width="1"/>
+      <line x1="96.8" y1="63.3" x2="101.2" y2="63.3" stroke="#ece7da" stroke-width=".7"/>
+      <line x1="97" y1="64.8" x2="101" y2="64.8" stroke="#ece7da" stroke-width=".7"/>
+      <line x1="99" y1="65" x2="95.8" y2="67.8" stroke="#ece7da" stroke-width=".85"/>
+      <line x1="99" y1="65" x2="102.2" y2="67.8" stroke="#ece7da" stroke-width=".85"/>
+      <line x1="99" y1="68" x2="97.2" y2="70.8" stroke="#ece7da" stroke-width=".85"/>
+      <line x1="99" y1="68" x2="100.8" y2="70.8" stroke="#ece7da" stroke-width=".85"/>
     </g>
     <rect x="120" y="88" width="28" height="12" rx="1" fill="#9aa0a6"/>
     <rect x="138" y="62" width="3" height="28" fill="#6b4f35"/>
     <rect x="134" y="58" width="11" height="7" rx="1" fill="#C1272D"/>
-  </svg>
-
-  <!-- city landscape at the end of the road -->
-  <svg class="structure" style="left:50%;bottom:41.5%;width:340px;height:110px;transform:translateX(-50%);z-index:0" viewBox="0 0 340 110">
-    <g fill="#7b8798" opacity=".92">
-      <rect x="10" y="52" width="30" height="58"/>
-      <rect x="45" y="32" width="26" height="78"/>
-      <rect x="76" y="56" width="34" height="54"/>
-      <rect x="115" y="18" width="30" height="92"/>
-      <rect x="150" y="42" width="24" height="68"/>
-      <rect x="179" y="8" width="34" height="102"/>
-      <rect x="218" y="36" width="26" height="74"/>
-      <rect x="249" y="56" width="30" height="54"/>
-      <rect x="284" y="44" width="24" height="66"/>
-    </g>
-    <rect x="193" y="0" width="3" height="9" fill="#7b8798"/>
-    <g fill="#CEE2FF" opacity=".75">
-      <rect x="50" y="38" width="5" height="6"/><rect x="60" y="38" width="5" height="6"/><rect x="50" y="50" width="5" height="6"/><rect x="60" y="50" width="5" height="6"/>
-      <rect x="120" y="25" width="5" height="6"/><rect x="130" y="25" width="5" height="6"/><rect x="120" y="38" width="5" height="6"/><rect x="130" y="38" width="5" height="6"/><rect x="125" y="52" width="5" height="6"/>
-      <rect x="185" y="15" width="6" height="7"/><rect x="196" y="15" width="6" height="7"/><rect x="185" y="30" width="6" height="7"/><rect x="196" y="30" width="6" height="7"/><rect x="190" y="46" width="6" height="7"/>
-      <rect x="223" y="43" width="5" height="6"/><rect x="233" y="43" width="5" height="6"/><rect x="223" y="56" width="5" height="6"/>
-      <rect x="16" y="60" width="5" height="6"/><rect x="26" y="60" width="5" height="6"/>
-      <rect x="255" y="63" width="5" height="6"/><rect x="265" y="63" width="5" height="6"/>
-    </g>
   </svg>
 
   <div class="zone" id="zoneFusion"><div class="lot" id="fusionLot"></div></div>
@@ -1077,7 +1489,7 @@ try { const s = localStorage.getItem("vanTrackerCfg"); if (s) CFG = JSON.parse(s
 
 /* ================= DARK MODE ================= */
 /* ---------------- THEMES ---------------- */
-const THEMES=["classic","southpark","simpsons","chuck","boring","waldo","random"]; /* room for more later */
+const THEMES=["classic","southpark","simpsons","chuck","lowcountry","halloween","boring","waldo","random"]; /* room for more later */
 const SCENES=THEMES.slice(0,-1); /* real scenes "random" can land on */
 let RANDOM_PICK=null; /* scene rolled for this page load while theme = random */
 function applyTheme(){
@@ -1088,12 +1500,14 @@ function applyTheme(){
   document.body.classList.toggle("theme-southpark", sp);
   document.body.classList.toggle("theme-simpsons", eff==="simpsons");
   document.body.classList.toggle("theme-chuck", eff==="chuck");
+  document.body.classList.toggle("theme-lowcountry", eff==="lowcountry");
+  document.body.classList.toggle("theme-halloween", eff==="halloween");
   document.body.classList.toggle("theme-boring", eff==="boring");
   document.body.classList.toggle("theme-waldo", eff==="waldo");
   const btn=document.getElementById("themeBtn");
   if(btn){
     const next=THEMES[(THEMES.indexOf(th)+1)%THEMES.length];
-    const LBL={classic:"🎨 Classic", southpark:"🏔️ South Park", simpsons:"🍩 Simpsons", chuck:"🤠 Chuck Norris", boring:"😴 Boring", waldo:"🔍 Waldo", random:"🎲 Random"};
+    const LBL={classic:"🎨 Classic", southpark:"🏔️ South Park", simpsons:"🍩 Simpsons", chuck:"🤠 Chuck Norris", lowcountry:"🦐 Low Country Boil", halloween:"🎃 Halloween", boring:"😴 Boring", waldo:"🔍 Waldo", random:"🎲 Random"};
     btn.textContent = LBL[next] || "🎨 Theme"; /* button shows what you switch TO */
   }
   const scene=document.getElementById("scene");
@@ -1123,6 +1537,91 @@ function cycleTheme(){
 }
 /* Random theme rolls a fresh scene on every page load (refresh button + 5-min auto-reload) */
 setTimeout(applyTheme, 0);
+/* only one window flickers at a time (Fusion HQ included) — and a skeleton shows up ONLY
+   during the brief moment its window is the one lit up */
+(function(){
+  const groups=[
+    {id:"fusionWinMain"},
+    {id:"fusionWinWing"},
+    {id:"jobWinG", skel:["skelJob1","skelJob2"]},
+    {id:"homeWinG", skel:["skelHome1","skelHome2"]}
+  ];
+  function tick(){
+    if(document.body.classList.contains("theme-halloween")){
+      const g=groups[Math.floor(Math.random()*groups.length)];
+      const el=document.getElementById(g.id);
+      let skelEl=null;
+      if(el){
+        el.classList.add("hwFlicker");
+        if(g.skel){
+          const pick=g.skel[Math.floor(Math.random()*g.skel.length)];
+          skelEl=document.getElementById(pick);
+          if(skelEl) skelEl.classList.add("active");
+        }
+        const onFor=950+Math.random()*450;
+        setTimeout(()=>{
+          el.classList.remove("hwFlicker");
+          if(skelEl) skelEl.classList.remove("active");
+        }, onFor);
+      }
+    }
+    setTimeout(tick, 1900+Math.random()*2600);
+  }
+  setTimeout(tick, 2500);
+})();
+/* ---- shared Halloween helper: vans don't stop for anyone at the crosswalk, but nobody gets hit anymore — everyone just dashes safely across ---- */
+function hwActive(){ return document.body.classList.contains("theme-halloween"); }
+/* lightning from the clouds, Halloween only — a real bolt graphic drops out of a random
+   cloud roughly every 15 seconds (nothing else on screen flashes). Each strike has a chance
+   to electrocute whoever it catches: Frankenstein, the mummy, or the bear. */
+(function(){
+  function scheduleNext(){ setTimeout(strike, 13000+Math.random()*4000); }
+  function strike(){
+    if(!hwActive()){ scheduleNext(); return; }
+    const scene=document.getElementById("scene");
+    const clouds=document.querySelectorAll(".cloud");
+    if(scene && clouds.length){
+      const cloud=clouds[Math.floor(Math.random()*clouds.length)];
+      const s=scene.getBoundingClientRect(), r=cloud.getBoundingClientRect();
+      const cx=((r.left+r.right)/2-s.left)/s.width*100;
+      const cy=(r.top-s.top)/s.height*100;
+      const b=document.createElement("div");
+      b.className="hwBolt";
+      b.style.left=cx+"%"; b.style.top=cy+"%";
+      b.style.height=Math.max(10, 82-cy)+"%";
+      b.innerHTML='<svg viewBox="0 0 20 100" preserveAspectRatio="none">'
+        +'<polyline points="10,0 3,30 12,33 2,62 14,65 7,100" fill="none" stroke="#fff6b8" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>'
+        +'<polyline points="10,0 3,30 12,33 2,62 14,65 7,100" fill="none" stroke="#ffe34d" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/></svg>';
+      scene.appendChild(b);
+      b.classList.add("strike");
+      setTimeout(()=>b.remove(), 450);
+    }
+    if(Math.random()<0.55){
+      const pool=[];
+      const chuck=document.querySelector(".chuck"); if(chuck) pool.push(chuck);
+      const wd=document.querySelector(".waldo"); if(wd) pool.push(wd);
+      const br=document.querySelector(".bear"); if(br) pool.push(br);
+      if(pool.length){
+        const el=pool[Math.floor(Math.random()*pool.length)];
+        el.classList.add("electrocuted");
+        setTimeout(()=>el.classList.remove("electrocuted"), 1100+Math.random()*300);
+      }
+    }
+    scheduleNext();
+  }
+  scheduleNext();
+})();
+/* belt-and-suspenders: if Halloween becomes active mid-ride (switched in while Waldo happened
+   to be biking in another theme), strip the bike/scooter immediately instead of waiting for
+   the next natural mount/dismount event — his sprite only swaps at those specific moments,
+   not continuously, so a leftover bike could otherwise sit there for a long time */
+setInterval(function(){
+  if(!hwActive()) return;
+  const WD=window.__waldo;
+  if(!WD) return;
+  if(WD.biking()) WD.dismount();
+  if(WD.parkedBike()) WD.takeParked();
+}, 800);
 function toggleDark(){
   const on = document.body.classList.toggle("dark");
   try{ localStorage.setItem("vanTrackerDark", on ? "1" : "0"); }catch(e){}
@@ -1352,6 +1851,30 @@ async function cityState(lat, lon){
     return s;
   }catch(e){ return ""; }
 }
+/* reverse geocode → street address "123 Main St, City, ST" (OSM Nominatim, cached, 1 req/s) */
+let ADDRS = {};
+try { ADDRS = JSON.parse(localStorage.getItem("vanTrackerAddr")||"{}"); } catch(e){}
+let addrQueue = Promise.resolve();
+async function streetAddr(lat, lon, cityST){
+  if (lat==null || lon==null) return cityST||"";
+  const key = lat.toFixed(4)+","+lon.toFixed(4);
+  if (ADDRS[key]) return ADDRS[key];
+  const run = addrQueue.then(async ()=>{
+    try{
+      const r = await fetch("https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=18&addressdetails=1&lat="+lat+"&lon="+lon);
+      const j = await r.json();
+      const a = j.address||{};
+      const road = a.road || a.pedestrian || a.footway || "";
+      const street = road ? ((a.house_number ? a.house_number+" " : "")+road) : "";
+      const s = street ? (street + (cityST ? ", "+cityST : "")) : (cityST||"");
+      if (street){ ADDRS[key]=s; try{ localStorage.setItem("vanTrackerAddr", JSON.stringify(ADDRS)); }catch(e){} }
+      await new Promise(res=>setTimeout(res,1100)); /* be polite to the free API */
+      return s;
+    }catch(e){ return cityST||""; }
+  });
+  addrQueue = run.catch(()=>{});
+  return run;
+}
 
 /* ================= SKY — time of day × weather ================= */
 function hexBlend(a,b,w){
@@ -1395,6 +1918,20 @@ function applySky(){
     scene.classList.remove("ph-night","ph-dawn","ph-sunset","ph-dusk","sunset");
     scene.classList.add("ph-day");
     scene.style.background="linear-gradient(#3f9fe8 0%, #7ec3f0 55%, #cfeafd 100%)";
+    return;
+  }
+  if(document.body.classList.contains("theme-lowcountry")){
+    /* permanent golden-hour cookout light — low country marsh dusk */
+    scene.classList.remove("ph-night","ph-dawn","ph-sunset","ph-dusk","sunset");
+    scene.classList.add("ph-day");
+    scene.style.background="linear-gradient(#f2a45e 0%, #f6c98a 45%, #fbe3b8 60%, #ead9ae 100%)";
+    return;
+  }
+  if(document.body.classList.contains("theme-halloween")){
+    /* permanent haunted midnight — ph-night still applies (moonlit sun, dim mountains/clouds) */
+    scene.classList.remove("ph-dawn","ph-sunset","ph-dusk","sunset");
+    scene.classList.add("ph-night");
+    scene.style.background="linear-gradient(#0f0a1f 0%, #241544 45%, #3a2259 60%, #2b1a3f 100%)";
     return;
   }
   const o=etNowParts();
@@ -1690,7 +2227,7 @@ function birdSVG(){
 }
 
 function waldoSVG(){
-  return `<svg viewBox="0 0 20 34">
+  return `<svg viewBox="0 0 20 34"><g class="waldoBody">
     <rect class="wlL" x="6" y="24" width="2.6" height="9" rx="1.2" fill="#2b5fb8"/>
     <rect class="wlR" x="11" y="24" width="2.6" height="9" rx="1.2" fill="#2b5fb8"/>
     <rect x="4.5" y="13" width="11" height="12" rx="2" fill="#fff"/>
@@ -1705,6 +2242,35 @@ function waldoSVG(){
     <circle cx="12" cy="8" r="1.4" fill="none" stroke="#1b1b1d" stroke-width=".7"/>
     <line x1="9.4" y1="8" x2="10.6" y2="8" stroke="#1b1b1d" stroke-width=".7"/>
     <path d="M7.8 11 Q10 12.4 12.2 11" stroke="#1b1b1d" stroke-width=".6" fill="none"/>
+    <g class="hwMummy">
+      <path d="M6.3 4.4 Q10 2.6 13.7 4.4" stroke="#e8e1cc" stroke-width="1.9" fill="none" stroke-linecap="round"/>
+      <path d="M5.9 6.7 Q10 8.7 14.1 6.7" stroke="#ddd5bc" stroke-width="1.9" fill="none" stroke-linecap="round"/>
+      <path d="M6.2 9.8 Q10 12 13.8 9.8" stroke="#e8e1cc" stroke-width="2.1" fill="none" stroke-linecap="round"/>
+      <path d="M4.5 14.2 L15.5 16.4 M4.5 18.2 L15.5 20.4 M4.5 22.2 L15.5 24.4" stroke="#e4ddc8" stroke-width="2.3" stroke-linecap="round"/>
+      <path d="M5.3 25 L8.3 26.3 M5.3 28.5 L8.3 29.8 M5.3 32 L8.3 33.3" stroke="#ddd5bc" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M10.3 25 L13.3 26.3 M10.3 28.5 L13.3 29.8 M10.3 32 L13.3 33.3" stroke="#ddd5bc" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M3.3 24.6 L.6 30.2" stroke="#d6cdb2" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M16.1 15.5 L19.4 20.8" stroke="#d6cdb2" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M8 25.5 L5 33.5" stroke="#c9bfa2" stroke-width="1.1" stroke-linecap="round" opacity=".8"/>
+    </g>
+    <g class="hwArmsUp">
+      <path d="M5.5 15 Q2 10 1.5 3" stroke="#e4ddc8" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <path d="M14.5 15 Q18 10 18.5 3" stroke="#e4ddc8" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <circle cx="1.5" cy="2.4" r="1.4" fill="#f2c9a0"/><circle cx="18.5" cy="2.4" r="1.4" fill="#f2c9a0"/>
+    </g>
+    </g>
+    <g class="waldoSkel">
+      <circle cx="10" cy="8" r="3.4" fill="none" stroke="#ffe24d" stroke-width="1"/>
+      <circle cx="8.4" cy="7.6" r=".7" fill="#ffe24d"/><circle cx="11.6" cy="7.6" r=".7" fill="#ffe24d"/>
+      <path d="M8.2 10.4 Q10 11.6 11.8 10.4" stroke="#ffe24d" stroke-width=".8" fill="none"/>
+      <line x1="10" y1="12" x2="10" y2="24.5" stroke="#ffe24d" stroke-width="1.1"/>
+      <path d="M6.3 15.5 Q10 17 13.7 15.5 M6.5 18.5 Q10 20 13.5 18.5 M6.8 21.5 Q10 23 13.2 21.5" stroke="#ffe24d" stroke-width=".8" fill="none"/>
+      <path d="M5 14.5 Q3 18 3.5 22" stroke="#ffe24d" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+      <path d="M15 14.5 Q17 18 16.5 22" stroke="#ffe24d" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+      <circle cx="10" cy="24.5" r=".9" fill="#ffe24d"/>
+      <line x1="7.3" y1="25" x2="7.3" y2="32.5" stroke="#ffe24d" stroke-width="1.1"/>
+      <line x1="12.7" y1="25" x2="12.7" y2="32.5" stroke="#ffe24d" stroke-width="1.1"/>
+    </g>
   </svg>`;
 }
 /* Waldo on his bike — side view, facing right; wheels/legs animate via CSS */
@@ -1743,6 +2309,14 @@ function waldoBikeSVG(){
     <circle cx="21.8" cy="7" r="1.3" fill="none" stroke="#1b1b1d" stroke-width=".7"/>
     <line x1="19.5" y1="7" x2="20.5" y2="7" stroke="#1b1b1d" stroke-width=".7"/>
     <path d="M18 9.8 Q20 11 22 9.8" stroke="#1b1b1d" stroke-width=".6" fill="none"/>
+    <g class="hwMummy">
+      <path d="M16.3 3.4 Q20 1.6 23.7 3.4" stroke="#e8e1cc" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+      <path d="M15.9 5.7 Q20 7.7 24.1 5.7" stroke="#ddd5bc" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+      <path d="M16.2 8.8 Q20 11 23.8 8.8" stroke="#e8e1cc" stroke-width="1.9" fill="none" stroke-linecap="round"/>
+      <path d="M15.5 11.2 L24.5 13 M15.5 14.8 L24.5 16.6 M15.5 18.4 L24.5 20" stroke="#e4ddc8" stroke-width="2" stroke-linecap="round"/>
+      <path d="M14.3 20.4 L11.6 25.6" stroke="#d6cdb2" stroke-width="1.4" stroke-linecap="round"/>
+      <path d="M25.3 12.4 L28.2 17" stroke="#d6cdb2" stroke-width="1.4" stroke-linecap="round"/>
+    </g>
   </svg>`;
 }
 /* the bike by itself — for when Waldo parks it outside Fusion */
@@ -1760,6 +2334,52 @@ function bikeOnlySVG(){
     <path d="M17.5 19.5 L20.5 19.5 L20.5 15" stroke="#26282b" stroke-width="1.8" fill="none"/>
   </svg>`;
 }
+/* Waldo's electric scooter — Halloween theme only (swapped in for the bike; same viewBox/classes so all the ride logic just works) */
+function waldoScooterSVG(){
+  return `<svg viewBox="0 0 46 41">
+    <g class="wwB"><circle cx="11" cy="37" r="4.6" fill="none" stroke="#26282b" stroke-width="2.2"/></g>
+    <g class="wwF"><circle cx="35" cy="37" r="4.6" fill="none" stroke="#26282b" stroke-width="2.2"/></g>
+    <rect x="9" y="31.6" width="28" height="3" rx="1.4" fill="#3a3d42"/>
+    <rect x="20.5" y="10" width="2.6" height="22" fill="#5b6068"/>
+    <rect x="13" y="8.6" width="17" height="2.6" rx="1.3" fill="#2b2d31"/>
+    <circle cx="14.6" cy="9.9" r="1.6" fill="#1b1b1d"/><circle cx="28.4" cy="9.9" r="1.6" fill="#1b1b1d"/>
+    <circle cx="21.8" cy="18" r="1.3" fill="#8fe08a"/>
+    <rect class="wlLs" x="17" y="23" width="2.6" height="9" rx="1.2" fill="#2b5fb8"/>
+    <rect class="wlRs" x="24" y="23" width="2.6" height="9" rx="1.2" fill="#2b5fb8"/>
+    <rect x="15.5" y="10.4" width="9" height="10" rx="2" fill="#fff"/>
+    <rect x="15.5" y="11.9" width="9" height="1.8" fill="#C1272D"/>
+    <rect x="15.5" y="15.4" width="9" height="1.8" fill="#C1272D"/>
+    <rect x="15.5" y="18.8" width="9" height="1.6" fill="#C1272D"/>
+    <circle cx="20" cy="7.4" r="4" fill="#f2c9a0"/>
+    <circle cx="18.2" cy="7.4" r="1.3" fill="none" stroke="#1b1b1d" stroke-width=".7"/>
+    <circle cx="21.8" cy="7.4" r="1.3" fill="none" stroke="#1b1b1d" stroke-width=".7"/>
+    <line x1="19.5" y1="7.4" x2="20.5" y2="7.4" stroke="#1b1b1d" stroke-width=".7"/>
+    <g class="hwMummy">
+      <path d="M16.3 3.4 Q20 1.6 23.7 3.4" stroke="#e8e1cc" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+      <path d="M15.9 5.7 Q20 7.7 24.1 5.7" stroke="#ddd5bc" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+      <path d="M16.2 8.8 Q20 11 23.8 8.8" stroke="#e8e1cc" stroke-width="1.9" fill="none" stroke-linecap="round"/>
+      <path d="M15.5 11.6 L24.5 13.4 M15.5 15.2 L24.5 17 M15.5 18.8 L24.5 20.4" stroke="#e4ddc8" stroke-width="2" stroke-linecap="round"/>
+      <path d="M14.3 20.8 L11.6 26" stroke="#d6cdb2" stroke-width="1.4" stroke-linecap="round"/>
+      <path d="M25.3 12.8 L28.2 17.4" stroke="#d6cdb2" stroke-width="1.4" stroke-linecap="round"/>
+    </g>
+  </svg>`;
+}
+/* the scooter by itself — for when Waldo parks it outside Fusion, Halloween theme */
+function scooterOnlySVG(){
+  return `<svg viewBox="0 0 46 41">
+    <circle cx="11" cy="37" r="4.6" fill="none" stroke="#26282b" stroke-width="2.2"/>
+    <circle cx="35" cy="37" r="4.6" fill="none" stroke="#26282b" stroke-width="2.2"/>
+    <rect x="9" y="31.6" width="28" height="3" rx="1.4" fill="#3a3d42"/>
+    <rect x="20.5" y="10" width="2.6" height="22" fill="#5b6068"/>
+    <rect x="13" y="8.6" width="17" height="2.6" rx="1.3" fill="#2b2d31"/>
+    <circle cx="14.6" cy="9.9" r="1.6" fill="#1b1b1d"/><circle cx="28.4" cy="9.9" r="1.6" fill="#1b1b1d"/>
+    <circle cx="21.8" cy="18" r="1.3" fill="#8fe08a"/>
+  </svg>`;
+}
+/* theme-aware wrappers — every call site below uses these instead of the raw bike/scooter functions,
+   so Halloween shows the scooter and every other theme keeps the bicycle */
+function waldoRideSVG(){ return document.body.classList.contains("theme-halloween") ? waldoSVG() : waldoBikeSVG(); }
+function parkedRideSVG(){ return document.body.classList.contains("theme-halloween") ? "" : bikeOnlySVG(); }
 /* Waldo from BEHIND — for walking up to a door, away from the viewer */
 function waldoRearSVG(){
   return `<svg viewBox="0 0 20 34">
@@ -1775,6 +2395,13 @@ function waldoRearSVG(){
     <rect x="5.5" y="4.6" width="9" height="1.4" fill="#a92025"/>
     <circle cx="10" cy="1.8" r="1.5" fill="#a92025"/>
     <path d="M5.9 8 L4.9 7.4 M14.1 8 L15.1 7.4" stroke="#1b1b1d" stroke-width=".6"/>
+    <g class="hwMummy">
+      <path d="M6.3 4.4 Q10 2.6 13.7 4.4" stroke="#d8d0b8" stroke-width="1.9" fill="none" stroke-linecap="round"/>
+      <path d="M5.9 6.7 Q10 8.7 14.1 6.7" stroke="#cdc4a8" stroke-width="1.9" fill="none" stroke-linecap="round"/>
+      <path d="M4.5 14.2 L15.5 16.4 M4.5 18.2 L15.5 20.4 M4.5 22.2 L15.5 24.4" stroke="#d2c9ae" stroke-width="2.3" stroke-linecap="round"/>
+      <path d="M3.3 24.6 L.6 30.2" stroke="#c4baa0" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M16.1 15.5 L19.4 20.8" stroke="#c4baa0" stroke-width="1.5" stroke-linecap="round"/>
+    </g>
   </svg>`;
 }
 /* the bear from BEHIND — big rump, stubby tail, ears */
@@ -1835,17 +2462,17 @@ function bearBikeSVG(){
 /* CHUCK NORRIS — paper-cutout cowboy: hat, mustache, olive shirt, jeans, boots */
 function chuckSVG(){
   return `<svg viewBox="0 0 34 56">
-    <g class="clL"><rect x="10.5" y="37.5" width="5.2" height="12.5" rx="1.8" fill="#3d6cb3"/>
-      <path d="M10 48.5 h6.2 v3.6 q0 1.7 -2 1.7 h-5.6 q-1.7 0 -1.1 -1.9 Z" fill="#8a5a2b"/>
-      <path d="M8.6 50.6 h7.4" stroke="#6e4620" stroke-width=".8"/></g>
-    <g class="clR"><rect x="18.3" y="37.5" width="5.2" height="12.5" rx="1.8" fill="#3d6cb3"/>
-      <path d="M17.8 48.5 h6.2 v3.6 q0 1.7 2 1.7 h-5.6 q-2.6 0 -2.6 -1.9 Z" transform="translate(0,0) scale(-1,1) translate(-41.8,0)" fill="#8a5a2b"/>
-      <path d="M18 50.6 h7.4" stroke="#6e4620" stroke-width=".8"/></g>
-    <path d="M8.2 22.5 q8.8 -4 17.6 0 l1.6 13.8 q-10.4 4.2 -20.8 0 Z" fill="#7d8a5c"/>
+    <g class="clL"><rect x="10.5" y="37.5" width="5.2" height="12.5" rx="1.8" fill="#17171b"/>
+      <path d="M10 48.5 h6.2 v3.6 q0 1.7 -2 1.7 h-5.6 q-1.7 0 -1.1 -1.9 Z" fill="#0c0c0e"/>
+      <path d="M8.6 50.6 h7.4" stroke="#000000" stroke-width=".8"/></g>
+    <g class="clR"><rect x="18.3" y="37.5" width="5.2" height="12.5" rx="1.8" fill="#17171b"/>
+      <path d="M17.8 48.5 h6.2 v3.6 q0 1.7 2 1.7 h-5.6 q-2.6 0 -2.6 -1.9 Z" transform="translate(0,0) scale(-1,1) translate(-41.8,0)" fill="#0c0c0e"/>
+      <path d="M18 50.6 h7.4" stroke="#000000" stroke-width=".8"/></g>
+    <path d="M8.2 22.5 q8.8 -4 17.6 0 l1.6 13.8 q-10.4 4.2 -20.8 0 Z" fill="#1d1d22"/>
     <path d="M13.2 22 L17 28.4 L20.8 22 Z" fill="#e8c39a"/>
-    <path d="M12.6 21.4 L17 28.8 L21.4 21.4" stroke="#66744a" stroke-width="1.4" fill="none"/>
+    <path d="M12.6 21.4 L17 28.8 L21.4 21.4" stroke="#0a0a0d" stroke-width="1.4" fill="none"/>
     <path d="M15.3 23.4 q.8 .8 1.7 0 M14.9 25 q.9 .9 2 .1 M15.8 26.4 q.7 .6 1.5 0" stroke="#c7992f" stroke-width=".55" fill="none"/>
-    <path d="M8.6 24 q-3.6 3.2 -3 8.4" stroke="#7d8a5c" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+    <path d="M8.6 24 q-3.6 3.2 -3 8.4" stroke="#1d1d22" stroke-width="3.4" fill="none" stroke-linecap="round"/>
     <circle cx="5.8" cy="33.2" r="1.9" fill="#e8c39a"/>
     <circle cx="17" cy="12.5" r="7.2" fill="#e8c39a"/>
     <path d="M10 11.5 q-1.6 5.2 1.6 8 l1.6 -1.4 q-1.8 -3 -1 -6.2 Z" fill="#e9c34a"/>
@@ -1855,17 +2482,184 @@ function chuckSVG(){
     <path d="M11.4 8.7 q2.9 -1.5 5.1 -.2 M17.5 8.5 q2.2 -1.3 5.1 .2" stroke="#c9992e" stroke-width="1.6" fill="none" stroke-linecap="round"/>
     <path d="M11.6 15.4 q5.4 2.8 10.8 0 l-1 3.7 q-4.4 2.7 -8.8 0 Z" fill="#dcae38"/>
     <path d="M14.4 20.1 q2.6 1.3 5.2 0" stroke="#c99d72" stroke-width=".7" fill="none"/>
-    <ellipse cx="17" cy="6.9" rx="12" ry="3.2" fill="#7a5c3d"/>
-    <path d="M10.6 6.6 q0 -6.2 6.4 -6.2 q6.4 0 6.4 6.2 Z" fill="#8a6a45"/>
-    <path d="M12.4 3.4 q4.6 -2.2 9.2 0" stroke="#6e5236" stroke-width=".9" fill="none"/>
-    <ellipse cx="17" cy="6.9" rx="12" ry="3.2" fill="none" stroke="#6e5236" stroke-width=".7"/>
-    <g class="armR"><path d="M25.4 24 q4.2 1.8 5.8 7.3" stroke="#7d8a5c" stroke-width="3.4" fill="none" stroke-linecap="round"/>
-      <path d="M30.6 30.4 l3.2 3.4" stroke="#e8c39a" stroke-width="3" stroke-linecap="round"/></g>
-    <g class="gArm"><path d="M25.4 24 L32.4 17.2" stroke="#7d8a5c" stroke-width="3.4" stroke-linecap="round"/>
+    <ellipse cx="17" cy="6.9" rx="12" ry="3.2" fill="#101013"/>
+    <path d="M10.6 6.6 q0 -6.2 6.4 -6.2 q6.4 0 6.4 6.2 Z" fill="#1a1a1f"/>
+    <path d="M12.4 3.4 q4.6 -2.2 9.2 0" stroke="#000000" stroke-width=".9" fill="none"/>
+    <ellipse cx="17" cy="6.9" rx="12" ry="3.2" fill="none" stroke="#000000" stroke-width=".7"/>
+    <g class="armR"><path d="M25.4 24 q4.2 1.8 5.8 7.3" stroke="#1d1d22" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+      <path d="M30.6 30.4 l3.2 3.4" stroke="#e8c39a" stroke-width="3" stroke-linecap="round"/>
+      <g class="wg"><path d="M30.4 30.2 l3.4 3.6" stroke="#ffffff" stroke-width="3.6" stroke-linecap="round"/>
+        <circle cx="34" cy="34" r="2.8" fill="#ffffff" stroke="#cfd2d8" stroke-width=".5"/>
+        <path d="M32.2 31.8 l3.2 3.4 M33.4 31.1 l2.4 4.2" stroke="#cfd2d8" stroke-width=".4"/>
+        <polygon class="wgSpark" points="38,26.8 38.7,28.9 40.8,29.6 38.7,30.3 38,32.4 37.3,30.3 35.2,29.6 37.3,28.9" fill="#ffffff" stroke="#e8eaf0" stroke-width=".3"/></g></g>
+    <g class="gArm"><path d="M25.4 24 L32.4 17.2" stroke="#1d1d22" stroke-width="3.4" stroke-linecap="round"/>
       <circle cx="32.6" cy="17" r="1.9" fill="#e8c39a"/>
       <rect x="32.6" y="13.2" width="6.6" height="2.5" rx="1" fill="#5b6068" transform="rotate(-38 32.6 15.2)"/>
       <rect x="33.6" y="15.4" width="2" height="3" fill="#5b6068" transform="rotate(-38 32.6 15.2)"/>
       <g class="mflash"><polygon points="38.6,8.4 44,5.6 41.2,9.2 46,10 41.4,11.2 43.6,14.6 38.9,11.6" fill="#ffd23f" stroke="#ff8a00" stroke-width=".6"/></g></g>
+  </svg>`;
+}
+/* CHUCK ON THE BIKE — man in black, hunched over the bars, ready to wheelie */
+function chuckBikeSVG(){
+  return `<svg viewBox="0 0 56 46">
+    <g class="wwB"><circle cx="14" cy="36" r="8" fill="none" stroke="#26282b" stroke-width="2.4"/>
+      <line x1="14" y1="28.6" x2="14" y2="43.4" stroke="#8a8d90" stroke-width="1"/>
+      <line x1="6.6" y1="36" x2="21.4" y2="36" stroke="#8a8d90" stroke-width="1"/></g>
+    <g class="wwF"><circle cx="42" cy="36" r="8" fill="none" stroke="#26282b" stroke-width="2.4"/>
+      <line x1="42" y1="28.6" x2="42" y2="43.4" stroke="#8a8d90" stroke-width="1"/>
+      <line x1="34.6" y1="36" x2="49.4" y2="36" stroke="#8a8d90" stroke-width="1"/></g>
+    <path d="M14 36 L27 36 L23 23 L14 36 M27 36 L36 23 M36 23 L42 36 M23 23 L35.5 23" fill="none" stroke="#C1272D" stroke-width="2.2"/>
+    <circle cx="27" cy="36" r="2.6" fill="#26282b"/>
+    <path d="M36 23 L36 19 M33 19 L39 19" stroke="#26282b" stroke-width="1.8"/>
+    <path d="M21 20 L24.5 28 L27 34.5" stroke="#17171b" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+    <path d="M22 20 L27.5 27 L29.5 33.5" stroke="#101013" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+    <path d="M26 34.8 l3 .6 M28.5 33.8 l3 .6" stroke="#0c0c0e" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M21 19 Q24.5 11.5 30.5 9.8" stroke="#1d1d22" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <path d="M29.5 11 Q33 14 36 19.5" stroke="#1d1d22" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <circle cx="36.2" cy="19.6" r="1.7" fill="#e8c39a"/>
+    <circle cx="34" cy="6.8" r="4.4" fill="#e8c39a"/>
+    <path d="M30 6.2 q-1 3.4 1 5.4 l1.2 -1 q-1.1 -2 -.6 -4 Z" fill="#e9c34a"/>
+    <circle cx="35.6" cy="6.6" r=".85" fill="#1b1b1d"/>
+    <path d="M33 9.6 q2.9 1.6 5.6 0 l-.5 2 q-2.3 1.4 -4.6 0 Z" fill="#dcae38"/>
+    <ellipse cx="34" cy="2.4" rx="7.2" ry="2" fill="#101013"/>
+    <path d="M30.2 2.2 q0 -3.8 3.8 -3.8 q3.8 0 3.8 3.8 Z" fill="#1a1a1f"/>
+    <ellipse cx="34" cy="2.4" rx="7.2" ry="2" fill="none" stroke="#000000" stroke-width=".6"/>
+  </svg>`;
+}
+/* CHUCK IN BULL MODE — down on all fours, head up, ready to buck */
+function chuckBullSVG(){
+  return `<svg viewBox="0 0 56 36">
+    <path d="M13 17 Q26 11 38 14" stroke="#1d1d22" stroke-width="9" fill="none" stroke-linecap="round"/>
+    <path d="M14 20 L10.5 26 L10 31" stroke="#17171b" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <path d="M17 21 L15.5 27 L16 31.5" stroke="#101013" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <path d="M8.5 30.5 h4.5 M14.5 31 h4.5" stroke="#0c0c0e" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M35 17 L37.5 25 L38 31" stroke="#1d1d22" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M38.5 16 L41.5 24 L42.5 31" stroke="#17171b" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <circle cx="38.2" cy="31.6" r="1.7" fill="#e8c39a"/><circle cx="42.7" cy="31.6" r="1.7" fill="#e8c39a"/>
+    <circle cx="45" cy="10.5" r="5" fill="#e8c39a"/>
+    <path d="M40.5 9.8 q-1.1 3.6 1.1 5.8 l1.3 -1.1 q-1.2 -2.1 -.7 -4.3 Z" fill="#e9c34a"/>
+    <circle cx="46.8" cy="10.2" r=".9" fill="#1b1b1d"/>
+    <path d="M43.8 13.6 q3.2 1.7 6.2 0 l-.6 2.2 q-2.5 1.5 -5 0 Z" fill="#dcae38"/>
+    <ellipse cx="45" cy="5.6" rx="8" ry="2.2" fill="#101013"/>
+    <path d="M40.8 5.4 q0 -4.2 4.2 -4.2 q4.2 0 4.2 4.2 Z" fill="#1a1a1f"/>
+    <ellipse cx="45" cy="5.6" rx="8" ry="2.2" fill="none" stroke="#000000" stroke-width=".6"/>
+    <path d="M13 15 q-3.5 .5 -4.5 3.5" stroke="#1d1d22" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </svg>`;
+}
+/* CHUCK, LOW COUNTRY BOIL MASTER — same frame, checkered bib apron, boil cap, wooden paddle */
+function chuckBoilSVG(){
+  return `<svg viewBox="0 0 34 56">
+    <defs><pattern id="lcbCheck" width="5" height="5" patternUnits="userSpaceOnUse">
+      <rect width="5" height="5" fill="#fdf6ea"/><rect width="2.5" height="2.5" fill="#C1272D"/><rect x="2.5" y="2.5" width="2.5" height="2.5" fill="#C1272D"/>
+    </pattern></defs>
+    <g class="clL"><rect x="10.5" y="37.5" width="5.2" height="12.5" rx="1.8" fill="#17171b"/>
+      <path d="M10 48.5 h6.2 v3.6 q0 1.7 -2 1.7 h-5.6 q-1.7 0 -1.1 -1.9 Z" fill="#0c0c0e"/>
+      <path d="M8.6 50.6 h7.4" stroke="#000000" stroke-width=".8"/></g>
+    <g class="clR"><rect x="18.3" y="37.5" width="5.2" height="12.5" rx="1.8" fill="#17171b"/>
+      <path d="M17.8 48.5 h6.2 v3.6 q0 1.7 2 1.7 h-5.6 q-2.6 0 -2.6 -1.9 Z" transform="translate(0,0) scale(-1,1) translate(-41.8,0)" fill="#0c0c0e"/>
+      <path d="M18 50.6 h7.4" stroke="#000000" stroke-width=".8"/></g>
+    <path d="M8.2 22.5 q8.8 -4 17.6 0 l1.6 13.8 q-10.4 4.2 -20.8 0 Z" fill="url(#lcbCheck)" stroke="#fdf6ea" stroke-width=".6"/>
+    <path d="M11 22.6 L14.2 14.4 M23 22.6 L19.8 14.4" stroke="#fdf6ea" stroke-width="2.1" stroke-linecap="round" fill="none"/>
+    <rect x="12.4" y="29.6" width="9.2" height="5.6" rx="1" fill="#fdf6ea" stroke="#C1272D" stroke-width=".5"/>
+    <path d="M13.2 22 L17 28.4 L20.8 22 Z" fill="#e8c39a"/>
+    <path d="M12.6 21.4 L17 28.8 L21.4 21.4" stroke="#0a0a0d" stroke-width="1.4" fill="none"/>
+    <path d="M15.3 23.4 q.8 .8 1.7 0 M14.9 25 q.9 .9 2 .1 M15.8 26.4 q.7 .6 1.5 0" stroke="#c7992f" stroke-width=".55" fill="none"/>
+    <path d="M8.6 24 q-3.6 3.2 -3 8.4" stroke="#1d1d22" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+    <circle cx="5.8" cy="33.2" r="1.9" fill="#e8c39a"/>
+    <circle cx="17" cy="12.5" r="7.2" fill="#e8c39a"/>
+    <path d="M10 11.5 q-1.6 5.2 1.6 8 l1.6 -1.4 q-1.8 -3 -1 -6.2 Z" fill="#e9c34a"/>
+    <path d="M24 11.5 q1.6 5.2 -1.6 8 l-1.6 -1.4 q1.8 -3 1 -6.2 Z" fill="#e9c34a"/>
+    <ellipse cx="14.3" cy="12" rx="2.9" ry="3.2" fill="#fff"/><ellipse cx="19.7" cy="12" rx="2.9" ry="3.2" fill="#fff"/>
+    <circle cx="15.2" cy="12.5" r="1.05" fill="#1b1b1d"/><circle cx="18.8" cy="12.5" r="1.05" fill="#1b1b1d"/>
+    <path d="M11.4 8.7 q2.9 -1.5 5.1 -.2 M17.5 8.5 q2.2 -1.3 5.1 .2" stroke="#c9992e" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+    <path d="M11.6 15.4 q5.4 2.8 10.8 0 l-1 3.7 q-4.4 2.7 -8.8 0 Z" fill="#dcae38"/>
+    <path d="M14.4 20.1 q2.6 1.3 5.2 0" stroke="#c99d72" stroke-width=".7" fill="none"/>
+    <path d="M9.8 7 q0 -6.4 7.2 -6.4 q7.2 0 7.2 6.4 Z" fill="#2A4562"/>
+    <ellipse cx="17" cy="7" rx="8.6" ry="1.8" fill="#1F3B73"/>
+    <circle cx="17" cy=".8" r="1.1" fill="#C1272D"/>
+    <g class="armR"><path d="M25.4 24 q4.2 1.8 5.8 7.3" stroke="#1d1d22" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+      <path d="M30.6 30.4 l3.2 3.4" stroke="#e8c39a" stroke-width="3" stroke-linecap="round"/>
+      <path d="M30.6 30.4 L38 38" stroke="#a9743f" stroke-width="2.6" stroke-linecap="round"/>
+      <ellipse cx="40.6" cy="40.6" rx="3.6" ry="2.3" fill="#c08a4d" stroke="#8a5f34" stroke-width=".4" transform="rotate(35 40.6 40.6)"/>
+      <g class="wg"><path d="M30.4 30.2 l3.4 3.6" stroke="#ffffff" stroke-width="3.6" stroke-linecap="round"/>
+        <circle cx="34" cy="34" r="2.8" fill="#ffffff" stroke="#cfd2d8" stroke-width=".5"/>
+        <path d="M32.2 31.8 l3.2 3.4 M33.4 31.1 l2.4 4.2" stroke="#cfd2d8" stroke-width=".4"/>
+        <polygon class="wgSpark" points="38,26.8 38.7,28.9 40.8,29.6 38.7,30.3 38,32.4 37.3,30.3 35.2,29.6 37.3,28.9" fill="#ffffff" stroke="#e8eaf0" stroke-width=".3"/></g></g>
+    <g class="gArm"><path d="M25.4 24 L32.4 17.2" stroke="#1d1d22" stroke-width="3.4" stroke-linecap="round"/>
+      <circle cx="32.6" cy="17" r="1.9" fill="#e8c39a"/>
+      <rect x="32.6" y="13.2" width="6.6" height="2.5" rx="1" fill="#5b6068" transform="rotate(-38 32.6 15.2)"/>
+      <rect x="33.6" y="15.4" width="2" height="3" fill="#5b6068" transform="rotate(-38 32.6 15.2)"/>
+      <g class="mflash"><polygon points="38.6,8.4 44,5.6 41.2,9.2 46,10 41.4,11.2 43.6,14.6 38.9,11.6" fill="#ffd23f" stroke="#ff8a00" stroke-width=".6"/></g></g>
+  </svg>`;
+}
+/* the giant crab Chuck wrestles into the pot — Low Country Boil theme only */
+function crabSVG(){
+  return `<svg viewBox="0 0 40 28">
+    <ellipse cx="20" cy="26" rx="14" ry="1.6" fill="rgba(0,0,0,.16)"/>
+    <ellipse cx="20" cy="15" rx="13" ry="8.4" fill="#b5502c"/>
+    <ellipse cx="20" cy="13.4" rx="13" ry="8.4" fill="#d06a3e"/>
+    <circle cx="12.5" cy="8.5" r="1.8" fill="#2a1712"/><circle cx="27.5" cy="8.5" r="1.8" fill="#2a1712"/>
+    <line x1="12.5" y1="8.5" x2="11" y2="4.6" stroke="#d06a3e" stroke-width="1.6"/><line x1="27.5" y1="8.5" x2="29" y2="4.6" stroke="#d06a3e" stroke-width="1.6"/>
+    <g class="clawL"><path d="M6 16 Q-2 12 -1 6 Q4 8 6 13" fill="#c25f36"/>
+      <path d="M-1 6 Q1 9 3 8" fill="none" stroke="#8a3f22" stroke-width="1"/></g>
+    <g class="clawR"><path d="M34 16 Q42 12 41 6 Q36 8 34 13" fill="#c25f36"/>
+      <path d="M41 6 Q39 9 37 8" fill="none" stroke="#8a3f22" stroke-width="1"/></g>
+    <g stroke="#8a3f22" stroke-width="1.4" fill="none">
+      <path d="M9 18 L4 22"/><path d="M12 20.5 L8 25"/><path d="M16 21.5 L13 26.5"/>
+      <path d="M31 18 L36 22"/><path d="M28 20.5 L32 25"/><path d="M24 21.5 L27 26.5"/>
+    </g>
+  </svg>`;
+}
+/* CHUCK, MAD SCIENTIST — same frame, lab coat, forehead goggles, wrench in hand (no hat this time) */
+function chuckLabSVG(){
+  return `<svg viewBox="0 0 34 56"><g class="chuckBody">
+    <g class="clL"><rect x="10.5" y="37.5" width="5.2" height="12.5" rx="1.8" fill="#17171b"/>
+      <path d="M10 48.5 h6.2 v3.6 q0 1.7 -2 1.7 h-5.6 q-1.7 0 -1.1 -1.9 Z" fill="#0c0c0e"/>
+      <path d="M8.6 50.6 h7.4" stroke="#000000" stroke-width=".8"/></g>
+    <g class="clR"><rect x="18.3" y="37.5" width="5.2" height="12.5" rx="1.8" fill="#17171b"/>
+      <path d="M17.8 48.5 h6.2 v3.6 q0 1.7 2 1.7 h-5.6 q-2.6 0 -2.6 -1.9 Z" transform="translate(0,0) scale(-1,1) translate(-41.8,0)" fill="#0c0c0e"/>
+      <path d="M18 50.6 h7.4" stroke="#000000" stroke-width=".8"/></g>
+    <rect x="9" y="20" width="16" height="19" rx="2.5" fill="#4f8a5c"/>
+    <path d="M10.5 25 H23.5 M10.5 31 H23.5" stroke="#2c4a33" stroke-width="1.4" stroke-dasharray="2.2,2"/>
+    <rect x="12" y="4.5" width="10" height="15.5" rx="1.5" fill="#4f8a5c"/>
+    <rect x="11" y="3.6" width="12" height="4.2" rx="1" fill="#2b2d22"/>
+    <circle cx="8.3" cy="13" r="1.9" fill="#9aa0a6"/><circle cx="25.7" cy="13" r="1.9" fill="#9aa0a6"/>
+    <path d="M12.5 8.3 H21.5" stroke="#2c4a33" stroke-width="1" stroke-dasharray="1.6,1.4"/>
+    <ellipse cx="15.2" cy="12.2" rx="1.7" ry="1.1" fill="#17171b"/><ellipse cx="18.8" cy="12.2" rx="1.7" ry="1.1" fill="#17171b"/>
+    <path d="M12.8 16.8 Q17 15.6 21.2 16.8" stroke="#1d3324" stroke-width="1" fill="none"/>
+    <path d="M14 7.3 q3 1.5 6 0" stroke="#2c4a33" stroke-width=".8" fill="none"/>
+    <g class="armL"><rect x="-3.5" y="22.4" width="13" height="4.6" rx="2" fill="#4f8a5c"/><rect x="-6.2" y="21.8" width="4.6" height="5.8" rx="1.6" fill="#3f6f4a"/></g>
+    <g class="armR"><rect x="24.5" y="22.4" width="13" height="4.6" rx="2" fill="#4f8a5c"/><rect x="36.6" y="21.8" width="4.6" height="5.8" rx="1.6" fill="#3f6f4a"/></g>
+    </g>
+    <g class="chuckSkel">
+      <circle cx="17" cy="12.5" r="6.4" fill="none" stroke="#ffe24d" stroke-width="1.4"/>
+      <circle cx="14.6" cy="11.6" r="1" fill="#ffe24d"/><circle cx="19.4" cy="11.6" r="1" fill="#ffe24d"/>
+      <path d="M14.2 16 Q17 18 19.8 16" stroke="#ffe24d" stroke-width="1" fill="none"/>
+      <line x1="17" y1="19.5" x2="17" y2="35" stroke="#ffe24d" stroke-width="1.6"/>
+      <path d="M10.5 23 Q17 25.5 23.5 23 M10.8 27.5 Q17 30 23.2 27.5 M11.2 31.5 Q17 33.8 22.8 31.5" stroke="#ffe24d" stroke-width="1.1" fill="none"/>
+      <path d="M8.6 24 Q6 29 6.5 33.8" stroke="#ffe24d" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <path d="M25.4 24 Q29 27 31 32" stroke="#ffe24d" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <line x1="10.5" y1="38" x2="12.5" y2="50" stroke="#ffe24d" stroke-width="1.6"/>
+      <line x1="23.5" y1="38" x2="21.5" y2="50" stroke="#ffe24d" stroke-width="1.6"/>
+      <circle cx="17" cy="35.5" r="1.3" fill="#ffe24d"/>
+    </g>
+  </svg>`;
+}
+/* the stitched creature Chuck wrestles onto the slab — Halloween theme only */
+function monsterSVG(){
+  return `<svg viewBox="0 0 36 54">
+    <ellipse cx="18" cy="52" rx="13" ry="2" fill="rgba(0,0,0,.18)"/>
+    <rect x="9" y="30" width="18" height="20" rx="3" fill="#3f6f4a"/>
+    <path d="M10 38 H26 M11 44 H25" stroke="#244a2b" stroke-width="1.6" stroke-dasharray="2.4,2.2"/>
+    <rect x="10" y="48" width="6" height="6" fill="#2d2d31"/><rect x="20" y="48" width="6" height="6" fill="#2d2d31"/>
+    <g class="armL"><rect x="2" y="32" width="8" height="16" rx="3" fill="#4f8a5c"/></g>
+    <g class="armR"><rect x="26" y="32" width="8" height="16" rx="3" fill="#4f8a5c"/></g>
+    <rect x="10" y="12" width="16" height="20" rx="4" fill="#4f8a5c"/>
+    <path d="M12 18 H24 M12 26 H24" stroke="#2c4a33" stroke-width="1.6" stroke-dasharray="2.4,2.2"/>
+    <rect x="6" y="18" width="5" height="9" rx="2" fill="#8a8a94"/><rect x="25" y="18" width="5" height="9" rx="2" fill="#8a8a94"/>
+    <rect x="10" y="6" width="16" height="10" rx="2" fill="#3f6f4a"/>
+    <circle cx="14" cy="11" r="2" fill="#17171b"/><circle cx="22" cy="11" r="2" fill="#17171b"/>
+    <path d="M12 16 H24" stroke="#1d1d22" stroke-width="1.6"/>
   </svg>`;
 }
 /* hide Waldo in a random spot — new spot on every refresh */
@@ -2015,12 +2809,12 @@ function startFlyer(row, stripColor){
         await rodeo(h);
       }
       const mustStop = traffic();
-      if(mustStop){
+      if(mustStop && !hwActive()){
         lampRed();                            /* flashing red — vans queue at the stop line */
         await sleepB(1400);                   /* let anyone on the stripes clear them */
-      }
+      }                                        /* Halloween: vans don't stop, but everyone dashes across safely now */
       await walkTo(farEdge, CROSS_Y, vel, minD);  /* crosses on the stripes */
-      if(mustStop) lampGreen();               /* green — traffic rolls on */
+      if(mustStop && !hwActive()) lampGreen();    /* green — traffic rolls on */
     }
     return walkTo(tx,ty,vel,minD);
   }
@@ -2114,9 +2908,9 @@ function startFlyer(row, stripColor){
       const farEdge  = sideOf(wd.x)==="L" ? 50+h+0.5 : 50-h-3;
       await wWalk(nearEdge, CROSS_Y, vel);
       const mustStop = traffic();
-      if(mustStop){ lampRed(); await sleepB(900); }
+      if(mustStop && !hwActive()){ lampRed(); await sleepB(900); } /* Halloween: vans don't stop, but he dashes across safely */
       await wWalk(farEdge, CROSS_Y, vel);
-      if(mustStop) lampGreen();
+      if(mustStop && !hwActive()) lampGreen();
     }
     return wWalk(tx,ty,vel);
   }
@@ -2124,7 +2918,7 @@ function startFlyer(row, stripColor){
      catch him at a random moment, shake him silly, launch him like a ragdoll,
      and the chase is on again */
   async function chaseWaldo(){
-    if(!wd || wVisiting || wInside || bearOnBike) return; /* busy elsewhere */
+    if(!wd || wBusy || wVisiting || wInside || bearOnBike) return; /* busy elsewhere (maybe with Chuck) */
     chaseMode=true; wBusy=true;
     const w=wd.el;
     const tripAt=Date.now()+rnd(8000,16000);  /* Waldo slips at a random moment — that's the catch */
@@ -2173,7 +2967,7 @@ function startFlyer(row, stripColor){
         continue;
       }
       if(!bearVisited && Math.random()<.3){ await bearVisit(); continue; } /* clocking in */
-      if(pBike && wInside && !bearOnBike && Math.random()<.5){ await stealBike(); continue; } /* an unattended bike?! */
+      if(pBike && wInside && !bearOnBike && !document.body.classList.contains("theme-halloween") && Math.random()<.5){ await stealBike(); continue; } /* an unattended bike?! (not in Halloween — he leaves the scooter alone) */
       const r=Math.random();
       if(r<.30)      await chaseWaldo();      /* spots Waldo — the chase is ON */
       else if(r<.62) await raidVan(sideOf(x));/* another lunch box bites the dust */
@@ -2193,7 +2987,7 @@ function startFlyer(row, stripColor){
      refresh he parks it, opens the Fusion front door, and puts in a desk shift */
   function wSpawn(){
     const w=document.createElement("div");
-    w.className="waldo biking running"; w.innerHTML=waldoBikeSVG();
+    w.className = hwActive() ? "waldo running" : "waldo biking running"; w.innerHTML=waldoRideSVG();
     w.style.zIndex="1";
     scene.appendChild(w);
     wd={el:w, x:60+Math.random()*30, y:56+Math.random()*22, flip:false};
@@ -2220,10 +3014,12 @@ function startFlyer(row, stripColor){
     const bikeY=62 - 4100/H;
     await wTravel(doorX, 80, 2.8);              /* ride to the foot of the sidewalk */
     await wWalk(doorX, midY, 2.2);              /* pedal halfway up it... */
-    pBike=document.createElement("div");        /* ...bike stays right there (bears take note) */
-    pBike.className="parkedBike"; pBike.innerHTML=bikeOnlySVG();
-    pBike.style.left=(wd.x-0.4)+"%"; pBike.style.top=(wd.y+0.8)+"%";
-    scene.appendChild(pBike);
+    if(!hwActive()){
+      pBike=document.createElement("div");        /* ...bike stays right there (bears take note) */
+      pBike.className="parkedBike"; pBike.innerHTML=parkedRideSVG();
+      pBike.style.left=(wd.x-0.4)+"%"; pBike.style.top=(wd.y+0.8)+"%";
+      scene.appendChild(pBike);
+    }
     wd.el.classList.remove("biking"); wd.el.innerHTML=waldoRearSVG(); /* walking AWAY from us */
     await wWalk(doorX, walkY, 1.5);             /* up the sidewalk, seen from behind */
     const door=document.getElementById("fusionDoor"), way=document.getElementById("fusionDoorway");
@@ -2250,7 +3046,7 @@ function startFlyer(row, stripColor){
     if(pBike){                                  /* bike still where he left it? */
       await wWalk(parseFloat(pBike.style.left)+0.4, parseFloat(pBike.style.top)-0.8, 1.5);
       pBike.remove(); pBike=null;
-      wd.el.classList.add("biking"); wd.el.innerHTML=waldoBikeSVG();
+      wd.el.classList.add("biking"); wd.el.innerHTML=waldoRideSVG();
     } else if(bearOnBike){                      /* the BEAR took it — GET HIM */
       while(bearOnBike){
         const cy=Math.min(Math.max(y,CH_LO),CH_HI);
@@ -2261,10 +3057,12 @@ function startFlyer(row, stripColor){
     /* ...and heads straight HOME — long day */
     await wTravel(homeX, 78, 2.8);              /* across town (crosswalk, naturally) */
     await wWalk(homeX, bikeY+1.2, 2.0);         /* rolls right up to the house */
-    pBike=document.createElement("div");        /* bike left at the HOME front door */
-    pBike.className="parkedBike"; pBike.innerHTML=bikeOnlySVG();
-    pBike.style.left=(homeX-2.6)+"%"; pBike.style.top=(bikeY+1.2)+"%";
-    scene.appendChild(pBike);
+    if(!hwActive()){
+      pBike=document.createElement("div");        /* bike left at the HOME front door */
+      pBike.className="parkedBike"; pBike.innerHTML=parkedRideSVG();
+      pBike.style.left=(homeX-2.6)+"%"; pBike.style.top=(bikeY+1.2)+"%";
+      scene.appendChild(pBike);
+    }
     wd.el.classList.remove("biking"); wd.el.innerHTML=waldoRearSVG(); /* rear view up to the door */
     await wWalk(homeX, walkY, 1.5);             /* one step up to the door */
     await sleepB(500);
@@ -2280,7 +3078,7 @@ function startFlyer(row, stripColor){
     if(pBike){
       await wWalk(parseFloat(pBike.style.left)+0.4, parseFloat(pBike.style.top), 1.5);
       pBike.remove(); pBike=null;
-      wd.el.classList.add("biking"); wd.el.innerHTML=waldoBikeSVG();
+      wd.el.classList.add("biking"); wd.el.innerHTML=waldoRideSVG();
     } else if(bearOnBike){                      /* stolen AGAIN?! */
       while(bearOnBike){
         const cy=Math.min(Math.max(y,CH_LO),CH_HI);
@@ -2299,8 +3097,9 @@ function startFlyer(row, stripColor){
   const bearSideHTML=bear.innerHTML;
   function dropBike(){
     bear.classList.remove("onbike"); bear.innerHTML=bearSideHTML; bearOnBike=false;
+    if(hwActive()) return;               /* no bike/scooter ever exists in Halloween */
     pBike=document.createElement("div");
-    pBike.className="parkedBike"; pBike.innerHTML=bikeOnlySVG();
+    pBike.className="parkedBike"; pBike.innerHTML=parkedRideSVG();
     pBike.style.left=(x+1)+"%"; pBike.style.top=(y+1)+"%";
     scene.appendChild(pBike);
   }
@@ -2308,7 +3107,7 @@ function startFlyer(row, stripColor){
     if(!pBike) return;
     await wWalk(parseFloat(pBike.style.left)+0.3, parseFloat(pBike.style.top)-0.6, vel||3);
     pBike.remove(); pBike=null;
-    wd.el.classList.add("biking"); wd.el.innerHTML=waldoBikeSVG();
+    wd.el.classList.add("biking"); wd.el.innerHTML=waldoRideSVG();
   }
   /* the tables turned: bear pedals for his life, Waldo chases on foot */
   async function reverseChase(ms){
@@ -2482,7 +3281,23 @@ function startFlyer(row, stripColor){
     release:()=>{ hit=false; fighting=false; },
     walk:fWalk,
     face:d=>{ flip=d; setT(); },
+    jump:(tx,ty)=>{ bear.style.transition="none"; x=tx; y=ty; bear.style.left=x+"%"; bear.style.top=y+"%"; setT(); void bear.offsetWidth; },
     cls:bear.classList
+  };
+  /* Waldo controls for Chuck — bull rides and bike "borrowing" */
+  window.__waldo={
+    d:()=>wd,
+    free:()=>!waldoOff() && wd && !wBusy && !wVisiting && !wInside && wd.el.style.display!=="none",
+    grab:()=>{ if(!window.__waldo.free()) return false; wBusy=true; return true; },
+    release:()=>{ wBusy=false; },
+    jump:(tx,ty)=>{ wd.x=tx; wd.y=ty; wJump(); },
+    walk:wWalk,
+    biking:()=>!!wd && wd.el.classList.contains("biking"),
+    dismount:()=>{ wd.el.classList.remove("biking"); wd.el.innerHTML=waldoSVG(); },
+    mount:()=>{ wd.el.classList.add("biking"); wd.el.innerHTML=waldoRideSVG(); },
+    parkedBike:()=>pBike,
+    takeParked:()=>{ if(!pBike) return null; const p={x:parseFloat(pBike.style.left),y:parseFloat(pBike.style.top)}; pBike.remove(); pBike=null; return p; },
+    dropBikeAt:(px,py)=>{ if(pBike) return; pBike=document.createElement("div"); pBike.className="parkedBike"; pBike.innerHTML=parkedRideSVG(); pBike.style.left=px+"%"; pBike.style.top=py+"%"; scene.appendChild(pBike); }
   };
   /* shared crosswalk controls — Chuck has to use the crosswalk too now */
   window.__xwalk={ red:lampRed, green:lampGreen, traffic:traffic, Y:CROSS_Y };
@@ -2518,6 +3333,15 @@ function startFlyer(row, stripColor){
     ch.style.left=x+"%"; ch.style.top=y+"%"; setT();
     await zz(dur*1000);
   }
+  /* like walkRaw, but keeps whatever direction he's already facing — moonwalk physics */
+  async function moonRaw(tx,ty,vel){
+    ch.style.transition="none"; setT(); void ch.offsetWidth;
+    const dur=Math.max(.9, Math.hypot(tx-x,(ty-y)*1.2)/(vel||1.6));
+    x=tx; y=ty;
+    ch.style.transition="left "+dur+"s linear, top "+dur+"s linear, transform "+dur+"s linear";
+    ch.style.left=x+"%"; ch.style.top=y+"%"; setT();
+    await zz(dur*1000);
+  }
   /* even Chuck Norris uses the crosswalk now (per management). the road appreciates it */
   const sideOfC=v=>v<50?"L":"R";
   let crossingC=false;
@@ -2531,10 +3355,28 @@ function startFlyer(row, stripColor){
         const farEdge  = sideOfC(x)==="L" ? 50+h+0.5 : 50-h-4.5;
         await walkRaw(nearEdge, CY, vel);   /* strolls to the stripes */
         await zz(400);                      /* looks both ways. begrudgingly */
+        const mj=!ch.classList.contains("onbike") && !document.body.classList.contains("theme-halloween");  /* no moonwalking a bicycle — or on Halloween, where he's got other problems */
+        if(mj){
+          ch.classList.add("gloved");       /* the white glove goes ON */
+          await zz(600);
+          ch.classList.remove("running"); ch.classList.add("spinKick");  /* spinning jump kick */
+          await zz(1150);
+          ch.classList.remove("spinKick");
+        }
         const mustStop=XW.traffic();
-        if(mustStop){ XW.red(); await zz(1200); } /* flashing red — vans queue at the line */
-        await walkRaw(farEdge, CY, vel);    /* crosses ON the stripes */
-        if(mustStop) XW.green();
+        const hwNoStop = document.body.classList.contains("theme-halloween");
+        if(mustStop && !hwNoStop){ XW.red(); await zz(1200); } /* flashing red — vans queue at the line */
+        /* Halloween: vans don't stop, but he dashes across safely — nobody gets hit anymore */
+        if(mj){
+          /* moonwalks across — backwards, boots never leave the asphalt. smooth. */
+          ch.classList.add("moonwalking");
+          flip = farEdge > x;               /* faces AWAY from where he's headed */
+          await moonRaw(farEdge, CY, 1.6);
+          ch.classList.remove("moonwalking","gloved"); ch.classList.add("running");
+        } else {
+          await walkRaw(farEdge, CY, vel);  /* crosses ON the stripes */
+        }
+        if(mustStop && !hwNoStop) XW.green();
       } finally{ crossingC=false; }
     }
     return walkRaw(tx,ty,vel);
@@ -2684,9 +3526,9 @@ function startFlyer(row, stripColor){
     }, 2300);
     return true;
   }
-  /* ---- CROSS PATHS WITH THE BEAR? IT'S ON. ----
-     spinning jump kicks vs. grizzly haymakers. Chuck wins (obviously), claims
-     his prize with a 5-second victory ride, and gets bucked into next week */
+  /* ---- CROSS PATHS WITH THE BEAR? RODEO TIME. ----
+     the bear climbs on and rides Chuck like a bull. He hangs on a full
+     8 seconds of bucking — then gets launched clean OFF the screen */
   let nextFight=0;
   async function bearFight(){
     const B=window.__bearFight;
@@ -2700,95 +3542,364 @@ function startFlyer(row, stripColor){
     const cy=Math.min(Math.max((bp.y+y)/2,46),84);
     const mx=Math.min(Math.max((bp.x+x)/2,8),90);
     const chuckLeft=x<=bp.x;
-    await Promise.all([ walkRaw(chuckLeft?mx-4:mx+3.5, cy, 3.4), B.walk(chuckLeft?mx+3.5:mx-4, cy-0.4, 3.4) ]); /* brawl choreography — no crosswalk detours mid-fight */
+    await Promise.all([ walkRaw(chuckLeft?mx-4:mx+3.5, cy, 3.4), B.walk(chuckLeft?mx+3.5:mx-4, cy-0.4, 3.4) ]);
     flip=!chuckLeft; setT(); B.face(chuckLeft);
-    let b=bub("YOU WANT SOME?!"); await zz(1000); b.remove();
+    let b=bub("EIGHT SECONDS. GO."); await zz(1000); b.remove();
     if(!inTheme()){ ch.style.zIndex=""; B.el.style.zIndex=""; B.release(); return true; }
-    /* the brawl: flying passes straight through each other, all feet and fur */
-    ch.classList.remove("running"); ch.classList.add("fightSpin","fighting");
-    B.cls.add("brawl");
-    const yells=["POW!","WHA-CHA!","BAM!"];
-    for(let i=0;i<3;i++){
-      b=bub(yells[i]);
-      const cx0=x, bx0=B.pos().x;
-      await Promise.all([ walkRaw(bx0, cy+rnd(-1.5,1.5), 7), B.walk(cx0, cy+rnd(-1.5,1.5), 7) ]);
-      b.remove();
-    }
-    /* the finisher */
-    ch.classList.remove("fightSpin");
-    flip = B.pos().x < x; setT();
-    b=bub("HI-YAAAA!");
-    await zz(600);
-    B.cls.remove("brawl");
-    const bsvg=B.el.querySelector("svg");
-    bsvg.style.transition="transform .5s ease"; bsvg.style.transform="rotate(100deg)"; /* down goes the bear */
-    await zz(1400); b.remove();
-    bsvg.style.transform=""; setTimeout(function(){ bsvg.style.transition=""; },600);
-    ch.classList.remove("fighting");
-    await zz(650);
-    /* victory lap: Chuck rides the bear. the bear files a complaint. */
-    ch.style.display="none";
+    /* the bear climbs aboard. Chuck drops to ALL FOURS — he IS the bull now */
+    const bearHTML=B.el.innerHTML;
+    B.el.style.display="none";
+    ch.innerHTML=chuckBullSVG();
+    ch.classList.remove("running"); ch.classList.add("bucking","bull");
     const rider=document.createElement("div");
-    rider.className="bearRider chuckRider"; rider.innerHTML=chuckSVG();
-    B.el.appendChild(rider);
-    B.cls.add("bucking");
+    rider.className="bearRider onChuck"; rider.innerHTML=bearHTML;
+    ch.appendChild(rider);
     const t0=Date.now();
-    while(Date.now()-t0<5000){                    /* five glorious seconds */
-      const p0=B.pos();
-      await B.walk(Math.min(Math.max(p0.x+rnd(-11,11),6),92), Math.min(Math.max(p0.y+rnd(-4,4),48),84), 4);
+    while(Date.now()-t0<8000){                    /* a full 8-second qualified ride */
+      const ty=Math.min(Math.max(y+rnd(-5,5),46),84);
+      await walkRaw(offRoad(Math.min(Math.max(x+rnd(-12,12),5),92),ty), ty, 4.5);
     }
-    B.cls.remove("bucking"); rider.remove();      /* BUCKED. */
-    const p=B.pos();
-    x=p.x; y=p.y;
-    ch.style.display=""; ch.style.transition="none";
-    ch.style.left=x+"%"; ch.style.top=y+"%"; setT(); void ch.offsetWidth;
-    ch.classList.remove("running"); ch.classList.add("ragdoll");
-    const dir=Math.random()<.5?-1:1;              /* launched a good ways, two-phase arc */
-    const ly=Math.min(Math.max(y+rnd(-2,4),46),84);
-    const lx=offRoad(Math.min(Math.max(x+dir*rnd(14,20),4),92), ly);
-    ch.style.transition="left .55s linear, top .55s cubic-bezier(.3,.8,.55,1)";
-    x=(x+lx)/2; y=ly-15; ch.style.left=x+"%"; ch.style.top=y+"%";
-    await zz(550);
-    ch.style.transition="left .55s linear, top .55s cubic-bezier(.5,0,.8,.4)";
-    x=lx; y=ly; ch.style.left=x+"%"; ch.style.top=y+"%";
-    await zz(600);
-    ch.classList.remove("ragdoll");
-    const csvg=ch.querySelector("svg");
-    csvg.style.transition="transform .4s"; csvg.style.transform="rotate(96deg)"; /* seeing stars */
-    b=bub("...NICE BEAR.");
-    await zz(1600); b.remove();
-    csvg.style.transform=""; setTimeout(function(){ csvg.style.transition=""; },500);
-    ch.classList.add("running");
-    ch.style.zIndex=""; B.el.style.zIndex="";
-    B.release();                                  /* the bear storms off to file that complaint */
+    ch.classList.remove("bucking","bull"); rider.remove(); /* BUZZER — BUCKED! */
+    ch.innerHTML=chuckSVG(); ch.classList.add("running");  /* back on two feet */
+    const flyRight = x<50, edge = flyRight?112:-14;
+    B.jump(x+(flyRight?2:-2), y-2);
+    B.el.style.display="";
+    B.el.classList.add("ragdoll");                /* two-phase arc, clean off the screen */
+    B.el.style.transition="left .9s linear, top .9s cubic-bezier(.3,.8,.55,1)";
+    B.el.style.left=((x+edge)/2)+"%"; B.el.style.top="22%";
+    b=bub("THAT'S EIGHT!");
+    await zz(900);
+    B.el.style.transition="left .9s linear, top .9s cubic-bezier(.5,0,.8,.4)";
+    B.el.style.left=edge+"%"; B.el.style.top="66%";
+    await zz(1000); b.remove();
+    B.el.classList.remove("ragdoll");
+    B.jump(flyRight?106:-6, 62);                  /* ...and pads back in from the far side */
+    ch.style.zIndex="";
+    const rx=flyRight?rnd(70,92):rnd(6,28);
+    B.walk(offRoad(rx,64), 64, 2.4).then(function(){ B.el.style.zIndex=""; B.release(); });
+    await zz(300);
     return true;
   }
-  /* ---- Chuck's day: he only exists in the 🤠 Chuck Norris theme. Every time
-     the theme comes on he opens with a guaranteed rampage, then freelances ---- */
+  /* ---- WALDO WANTS A TURN — he lasts exactly half as long ---- */
+  let nextWRodeo=0;
+  async function waldoRodeo(){
+    const WD=window.__waldo;
+    if(!WD || Date.now()<nextWRodeo) return false;
+    const w=WD.d();
+    if(!w || !WD.free()) return false;
+    if(Math.abs(w.x-x)>14 || Math.abs(w.y-y)>11) return false; /* not close enough yet */
+    if(!WD.grab()) return false;
+    nextWRodeo=Date.now()+90000;
+    ch.style.zIndex="6";
+    await walkRaw(offRoad(Math.min(Math.max(w.x+(w.x<x?3:-3),4),93), Math.min(Math.max(w.y,46),84)), Math.min(Math.max(w.y,46),84), 3.2);
+    let b=bub("FOUR SECONDS, KID."); await zz(900); b.remove();
+    w.el.style.display="none";                    /* Waldo climbs on. bold. */
+    ch.innerHTML=chuckBullSVG();                  /* Chuck drops to all fours — full bull */
+    ch.classList.remove("running"); ch.classList.add("bucking","bull");
+    const rider=document.createElement("div");
+    rider.className="bearRider"; rider.innerHTML=waldoSVG();
+    ch.appendChild(rider);
+    const t0=Date.now();
+    while(Date.now()-t0<4000){                    /* four seconds. tops. */
+      const ty=Math.min(Math.max(y+rnd(-5,5),46),84);
+      await walkRaw(offRoad(Math.min(Math.max(x+rnd(-10,10),5),92),ty), ty, 4.5);
+    }
+    ch.classList.remove("bucking","bull"); rider.remove(); /* BUCKED at four on the dot */
+    ch.innerHTML=chuckSVG(); ch.classList.add("running");  /* back on two feet */
+    const flyRight = x<50, edge = flyRight?110:-12;
+    WD.jump(x+(flyRight?1.5:-1.5), y-2);
+    w.el.style.display="";
+    w.el.classList.add("ragdoll");                /* off the screen he goes */
+    const zK=w.el.style.zIndex; w.el.style.zIndex="6";
+    w.el.style.transition="left .8s linear, top .8s cubic-bezier(.3,.8,.55,1)";
+    w.x=(x+edge)/2; w.y=24; w.el.style.left=w.x+"%"; w.el.style.top=w.y+"%";
+    await zz(800);
+    w.el.style.transition="left .8s linear, top .8s cubic-bezier(.5,0,.8,.4)";
+    w.x=edge; w.y=64; w.el.style.left=w.x+"%"; w.el.style.top=w.y+"%";
+    await zz(900);
+    w.el.classList.remove("ragdoll"); w.el.style.zIndex=zK;
+    WD.jump(flyRight?-6:106, 62);                 /* back in from the OTHER side */
+    ch.style.zIndex="";
+    WD.release();
+    return true;
+  }
+  /* ---- CHUCK TAKES THE BIKE. it's his bike now. WHEELIES. ---- */
+  let nextRide=0;
+  async function bikeRide(){
+    const WD=window.__waldo;
+    if(!WD || Date.now()<nextRide) return false;
+    let src=null, home=null;
+    const pk=WD.parkedBike();
+    if(pk){ src="parked"; home={x:parseFloat(pk.style.left), y:parseFloat(pk.style.top)}; }
+    else if(WD.biking() && WD.free()) src="waldo";
+    if(!src) return false;
+    nextRide=Date.now()+70000;
+    if(src==="parked"){
+      await walkTo(Math.min(Math.max(home.x+1.2,2),95), Math.max(home.y-1,44), 2.8);
+      if(!WD.takeParked()) return false;          /* the bear beat him to it */
+    } else {
+      if(!WD.grab()) return false;
+      const w=WD.d();
+      await walkRaw(offRoad(Math.min(Math.max(w.x+(w.x<x?3:-3),4),93), Math.min(Math.max(w.y,46),84)), Math.min(Math.max(w.y,46),84), 3.2);
+      let b0=bub("NICE BIKE."); await zz(900); b0.remove();
+      WD.dismount();                              /* Waldo hands it over. wisely. */
+    }
+    ch.classList.remove("running"); ch.classList.add("onbike");
+    ch.innerHTML=chuckBikeSVG();
+    let riding=true;
+    (async()=>{ while(riding){ await zz(rnd(1100,2400)); if(!riding) break; /* pops a wheelie every few seconds */
+        ch.classList.add("wheelie"); await zz(rnd(900,1500)); ch.classList.remove("wheelie"); } })();
+    const b=bub("WHEELIE TIME."); setTimeout(function(){ b.remove(); }, 1600);
+    const t0=Date.now();
+    while(Date.now()-t0<14000 && inTheme()){      /* tears around the whole scene */
+      const ty=rnd(46,84);
+      await walkTo(offRoad(rnd(5,92),ty), ty, 3.6);
+    }
+    riding=false; ch.classList.remove("onbike","wheelie");
+    /* gives it back — Chuck's not a thief. mostly. */
+    if(src==="parked"){
+      await walkTo(Math.min(Math.max(home.x+1.2,2),95), Math.max(home.y-1,44), 3.2);
+      ch.innerHTML=chuckSVG(); ch.classList.add("running");
+      WD.dropBikeAt(home.x, home.y);
+    } else {
+      const w=WD.d();
+      await walkTo(offRoad(Math.min(Math.max(w.x+(w.x<x?3:-3),4),93), Math.min(Math.max(w.y,46),84)), Math.min(Math.max(w.y,46),84), 3.2);
+      ch.innerHTML=chuckSVG(); ch.classList.add("running");
+      WD.mount(); WD.release();
+    }
+    await zz(300);
+    return true;
+  }
+  /* ---- LOW COUNTRY BOIL MASTER — stirs the pot, wrestles the crab in, eats a raw pepper cold ---- */
+  async function stirPot(){
+    const pot=document.getElementById("boilPot");
+    if(!pot) return false;
+    const p=pctOf(pot); if(!p.w) return false;
+    await walkTo(Math.min(Math.max(p.x-4.5,2),95), Math.min(Math.max(p.y-2,42),86));
+    flip = p.x < x; setT();
+    ch.style.zIndex="4";
+    const b=bub("STIR IT. DON'T HURT IT.");
+    ch.classList.add("chopping"); ch.classList.remove("running");
+    pot.classList.add("roiling");
+    await zz(2400);
+    ch.classList.remove("chopping"); ch.classList.add("running"); b.remove();
+    pot.classList.remove("roiling");
+    ch.style.zIndex="";
+    await zz(300);
+    return true;
+  }
+  let nextCrabFight=0;
+  async function wrestleCrab(){
+    if(Date.now()<nextCrabFight) return false;
+    const pot=document.getElementById("boilPot");
+    if(!pot) return false;
+    const pp=pctOf(pot); if(!pp.w) return false;
+    nextCrabFight=Date.now()+45000;
+    const side = pp.x>50?-1:1;
+    const cx=Math.min(Math.max(pp.x+side*11,3),95), cy=Math.min(Math.max(pp.y+3,44),86);
+    const crab=document.createElement("div");
+    crab.className="crab"; crab.innerHTML=crabSVG();
+    crab.style.left=cx+"%"; crab.style.top=cy+"%";
+    scene.appendChild(crab);
+    await walkTo(Math.min(Math.max(cx+(side>0?-3.8:3.8),2),95), cy);
+    flip = cx < x; setT();
+    ch.style.zIndex="5"; crab.style.zIndex="5";
+    let b=bub("OW! RUDE.");
+    ch.classList.add("frenzy"); ch.classList.remove("running");
+    crab.classList.add("pinching");
+    await zz(1500); b.remove();
+    b=bub("ALL RIGHT THEN."); await zz(900); b.remove();
+    ch.classList.remove("frenzy"); ch.classList.add("chopping");
+    await zz(1000);
+    ch.classList.remove("chopping"); ch.classList.add("running");
+    crab.classList.remove("pinching");
+    const potCx=pp.x, potCy=pp.y-6;
+    crab.style.transition="left .55s linear, top .55s cubic-bezier(.3,.8,.55,1), transform .55s linear";
+    crab.style.left=potCx+"%"; crab.style.top=potCy+"%"; crab.style.transform="rotate("+(side*300)+"deg) scale(.7)";
+    b=bub("IN YOU GO!");
+    await zz(600);
+    pot.classList.add("roiling");
+    await zz(250);
+    crab.remove(); b.remove();
+    ch.style.zIndex="";
+    setTimeout(()=>pot.classList.remove("roiling"),1200);
+    await zz(300);
+    return true;
+  }
+  async function pepperChallenge(){
+    const table=document.getElementById("lcbTable");
+    const p = table ? pctOf(table) : null;
+    const tx = p&&p.w ? Math.min(Math.max(p.x+2.5,3),95) : rnd(20,32);
+    const ty = p&&p.w ? Math.min(Math.max(p.y-3,44),86) : 62;
+    await walkTo(tx, ty);
+    flip = Math.random()<.5; setT();
+    ch.style.zIndex="4";
+    let b=bub("PASS THE PEPPERS."); await zz(900); b.remove();
+    b=bub("MEDIUM.");
+    smokeOn(ch);
+    await zz(1600); b.remove();
+    ch.style.zIndex="";
+    await zz(300);
+    return true;
+  }
+  /* ---- MAD SCIENTIST — throws the switch, wrestles the creature onto the slab, samples a potion ---- */
+  async function sparkSlab(){
+    const slab=document.getElementById("labSlab");
+    if(!slab) return false;
+    const p=pctOf(slab); if(!p.w) return false;
+    await walkTo(Math.min(Math.max(p.x-5,2),95), Math.min(Math.max(p.y-2,42),86));
+    flip = p.x < x; setT();
+    ch.style.zIndex="4";
+    const b=bub("THROW THE SWITCH!");
+    ch.classList.add("chopping"); ch.classList.remove("running");
+    slab.classList.add("charged");
+    await zz(1800);
+    ch.classList.remove("chopping"); ch.classList.add("running"); b.remove();
+    slab.classList.remove("charged");
+    ch.style.zIndex="";
+    await zz(300);
+    return true;
+  }
+  let nextMonsterFight=0;
+  async function wrestleMonster(){
+    if(Date.now()<nextMonsterFight) return false;
+    const slab=document.getElementById("labSlab");
+    if(!slab) return false;
+    const sp=pctOf(slab); if(!sp.w) return false;
+    nextMonsterFight=Date.now()+45000;
+    const side = sp.x>50?-1:1;
+    const mx=Math.min(Math.max(sp.x+side*12,3),95), my=Math.min(Math.max(sp.y+2,44),86);
+    const mon=document.createElement("div");
+    mon.className="monster"; mon.innerHTML=monsterSVG();
+    mon.style.left=mx+"%"; mon.style.top=my+"%";
+    scene.appendChild(mon);
+    await walkTo(Math.min(Math.max(mx+(side>0?-4:4),2),95), my);
+    flip = mx < x; setT();
+    ch.style.zIndex="5"; mon.style.zIndex="5";
+    let b=bub("HOLD STILL.");
+    ch.classList.add("frenzy"); ch.classList.remove("running");
+    mon.classList.add("struggling");
+    await zz(1500); b.remove();
+    b=bub("UP ON THE SLAB."); await zz(900); b.remove();
+    ch.classList.remove("frenzy"); ch.classList.add("chopping");
+    await zz(1000);
+    ch.classList.remove("chopping"); ch.classList.add("running");
+    mon.classList.remove("struggling");
+    const slabCx=sp.x, slabCy=sp.y-5;
+    mon.style.transition="left .55s linear, top .55s cubic-bezier(.3,.8,.55,1), transform .55s linear";
+    mon.style.left=slabCx+"%"; mon.style.top=slabCy+"%"; mon.style.transform="rotate("+(side*140)+"deg) scale(.85)";
+    b=bub("IT'S ALIVE!");
+    await zz(600);
+    slab.classList.add("charged");
+    await zz(900);
+    mon.remove(); b.remove();
+    ch.style.zIndex="";
+    setTimeout(()=>slab.classList.remove("charged"),900);
+    await zz(300);
+    return true;
+  }
+  async function mixPotion(){
+    const beaker=document.getElementById("labBeaker");
+    const p = beaker ? pctOf(beaker) : null;
+    const tx = p&&p.w ? Math.min(Math.max(p.x+2,3),95) : rnd(30,42);
+    const ty = p&&p.w ? Math.min(Math.max(p.y-3,44),86) : 62;
+    await walkTo(tx, ty);
+    flip = Math.random()<.5; setT();
+    ch.style.zIndex="4";
+    let b=bub("BOTTOMS UP."); await zz(900); b.remove();
+    b=bub("ROOM-TEMPERATURE SUPERCONDUCTOR, PROBABLY.");
+    smokeOn(ch);
+    await zz(1700); b.remove();
+    ch.style.zIndex="";
+    await zz(300);
+    return true;
+  }
+  /* ---- HALLOWEEN: opens the van door and makes off with an overflowing basket of candy (electrocution now comes from the lightning, not this) ---- */
+  async function raidCandy(){
+    const vans=lotVans();
+    if(!vans.length) return false;
+    const v=vans[Math.floor(Math.random()*vans.length)];
+    const p=pctOf(v); if(!p.w) return false;
+    const fromRight = p.x>50;
+    await walkTo(Math.min(Math.max(p.x+(fromRight?3.2:-3.2),2),95), Math.min(Math.max(p.y-5,44),86));
+    flip = p.x < x; setT();
+    ch.style.zIndex="4";
+    const door=document.createElement("div"); door.className="vanDoor";
+    v.appendChild(door);
+    let b=bub("LET'S SEE WHAT'S IN HERE.");
+    await zz(500); b.remove();
+    door.classList.add("open");
+    await zz(650);
+    b=bub("JACKPOT!");
+    const basket=document.createElement("div"); basket.className="candyBasket";
+    basket.innerHTML='<div class="basket">🧺</div><div class="spill">🍬🍭🎃</div>';
+    ch.appendChild(basket);
+    await zz(1800); b.remove();
+    basket.remove();
+    door.classList.remove("open");
+    await zz(500);
+    door.remove();
+    ch.style.zIndex="";
+    await zz(300);
+    return true;
+  }
+  /* ---- Chuck's day: he only exists in the 🤠 Chuck Norris (western rampage),
+     🦐 Low Country Boil (boil-master), OR 🎃 Halloween (green Frankenstein) themes.
+     Every time one comes on he opens with a guaranteed routine, then freelances
+     until the theme changes ---- */
   const inTheme=()=>document.body.classList.contains("theme-chuck");
+  const inBoil=()=>document.body.classList.contains("theme-lowcountry");
+  const inLab=()=>document.body.classList.contains("theme-halloween");
+  const activeMode=()=>inTheme()?"western":(inBoil()?"boil":(inLab()?"lab":null));
   async function loop(){
     await zz(3000);
-    let opened=false;
+    let mode=null;
     while(true){
-      if(!inTheme()){ opened=false; await zz(700); continue; } /* off duty — waits behind the theme button */
-      if(!opened){       /* fresh theme switch: ride in from the edge, then rampage */
-        opened=true;
+      const m=activeMode();
+      if(!m){ mode=null; await zz(700); continue; } /* off duty — waits behind the theme button */
+      if(mode!==m){       /* fresh theme switch (or swap between any of the three): ride in, then open routine */
+        mode=m;
         ch.style.transition="none"; x=94; y=58; flip=true;
+        ch.classList.remove("bull","onbike","wheelie","bucking","chopping","frenzy","aiming");
+        ch.innerHTML = m==="boil" ? chuckBoilSVG() : (m==="lab" ? chuckLabSVG() : chuckSVG());
+        ch.classList.add("running");
         ch.style.left=x+"%"; ch.style.top=y+"%"; setT(); void ch.offsetWidth;
-        await chopTree();  if(!inTheme()) continue;
-        await smashVan();  if(!inTheme()) continue;
-        await crumpleVan();
+        if(m==="western"){
+          await chopTree();  if(activeMode()!==m) continue;
+          await smashVan();  if(activeMode()!==m) continue;
+          await crumpleVan(); if(activeMode()!==m) continue;
+          await bikeRide();  /* opening set closes with a wheelie show, bike permitting */
+        } else if(m==="boil"){
+          await stirPot();      if(activeMode()!==m) continue;
+          await wrestleCrab();  if(activeMode()!==m) continue;
+          await pepperChallenge();
+        } else {
+          await raidCandy();
+        }
         continue;
       }
       await zz(rnd(400,1200));
-      if(!inTheme()) continue;
-      if(await shootBird()) continue;  /* the bird takes priority the moment it appears */
-      if(await bearFight()) continue;  /* crossed paths with the bear — FIGHT */
-      const r=Math.random();
-      if(r<.30)      await chopTree();
-      else if(r<.55) await smashVan();
-      else if(r<.72) await crumpleVan();
-      else { const ty=rnd(44,86); await walkTo(offRoad(rnd(4,92),ty), ty); }
+      if(activeMode()!==mode) continue;
+      if(mode==="western"){
+        if(await shootBird()) continue;   /* the bird takes priority the moment it appears */
+        if(await bearFight()) continue;   /* crossed paths with the bear — 8-second rodeo */
+        if(await waldoRodeo()) continue;  /* Waldo's 4-second try */
+        if(Math.random()<.5 && await bikeRide()) continue; /* bike unattended? WHEELIES */
+        const r=Math.random();
+        if(r<.30)      await chopTree();
+        else if(r<.55) await smashVan();
+        else if(r<.72) await crumpleVan();
+        else { const ty=rnd(44,86); await walkTo(offRoad(rnd(4,92),ty), ty); }
+      } else if(mode==="boil"){
+        const r=Math.random();
+        if(r<.34)      await stirPot();
+        else if(r<.62) await wrestleCrab();
+        else if(r<.82) await pepperChallenge();
+        else { const ty=rnd(44,86); await walkTo(offRoad(rnd(4,92),ty), ty); }
+      } else {
+        if(Math.random()<.75) await raidCandy();
+        else { const ty=rnd(44,86); await walkTo(offRoad(rnd(4,92),ty), ty); }
+      }
     }
   }
   loop();
@@ -3387,8 +4498,9 @@ async function main(){
         }catch(e){}
       }
     }
-    /* city/state for any van away from Fusion */
+    /* city/state for any van away from Fusion — job-site vans get the full street address */
     if (row.zone !== "fusion") row.place = await cityState(v.latitude, v.longitude);
+    if (row.zone === "job" && !v.isDriving) row.addr = await streetAddr(v.latitude, v.longitude, row.place);
     /* never left Fusion today (overnight vans / non-departures) */
     row.neverLeft = !v.isDriving && atFusion(v.latitude, v.longitude) &&
       !(tripsBy[nm]||[]).some(t=>t.lat!=null && !atFusion(t.lat,t.lon));
@@ -3560,9 +4672,9 @@ async function main(){
   const tOr = d => d ? esc(fmtET(d)) : "—";
   const nowTxtFor = r => {
     const loc = r.place ? " · " + esc(r.place) : "";
-    return r.live.isDriving ? `🚐 ${kmh2mph(r.live.speed)} mph${loc}`
+    return r.live.isDriving ? "🚐 Traveling"
       : (r.zone==="fusion" ? "🏢 Fusion"
-      : (r.zone==="home" ? `🏡 Home${loc}` : `🅿️ ${esc(r.place||"Parked")}`));
+      : (r.zone==="home" ? `🏡 Home${loc}` : `🅿️ ${esc(r.addr||r.place||"Parked")}`));
   };
   /* transposed TV layout: vans run across the top, metrics are rows; fleet split into 2 bands */
   const cells = {
